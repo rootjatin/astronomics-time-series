@@ -55,6 +55,7 @@ import math
 import os
 import shutil
 import subprocess
+import time
 import urllib.parse
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Tuple
@@ -64,6 +65,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import requests
+from requests.adapters import HTTPAdapter
+from requests.exceptions import RequestException
+from urllib3.util.retry import Retry
 from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont
 from tqdm.auto import tqdm
 
@@ -123,7 +127,11 @@ CONFIG = {
         "condition_code", "soln_date", "n_obs_used", "data_arc"
     ],
     "full_precision": True,
-    "page_limit": 5000,
+    # Smaller pages reduce the chance of one large API response timing out.
+    "page_limit": 1000,
+    "request_timeout": (20, 180),  # (connect timeout seconds, read timeout seconds)
+    "request_retries": 5,
+    "retry_backoff_s": 2.0,
 
     # Visual selection limits
     "max_objects_for_points": 2500,
@@ -145,10 +153,10 @@ CONFIG = {
     "saturation_boost": 1.06,
 
     # Text
-    "title_text": "The Kuiper Belt, Built from Real Orbits",
-    "subtitle_text": "JPL Small-Body Database • TNO orbital elements • cinematic map",
-    "credit_text": "Data: NASA/JPL Small-Body Database Query API",
-    "scientific_note": "Positions are Keplerian visual estimates from catalog orbital elements, not precision ephemerides.",
+    "title_text": "The Kuiper Belt",
+    "subtitle_text": "A frozen ring of worlds beyond Neptune",
+    "credit_text": "Data source: NASA/JPL Small-Body Database",
+    "scientific_note": "Orbital map uses catalog elements; labels and guide rings are for science communication.",
 
     # Optional audio / subtitles
     "audio_path": None,       # Example: "audio/space_ambient.mp3"
@@ -166,69 +174,54 @@ print("Configuration ready.")
 # The notebook caches the JSON and CSV locally so you can rerun video rendering without repeatedly calling the API. Delete the files in `kuiper_belt_short_output/data/` if you want a fresh query.
 
 # %%
-def request_json(url: str, params: Dict, timeout: int = 60) -> Dict:
-    response = requests.get(url, params=params, timeout=timeout)
-    response.raise_for_status()
-    payload = response.json()
+def build_retry_session(config: Dict) -> requests.Session:
+    """Create a requests session that survives temporary JPL/network slowdowns."""
+    retries = Retry(
+        total=int(config.get("request_retries", 5)),
+        connect=int(config.get("request_retries", 5)),
+        read=int(config.get("request_retries", 5)),
+        status=int(config.get("request_retries", 5)),
+        backoff_factor=float(config.get("retry_backoff_s", 2.0)),
+        status_forcelist=(429, 500, 502, 503, 504),
+        allowed_methods=frozenset(["GET"]),
+        raise_on_status=False,
+    )
+    session = requests.Session()
+    adapter = HTTPAdapter(max_retries=retries, pool_connections=4, pool_maxsize=4)
+    session.mount("https://", adapter)
+    session.mount("http://", adapter)
+    session.headers.update({
+        "User-Agent": "kuiper-belt-real-data-short/1.1 (educational visualization)"
+    })
+    return session
+
+
+def request_json(url: str, params: Dict, config: Dict, session: Optional[requests.Session] = None) -> Dict:
+    """Request JSON from JPL with explicit connect/read timeouts and clear errors."""
+    timeout = config.get("request_timeout", (20, 180))
+    session = session or build_retry_session(config)
+    try:
+        response = session.get(url, params=params, timeout=timeout)
+        response.raise_for_status()
+        payload = response.json()
+    except RequestException as exc:
+        query = urllib.parse.urlencode(params)
+        raise RuntimeError(
+            "JPL SBDB request failed after retries. This is usually a temporary network, VPN, "
+            "DNS, firewall, or JPL availability issue. Re-run the cell, reduce page_limit, "
+            "or use the cached CSV in kuiper_belt_short_output/data/.\n"
+            f"URL: {url}?{query}\nOriginal error: {exc}"
+        ) from exc
+    except ValueError as exc:
+        raise RuntimeError("JPL returned a response that was not valid JSON.") from exc
+
     if "code" in payload and str(payload.get("code")) != "200":
         raise RuntimeError(f"JPL API returned code={payload.get('code')}: {payload}")
     return payload
 
-def fetch_jpl_sbdb_tnos(config: Dict, force_refresh: bool = False) -> pd.DataFrame:
-    json_path = DATA_ROOT / "jpl_sbdb_tno_raw.json"
-    csv_path = DATA_ROOT / "jpl_sbdb_tno_clean.csv"
 
-    if csv_path.exists() and not force_refresh:
-        print(f"Using cached CSV: {csv_path}")
-        return pd.read_csv(csv_path)
-
-    fields = ",".join(config["fields"])
-    all_rows = []
-    field_names = None
-    limit = int(config["page_limit"])
-    offset = 0
-
-    while True:
-        params = {
-            "fields": fields,
-            "sb-class": config["sb_class"],
-            "sb-kind": config["sb_kind"],
-            "full-prec": "true" if config.get("full_precision", True) else "false",
-            "limit": str(limit),
-            "limit-from": str(offset),
-            "sort": "a",
-        }
-        print(f"Requesting JPL SBDB TNO rows {offset} to {offset + limit - 1} ...")
-        payload = request_json(config["jpl_api_url"], params=params)
-
-        if field_names is None:
-            field_names = payload.get("fields", config["fields"])
-
-        rows = payload.get("data", [])
-        if not rows:
-            break
-
-        all_rows.extend(rows)
-
-        # If fewer than limit rows came back, pagination is finished.
-        if len(rows) < limit:
-            break
-
-        offset += limit
-
-        # Safety stop for notebook use. Increase if needed.
-        if offset >= 30000:
-            print("Stopping at 30,000 rows for safety.")
-            break
-
-    if not all_rows:
-        raise RuntimeError("No rows returned from JPL SBDB. Check internet access or API parameters.")
-
-    raw_payload = {"fields": field_names, "data": all_rows}
-    json_path.write_text(json.dumps(raw_payload, indent=2), encoding="utf-8")
-
-    df = pd.DataFrame(all_rows, columns=field_names)
-
+def clean_jpl_dataframe(df: pd.DataFrame, csv_path: Optional[Path] = None) -> pd.DataFrame:
+    """Normalize numeric columns and keep rows useful for the orbit-map video."""
     numeric_cols = [
         "epoch", "e", "a", "q", "i", "om", "w", "ma", "per_y", "ad",
         "H", "diameter", "albedo", "n_obs_used", "data_arc"
@@ -237,17 +230,111 @@ def fetch_jpl_sbdb_tnos(config: Dict, force_refresh: bool = False) -> pd.DataFra
         if col in df.columns:
             df[col] = pd.to_numeric(df[col], errors="coerce")
 
-    # Basic physically useful filters for an orbit-map video.
+    required = ["a", "e", "i", "om", "w", "ma", "per_y"]
+    missing = [c for c in required if c not in df.columns]
+    if missing:
+        raise RuntimeError(f"JPL dataframe is missing required orbital fields: {missing}")
+
     df = df.replace([np.inf, -np.inf], np.nan)
-    df = df.dropna(subset=["a", "e", "i", "om", "w", "ma", "per_y"])
+    df = df.dropna(subset=required)
     df = df[(df["a"] > 0) & (df["e"] >= 0) & (df["e"] < 0.99) & (df["per_y"] > 0)].copy()
     df = df.sort_values(["a", "H"], na_position="last").reset_index(drop=True)
 
-    df.to_csv(csv_path, index=False)
-    print(f"Saved cleaned data: {csv_path}")
+    if csv_path is not None:
+        df.to_csv(csv_path, index=False)
+        print(f"Saved cleaned data: {csv_path}")
     print(f"Objects retained for visualisation: {len(df):,}")
-
     return df
+
+
+def dataframe_from_raw_payload(raw_payload: Dict, config: Dict) -> pd.DataFrame:
+    """Convert cached or freshly downloaded JPL rows into a dataframe."""
+    field_names = raw_payload.get("fields", config["fields"])
+    all_rows = raw_payload.get("data", [])
+    if not all_rows:
+        raise RuntimeError("No rows available in JPL payload or cache.")
+    return pd.DataFrame(all_rows, columns=field_names)
+
+
+def fetch_jpl_sbdb_tnos(config: Dict, force_refresh: bool = False) -> pd.DataFrame:
+    """
+    Download real TNO data from JPL SBDB, with a cache-first fallback.
+
+    Why this fixes the traceback:
+    - Your error was a ConnectTimeout from requests/urllib3.
+    - This version uses retries, smaller pages, and separate connect/read timeouts.
+    - If a previous real CSV or raw JSON cache exists, it uses that instead of crashing.
+    - It does not invent or synthesize fake astronomy data.
+    """
+    json_path = DATA_ROOT / "jpl_sbdb_tno_raw.json"
+    csv_path = DATA_ROOT / "jpl_sbdb_tno_clean.csv"
+
+    if csv_path.exists() and not force_refresh:
+        print(f"Using cached real JPL CSV: {csv_path}")
+        return clean_jpl_dataframe(pd.read_csv(csv_path), csv_path=None)
+
+    fields = ",".join(config["fields"])
+    all_rows = []
+    field_names = None
+    limit = int(config.get("page_limit", 1000))
+    offset = 0
+    session = build_retry_session(config)
+
+    try:
+        while True:
+            params = {
+                "fields": fields,
+                "sb-class": config["sb_class"],
+                "sb-kind": config["sb_kind"],
+                "full-prec": "true" if config.get("full_precision", True) else "false",
+                "limit": str(limit),
+                "limit-from": str(offset),
+                "sort": "a",
+            }
+            print(f"Requesting JPL SBDB TNO rows {offset} to {offset + limit - 1} ...")
+            payload = request_json(config["jpl_api_url"], params=params, config=config, session=session)
+
+            if field_names is None:
+                field_names = payload.get("fields", config["fields"])
+
+            rows = payload.get("data", [])
+            if not rows:
+                break
+
+            all_rows.extend(rows)
+            print(f"Downloaded {len(all_rows):,} rows so far.")
+
+            if len(rows) < limit:
+                break
+
+            offset += limit
+            time.sleep(0.35)  # polite pause; also helps avoid transient API throttling
+
+            # Safety stop for notebook use. Increase if needed.
+            if offset >= 30000:
+                print("Stopping at 30,000 rows for safety.")
+                break
+
+    except Exception as exc:
+        if json_path.exists() and not force_refresh:
+            print("Live JPL request failed, so using cached real JPL raw JSON instead.")
+            print(f"Reason: {exc}")
+            raw_payload = json.loads(json_path.read_text(encoding="utf-8"))
+            return clean_jpl_dataframe(dataframe_from_raw_payload(raw_payload, config), csv_path=csv_path)
+        raise
+
+    if not all_rows:
+        if json_path.exists() and not force_refresh:
+            print("No live rows returned, so using cached real JPL raw JSON instead.")
+            raw_payload = json.loads(json_path.read_text(encoding="utf-8"))
+            return clean_jpl_dataframe(dataframe_from_raw_payload(raw_payload, config), csv_path=csv_path)
+        raise RuntimeError("No rows returned from JPL SBDB. Check internet access or API parameters.")
+
+    raw_payload = {"fields": field_names, "data": all_rows}
+    json_path.write_text(json.dumps(raw_payload, indent=2), encoding="utf-8")
+    print(f"Saved raw JPL cache: {json_path}")
+    return clean_jpl_dataframe(dataframe_from_raw_payload(raw_payload, config), csv_path=csv_path)
+
 
 df = fetch_jpl_sbdb_tnos(CONFIG, force_refresh=False)
 df.head()
@@ -714,7 +801,7 @@ SHOT_PLAN = [
         "view_end": 95,
         "rotation_start": -18,
         "rotation_end": -7,
-        "caption": "Beyond Neptune: a belt of icy worlds",
+        "caption": "Beyond Neptune begins a distant icy frontier",
     },
     {
         "name": "real_catalog_reveal",
@@ -724,7 +811,7 @@ SHOT_PLAN = [
         "view_end": 72,
         "rotation_start": -7,
         "rotation_end": 8,
-        "caption": "Each dot comes from real JPL orbital data",
+        "caption": "Thousands of small icy worlds orbit the Sun here",
     },
     {
         "name": "belt_structure",
@@ -734,7 +821,7 @@ SHOT_PLAN = [
         "view_end": 58,
         "rotation_start": 8,
         "rotation_end": 25,
-        "caption": "The guide band marks the 30–50 AU Kuiper Belt region",
+        "caption": "The main belt begins near Neptune and reaches about 50 AU",
     },
     {
         "name": "new_horizons_targets",
@@ -754,17 +841,17 @@ SHOT_PLAN = [
         "view_end": 82,
         "rotation_start": 38,
         "rotation_end": 48,
-        "caption": "The glow is cinematic. The orbit data are real.",
+        "caption": "These worlds preserve clues from the young Solar System.",
     },
 ]
 
 CAPTIONS = [
-    (0.5, 5.6, "The Kuiper Belt is not one object — it is a population."),
-    (7.2, 15.8, "This video maps real Trans-Neptunian Object orbital elements."),
-    (16.0, 25.5, "Neptune marks the inner edge; the 30–50 AU band frames the classical belt."),
-    (25.7, 36.8, "Every orbit trail is drawn from semimajor axis, eccentricity, inclination, and angle elements."),
-    (37.0, 48.5, "Pluto and Arrokoth anchor the story of New Horizons exploration."),
-    (49.0, 57.4, "Colours are categories, not real surface colours. Motion is cinematic, data is real."),
+    (0.5, 5.6, "Beyond Neptune lies the Kuiper Belt: a vast ring of frozen worlds."),
+    (7.2, 15.8, "Its inner edge begins near Neptune, about 30 astronomical units from the Sun."),
+    (16.0, 25.5, "The main Kuiper Belt reaches roughly 50 AU, but some objects travel much farther."),
+    (25.7, 36.8, "Many of these icy bodies are ancient leftovers from Solar System formation."),
+    (37.0, 48.5, "Pluto and Arrokoth are Kuiper Belt worlds visited by New Horizons."),
+    (49.0, 57.4, "Their distant orbits preserve clues about how the outer Solar System formed."),
 ]
 
 def get_shot(t: float) -> Dict:
@@ -1126,51 +1213,24 @@ for path in sorted(OUTPUT_ROOT.glob("*")):
     print("-", path.name)
 
 # %% [markdown]
-# # Final explanation: what the video image represents
+# # Final narration and description: Kuiper Belt facts only
 # 
-# Use this section in your YouTube description, portfolio write-up, or voiceover.
-# 
-# ## What is real in the video?
-# 
-# The real data are the **orbital elements of Trans-Neptunian Objects** downloaded from NASA/JPL's Small-Body Database Query API.
-# 
-# Each dot represents one catalog object. Each orbit trail is computed from real elements such as semimajor axis, eccentricity, inclination, longitude of ascending node, argument of perihelion, mean anomaly, and orbital period.
-# 
-# ## What is cinematic?
-# 
-# The starfield, glow, particles, camera zoom, rotation, fade, text overlays, and vignette are editorial effects. They are added to make the short understandable and visually engaging. They do not represent new measured astronomical structure.
-# 
-# ## Why use orbits instead of telescope images?
-# 
-# For galaxies or nebulae, a telescope image is a natural visual base. For the Kuiper Belt, the scientifically meaningful story is the **population structure**: thousands of icy bodies orbiting beyond Neptune. Most of them are not resolved as detailed public images, so orbital data is a stronger real-data foundation.
-# 
-# ## What each visual element means
-# 
-# - **Central glow**: the Sun, not to scale.
-# - **Blue ring near 30 AU**: Neptune's approximate orbital distance.
-# - **Soft 30–50 AU guide band**: the approximate Kuiper Belt region used for visual context.
-# - **Thin orbit trails**: simplified two-body orbit paths from JPL catalog elements.
-# - **Moving dots**: estimated object positions from orbital elements.
-# - **Larger glowing labels**: named objects such as Pluto, Arrokoth, Eris, Makemake, Haumea, Quaoar, Sedna, Orcus, or Gonggong when they are present in the downloaded result.
-# - **Colours**: visual categories for communication, not true surface colours.
-# - **Motion**: accelerated cinematic time. It helps viewers feel the orbital structure but should not be interpreted as exact real-time motion.
+# Use this section for the YouTube description, caption, or voiceover.
+# It avoids explaining the production process and focuses on what viewers learn about the Kuiper Belt.
 # 
 # ## Suggested voiceover
 # 
-# > Beyond Neptune, the Solar System becomes a frozen archive.  
-# > This is the Kuiper Belt — not drawn from imagination, but built from real orbital data.  
-# > Every dot is a known Trans-Neptunian Object.  
-# > Every curve is an orbit shaped by distance, eccentricity, and inclination.  
-# > Pluto is here. Arrokoth is here — the far world visited by New Horizons.  
-# > The glow is cinematic. The structure is data.  
-# > This is the outer Solar System, mapped from real measurements.
+# > Beyond Neptune, sunlight is faint and the Solar System becomes a frozen frontier.  
+# > This is the Kuiper Belt: a vast ring of icy worlds orbiting far beyond the planets.  
+# > Its inner edge begins near Neptune, about 30 times farther from the Sun than Earth.  
+# > The main belt reaches roughly 50 astronomical units, but some distant objects travel far beyond that.  
+# > These bodies are ancient leftovers from the formation of the Solar System.  
+# > Pluto lives here, along with other dwarf planets and countless smaller icy objects.  
+# > Arrokoth also lives here — a small world visited by NASA's New Horizons spacecraft.  
+# > The Kuiper Belt is not empty space. It is a frozen archive of the early Solar System.
 # 
 # ## Suggested YouTube Shorts caption
 # 
-# Real Kuiper Belt data turned into a cinematic orbit map.  
-# Data source: NASA/JPL Small-Body Database Query API.  
-# Visualisation: Python, orbital elements, cinematic motion design.  
-# Note: dots and orbits are data-driven; colours and glow are presentation layers.
+# Beyond Neptune lies the Kuiper Belt — a vast ring of icy worlds, dwarf planets, and ancient leftovers from Solar System formation. Pluto and Arrokoth are part of this distant region, where objects preserve clues from the Solar System's earliest history.
 # 
-# #Astronomy #Python #DataVisualization #NASA #JPL #KuiperBelt #YouTubeShorts
-
+# #Astronomy #NASA #KuiperBelt #Pluto #Space #SolarSystem #ScienceShorts
