@@ -430,7 +430,18 @@ plt.show()
 
 fig, ax = plt.subplots(figsize=(10, 5))
 monthly_counts = event_df.set_index("event_time").resample("MS").size()
-monthly_counts.plot(kind="bar", ax=ax)
+
+# Draw the bars explicitly instead of using Series.plot(kind="bar").
+# Some pandas/Matplotlib combinations try to route a DatetimeIndex with
+# freq=<MonthBegin> through PeriodConverter, which can raise:
+# ValueError: <MonthBegin> is not supported as period frequency
+if len(monthly_counts):
+    month_labels = monthly_counts.index.strftime("%Y-%m")
+    x_positions = np.arange(len(monthly_counts))
+    ax.bar(x_positions, monthly_counts.to_numpy())
+    ax.set_xticks(x_positions)
+    ax.set_xticklabels(month_labels, rotation=45, ha="right")
+
 ax.set_title("Catalog events by month")
 ax.set_xlabel("Month")
 ax.set_ylabel("Event count")
