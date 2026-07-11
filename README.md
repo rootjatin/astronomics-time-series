@@ -6,3 +6,4 @@ Telescope : telescope data
 space_events/blackhole_gravity expained <br>
 
 kuiper belt video generation explained 
+video : https://www.youtube.com/shorts/S0I3dgtNvRg
