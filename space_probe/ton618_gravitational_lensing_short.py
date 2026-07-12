@@ -1,4 +1,3 @@
-# %% [markdown]
 # # TON 618 Gravitational Lensing — Cinematic YouTube Short
 #
 # This script creates a vertical 1080×1920 astronomy short about TON 618,
@@ -1306,7 +1305,6 @@ if __name__ == "__main__":
     main()
 
 
-# %% [markdown]
 # ## Suggested narration
 #
 # This is TON 618 — a quasar powered by one of the most massive known black-hole systems.
