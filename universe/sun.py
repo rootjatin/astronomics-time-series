@@ -10,6 +10,10 @@ This script builds a 1080x1920 (or quick-preview) video that compresses one
 full year of daily sunspot activity into a vertical astronomy short. It is
 built around the official daily total sunspot number produced by WDC-SILSO.
 
+Primary intended data source
+----------------------------
+WDC-SILSO / SIDC / Royal Observatory of Belgium:
+    https://www.sidc.be/SILSO/DATA/SN_d_tot_V2.0.csv
 
 Dataset notes from the official SILSO documentation:
 - Daily total sunspot number is available from 1818 to now.
