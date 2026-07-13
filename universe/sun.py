@@ -14,6 +14,7 @@ Primary intended data source
 ----------------------------
 WDC-SILSO / SIDC / Royal Observatory of Belgium:
     https://www.sidc.be/SILSO/DATA/SN_d_tot_V2.0.csv
+final result : https://youtube.com/shorts/LC2jbdP5Jbs
 
 Dataset notes from the official SILSO documentation:
 - Daily total sunspot number is available from 1818 to now.
