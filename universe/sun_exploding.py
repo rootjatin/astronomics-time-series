@@ -6,6 +6,11 @@
 # Reproducible fallback snapshot:
 # - Major events verified from NOAA/SWPC news posts for 2026-06-11 to 2026-07-11.
 #
+# Primary live data sources:
+# - NASA DONKI FLR API (30-day solar flare event records)
+# - NOAA SWPC GOES primary X-ray flare JSON (latest 7 days)
+#
+#
 # Scientific language:
 # - "Exploding" is a headline metaphor. The measured events are solar flares.
 # - A flare is electromagnetic radiation; a CME is expelled plasma and magnetic field.
