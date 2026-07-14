@@ -1,4 +1,3 @@
-# %% [markdown]
 # # The Sun Has Been "Exploding" All Month — Data-Driven YouTube Short
 #
 # Creates a vertical 1080x1920 cinematic solar-activity Short from real event data.
@@ -1168,7 +1167,6 @@ if __name__ == "__main__":
     main()
 
 
-# %% [markdown]
 # ## Suggested narration
 #
 # The Sun has been "exploding" all month — but that headline needs translation.
