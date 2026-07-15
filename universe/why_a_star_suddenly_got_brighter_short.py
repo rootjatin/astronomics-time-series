@@ -1,5 +1,9 @@
 # # A Star Suddenly Got Brighter — V462 Lupi Data-Driven YouTube Short
 #
+
+#Dataset : v462_lupi_published_photometry
+
+
 # Creates a vertical 1080x1920 cinematic astronomy Short about Nova V462 Lupi.
 #
 # Real published observations compiled in this renderer:
