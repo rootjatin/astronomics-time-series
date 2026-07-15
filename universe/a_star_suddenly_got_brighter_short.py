@@ -1,4 +1,3 @@
-# %% [markdown]
 # # A Star Suddenly Got Brighter — V462 Lupi Data-Driven YouTube Short
 #
 # Creates a vertical 1080x1920 cinematic astronomy Short about Nova V462 Lupi.
@@ -1226,7 +1225,6 @@ if __name__=="__main__":
     main()
 
 
-# %% [markdown]
 # ## Suggested narration
 #
 # For years, this point of light was almost invisible.
