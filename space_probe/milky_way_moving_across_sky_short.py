@@ -63,7 +63,6 @@ from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont
 from tqdm.auto import tqdm
 
 
-# %% [markdown]
 # ## Configuration
 
 OUTPUT_ROOT = Path("milky_way_moving_across_sky_short_output")
@@ -1435,7 +1434,7 @@ def main():
 if __name__ == "__main__":
     main()
 
-
+# source : https://www.youtube.com/shorts/fsY25A3cDaY
 # ## Suggested narration
 #
 # The Milky Way is moving across the sky.
