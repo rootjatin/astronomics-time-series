@@ -10,6 +10,21 @@
 # - dust-lane opacity and nebular glow,
 # - mountain silhouettes, observatory foreground, bloom, haze and HUD effects.
 #
+# Real geometry used by the renderer:
+# - Indian Astronomical Observatory, Hanle coordinates,
+# - fixed J2000/ICRS celestial coordinates,
+# - the IAU J2000 Galactic-to-equatorial rotation matrix,
+# - Greenwich/local mean sidereal time,
+# - equatorial-to-horizontal altitude/azimuth transformation,
+# - a fixed observing night from 2026-07-14 evening to 2026-07-15 pre-dawn.
+#
+# What is data-driven:
+# - the Milky Way's galactic-equator ridge,
+# - the Galactic Center position,
+# - named bright-star positions,
+# - each object's altitude and azimuth at every rendered time,
+# - the local sidereal clock and overnight track.
+
 # Scientific point:
 # The Milky Way does not physically sweep around Earth in a few hours. The
 # apparent east-to-west motion is diurnal motion caused by Earth's rotation.
