@@ -1,4 +1,3 @@
-# %% [markdown]
 # # The Milky Way Is Moving Across the Sky — Real-Sky YouTube Short
 #
 # Creates a vertical 1080x1920 cinematic astronomy Short showing the apparent
@@ -1410,7 +1409,6 @@ def render_video(scene: MilkyWaySkyScene) -> Path:
     return final_path
 
 
-# %% [markdown]
 # ## Main pipeline
 
 
@@ -1438,7 +1436,6 @@ if __name__ == "__main__":
     main()
 
 
-# %% [markdown]
 # ## Suggested narration
 #
 # The Milky Way is moving across the sky.
