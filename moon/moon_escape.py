@@ -6,6 +6,13 @@ The Moon Is Slowly "Escaping" Earth — cinematic YouTube Short renderer
 This script creates a vertical 1080×1920 astronomy short explaining the measured
 lunar recession caused by tidal interactions in the Earth–Moon system.
 
+Scientific grounding:
+- Mean Earth–Moon distance: ~384,400 km
+- Present-day lunar recession from lunar laser ranging: ~3.82 cm/year
+- Apollo-era retroreflectors allow direct ranging using laser pulses
+- The Moon is moving outward, but it is NOT currently escaping Earth's gravity
+- The recession rate is a present-day measured average and should not be
+  back-extrapolated linearly over all geological time
 
 Recommended install:
     pip install numpy pandas matplotlib pillow imageio imageio-ffmpeg tqdm
