@@ -31,6 +31,10 @@ Official sources and tools
 --------------------------
 TESS data at MAST:
     https://archive.stsci.edu/missions-and-data/tess
+NASA TESS data-product guide:
+    https://heasarc.gsfc.nasa.gov/docs/tess/data-products.html
+Lightkurve:
+    https://lightkurve.github.io/lightkurve/
 
 
 Honesty / interpretation rules
