@@ -26,6 +26,11 @@ What the video shows
   number of cycles covered by TESS.
 - A target-pixel stamp and pipeline aperture when a TESS Target Pixel File is
   available.
+  
+Official sources and tools
+--------------------------
+TESS data at MAST:
+    https://archive.stsci.edu/missions-and-data/tess
 
 
 Honesty / interpretation rules
