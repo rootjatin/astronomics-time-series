@@ -11,7 +11,15 @@ trajectory around the April 13, 2029 close approach. On an internet-connected
 run, the script requests a fresh Horizons vector table. A small official
 Horizons snapshot is embedded as a reproducible fallback.
 
-
+Official sources used by the data/story design:
+- NASA Apophis facts:
+  https://science.nasa.gov/solar-system/asteroids/apophis-facts/
+- JPL 2021 radar campaign / 100+ year safety result:
+  https://www.jpl.nasa.gov/news/nasa-analysis-earth-is-safe-from-asteroid-apophis-for-100-plus-years/
+- NASA OSIRIS-APEX:
+  https://science.nasa.gov/mission/osiris-apex/
+- JPL Horizons:
+  https://ssd-api.jpl.nasa.gov/doc/horizons.html
 
 Scientific fidelity notes
 -------------------------
