@@ -16,7 +16,12 @@ What the video shows
   orbital-family statistics, inclination structure, perihelion distances, and
   selected famous comets found in the live catalog.
 
-
+Official source
+---------------
+JPL Solar System Dynamics / Small-Body Database Query API:
+    https://ssd-api.jpl.nasa.gov/sbdb_query.api
+    https://ssd-api.jpl.nasa.gov/doc/sbdb_query.html
+    https://ssd.jpl.nasa.gov/sb/orbits.html
 
 Honesty / interpretation rules
 ------------------------------
