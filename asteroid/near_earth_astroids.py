@@ -8,6 +8,17 @@ EVERY KNOWN NEAR-EARTH ASTEROID — vertical cinematic data short
 This script downloads the current NASA/JPL Small-Body Database (SBDB) catalog
 of known near-Earth asteroids and renders a vertical 1080x1920 YouTube Short.
 
+Every catalog point comes from the JPL SBDB Query API:
+    https://ssd-api.jpl.nasa.gov/doc/sbdb_query.html
+
+The renderer uses:
+- JPL osculating orbital elements and epochs,
+- vectorized two-body propagation for cinematic motion,
+- Atira / Aten / Apollo / Amor orbit classes,
+- JPL's PHA flag and Earth MOID,
+- measured diameter when available,
+- absolute magnitude H when diameter is unavailable,
+- observation-arc and orbit-condition metadata.
 
 Scientific fidelity notes
 -------------------------
