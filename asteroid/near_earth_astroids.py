@@ -11,6 +11,7 @@ of known near-Earth asteroids and renders a vertical 1080x1920 YouTube Short.
 Every catalog point comes from the JPL SBDB Query API:
     https://ssd-api.jpl.nasa.gov/doc/sbdb_query.html
 
+#### renderer method : youtube shorts 
 The renderer uses:
 - JPL osculating orbital elements and epochs,
 - vectorized two-body propagation for cinematic motion,
