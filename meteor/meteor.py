@@ -16,8 +16,19 @@ What the video shows
 - Geocentric radiants, velocities, begin/end heights, shower codes, brightness,
   duration, and number of observing stations when those values are published.
 
+# Added dataset 
 
-Important honesty notes
+Primary data source
+-------------------
+Global Meteor Network REST API / Data Explorer:
+    https://explore.globalmeteornetwork.org/
+    https://explore.globalmeteornetwork.org/gmn_rest_api/meteor_summary
+
+GMN describes its high-level trajectory data as public, updated regularly, and
+released under CC BY 4.0:
+    https://globalmeteornetwork.org/data/
+
+Important  notes
 -----------------------
 - This is not every meteor that entered Earth's atmosphere. It is the subset
   reconstructed by participating GMN cameras and accepted into the public
