@@ -8,6 +8,10 @@ It is designed to fetch the official solar-eclipse century catalogs from NASA's
 Eclipse Web Site / GSFC catalog pages and then render a 1080x1920 short that
 shows every solar eclipse in the 100-year calendar window 2026-2125.
 
+Primary sources targeted by the script:
+- https://eclipse.gsfc.nasa.gov/SEcat5/SE2001-2100.html
+- https://eclipse.gsfc.nasa.gov/SEcat5/SE2101-2200.html
+
 
 Scientific grounding from those NASA catalog pages:
 - The 21st century (2001-2100) contains 224 solar eclipses.
