@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+# output : https://www.youtube.com/shorts/YLF46kdbNng
+
 """
 Every Solar Eclipse of the Next 100 Years — cinematic YouTube Short renderer
 
