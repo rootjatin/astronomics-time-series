@@ -9,6 +9,13 @@ Eclipse Web Site / GSFC catalog pages and then render a 1080x1920 short that
 shows every solar eclipse in the 100-year calendar window 2026-2125.
 
 
+Scientific grounding from those NASA catalog pages:
+- The 21st century (2001-2100) contains 224 solar eclipses.
+- The 22nd century (2101-2200) contains 235 solar eclipses.
+- Solar eclipses are cataloged by date/time of greatest eclipse, type, Saros,
+  gamma, magnitude, latitude/longitude, and central-path data.
+- NASA classifies solar eclipses as partial, annular, total, or hybrid.
+
 Important note for offline environments:
 If live NASA pages cannot be reached, the script falls back to a REAL but SMALL
 fixture subset of catalog rows (spanning 2026-2035 and 2120-2125). That fallback
