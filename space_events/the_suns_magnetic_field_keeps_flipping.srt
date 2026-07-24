@@ -1,0 +1,23 @@
+1
+00:00:00,500 --> 00:00:06,800
+About every eleven years, the Sun's global magnetic north and south poles reverse.
+
+2
+00:00:06,900 --> 00:00:15,000
+Wilcox Solar Observatory measurements track the northern and southern polar fields separately.
+
+3
+00:00:15,100 --> 00:00:24,000
+Near solar maximum, both fields weaken toward zero—and the two hemispheres may reverse at different times.
+
+4
+00:00:24,100 --> 00:00:34,000
+Decaying magnetic regions are carried toward the poles, cancelling the old field and building the new one.
+
+5
+00:00:34,100 --> 00:00:44,500
+One polarity reversal takes about eleven years, but returning to the original orientation takes roughly twenty-two.
+
+6
+00:00:44,600 --> 00:00:57,200
+The Sun is not physically turning over. Its magnetic field is rebuilding itself on a stellar scale.
