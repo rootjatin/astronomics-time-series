@@ -21,7 +21,7 @@ Science story:
 
 Preferred data source:
     https://wso.stanford.edu/Polar.html
-  
+
 Install:
     pip install numpy pandas matplotlib pillow imageio imageio-ffmpeg requests beautifulsoup4 tqdm
 
