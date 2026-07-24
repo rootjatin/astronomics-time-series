@@ -19,6 +19,9 @@ Science story:
   once before a new polarity becomes established.
 - "Flip" does not mean the physical rotation axis or geographic poles move.
 
+Preferred data source:
+    https://wso.stanford.edu/Polar.html
+  
 Install:
     pip install numpy pandas matplotlib pillow imageio imageio-ffmpeg requests beautifulsoup4 tqdm
 
