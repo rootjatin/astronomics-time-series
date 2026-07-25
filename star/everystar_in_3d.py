@@ -417,28 +417,70 @@ def save_data_products(named: pd.DataFrame, background: pd.DataFrame, summary: D
 
 
 def create_scientific_plots(named: pd.DataFrame, background: pd.DataFrame):
+    """Write optional diagnostic plots without blocking the video render.
+
+    Some Linux installations accidentally mix a distro Matplotlib package with a
+    user-site/pip Matplotlib package. In that state ``mpl_toolkits.mplot3d`` may
+    not import and the ``projection="3d"`` registry entry is unavailable. The
+    cinematic renderer below does not depend on mplot3d, so fall back to three
+    orthographic XYZ views instead of aborting the whole YouTube Short render.
+    """
     sample = background.sample(min(len(background), 1200), random_state=7) if len(background) > 1200 else background
-    fig = plt.figure(figsize=(7, 6))
-    ax = fig.add_subplot(111, projection="3d")
-    ax.scatter(sample["x_ly"], sample["y_ly"], sample["z_ly"], s=4, alpha=0.22)
     focus = named[named["name"] != "Sun"]
-    ax.scatter(focus["x_ly"], focus["y_ly"], focus["z_ly"], s=28)
-    ax.scatter([0], [0], [0], s=70, marker="*")
-    ax.set_title("Nearby-star render sample in Sun-centred XYZ coordinates")
-    ax.set_xlabel("X (light-years)")
-    ax.set_ylabel("Y (light-years)")
-    ax.set_zlabel("Z (light-years)")
-    plt.tight_layout()
-    plt.savefig(PREVIEW_DIR / "nearby_stars_3d_scientific.png", dpi=170)
-    plt.close(fig)
+    scientific_path = PREVIEW_DIR / "nearby_stars_3d_scientific.png"
+
+    fig = None
+    try:
+        # Explicit import also registers the "3d" projection on older Matplotlib
+        # releases. It raises cleanly when mpl_toolkits comes from another install.
+        from mpl_toolkits.mplot3d import Axes3D  # noqa: F401
+
+        fig = plt.figure(figsize=(7, 6))
+        ax = fig.add_subplot(111, projection="3d")
+        ax.scatter(sample["x_ly"], sample["y_ly"], sample["z_ly"], s=4, alpha=0.22)
+        ax.scatter(focus["x_ly"], focus["y_ly"], focus["z_ly"], s=28)
+        ax.scatter([0], [0], [0], s=70, marker="*")
+        ax.set_title("Nearby-star render sample in Sun-centred XYZ coordinates")
+        ax.set_xlabel("X (light-years)")
+        ax.set_ylabel("Y (light-years)")
+        ax.set_zlabel("Z (light-years)")
+        fig.tight_layout()
+        fig.savefig(scientific_path, dpi=170)
+    except Exception as exc:
+        if fig is not None:
+            plt.close(fig)
+        print(
+            "Matplotlib 3D preview unavailable; using 2D XYZ projections instead. "
+            f"Reason: {exc}"
+        )
+        fig, axes = plt.subplots(1, 3, figsize=(12, 4.2))
+        views = [
+            ("x_ly", "y_ly", "X", "Y"),
+            ("x_ly", "z_ly", "X", "Z"),
+            ("y_ly", "z_ly", "Y", "Z"),
+        ]
+        for ax, (horizontal, vertical, h_label, v_label) in zip(axes, views):
+            ax.scatter(sample[horizontal], sample[vertical], s=4, alpha=0.22)
+            ax.scatter(focus[horizontal], focus[vertical], s=28)
+            ax.scatter([0], [0], s=70, marker="*")
+            ax.set_xlabel(f"{h_label} (light-years)")
+            ax.set_ylabel(f"{v_label} (light-years)")
+            ax.set_aspect("equal", adjustable="box")
+            ax.grid(alpha=0.18)
+        fig.suptitle("Nearby-star XYZ coordinates — orthographic fallback")
+        fig.tight_layout()
+        fig.savefig(scientific_path, dpi=170)
+    finally:
+        if fig is not None:
+            plt.close(fig)
 
     ranks = focus.sort_values("distance_ly").head(12)
     fig, ax = plt.subplots(figsize=(9, 5.5))
     ax.barh(ranks["name"][::-1], ranks["distance_ly"][::-1])
     ax.set_xlabel("Distance (light-years)")
     ax.set_title("Closest highlighted stellar systems")
-    plt.tight_layout()
-    plt.savefig(PREVIEW_DIR / "nearest_system_distances.png", dpi=170)
+    fig.tight_layout()
+    fig.savefig(PREVIEW_DIR / "nearest_system_distances.png", dpi=170)
     plt.close(fig)
 
 
