@@ -51,6 +51,17 @@ from typing import Dict, Iterable, List, Optional, Tuple
 
 import imageio.v2 as iio
 import matplotlib.pyplot as plt
+
+# Some minimal or partially packaged Matplotlib installations do not register
+# the "3d" projection automatically. Importing mplot3d explicitly fixes the
+# normal case. If it is genuinely unavailable, preview plots fall back to three
+# orthographic 2D views; video rendering is unaffected.
+try:
+    from mpl_toolkits.mplot3d import Axes3D  # noqa: F401
+    HAS_MPL_3D = True
+except Exception:
+    HAS_MPL_3D = False
+
 import numpy as np
 import pandas as pd
 from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont
@@ -76,9 +87,9 @@ for directory in (OUTPUT_ROOT, DATA_ROOT, PREVIEW_DIR):
     directory.mkdir(parents=True, exist_ok=True)
 
 CONFIG = {
-    "video_width": 540 if QUICK_MODE else 1080,
-    "video_height": 960 if QUICK_MODE else 1920,
-    "fps": 6 if QUICK_MODE else 24,
+    "video_width": 720 if QUICK_MODE else 1080,
+    "video_height": 1280 if QUICK_MODE else 1920,
+    "fps": 8 if QUICK_MODE else 24,
     "duration_s": 12 if QUICK_MODE else 58,
     "output_basename": "the_closest_stars_to_earth_in_3d",
     "title": "THE CLOSEST STARS TO EARTH IN 3D",
@@ -86,17 +97,34 @@ CONFIG = {
     "gaia_table": "gaiadr3.gaia_source",
     "gaia_radius_pc": 12.0,
     "gaia_max_rows": 900 if QUICK_MODE else 2600,
-    "render_background_rows": 340 if QUICK_MODE else 1100,
-    "background_stars": 220 if QUICK_MODE else 430,
-    "contrast": 1.09,
-    "saturation": 1.06,
-    "vignette": 0.25,
+    "render_background_rows": 220 if QUICK_MODE else 760,
+    "background_stars": 140 if QUICK_MODE else 300,
+    "contrast": 1.16,
+    "saturation": 1.10,
+    "brightness": 1.035,
+    "sharpness": 1.35,
+    "vignette": 0.16,
 }
 
 OUT_W = CONFIG["video_width"]
 OUT_H = CONFIG["video_height"]
 OUT_SIZE = (OUT_W, OUT_H)
 SCALE = OUT_W / 1080.0
+# Layout still follows the 1080x1920 design grid, but text and key marks are
+# deliberately larger than a strict proportional scale. This keeps them readable
+# after YouTube compression and on small phone screens.
+UI_SCALE = max(0.78, SCALE * 1.18)
+STAR_SCALE = max(0.82, SCALE * 1.22)
+
+
+def px(value: float) -> int:
+    """Scale a layout measurement from the 1080-wide design grid."""
+    return max(1, int(round(value * SCALE)))
+
+
+def ui(value: float, minimum: int = 12) -> int:
+    """Scale typography for phone readability rather than strict geometry."""
+    return max(minimum, int(round(value * UI_SCALE)))
 
 FULL_CAPTIONS = [
     (0.5, 7.2, "The night sky looks flat, but every nearby star sits at a different distance and direction."),
@@ -181,6 +209,8 @@ def caption_at(t: float) -> Optional[str]:
 
 def get_font(size: int, bold: bool = False):
     candidates = [
+        "/usr/share/fonts/opentype/inter/InterDisplay-Bold.otf" if bold else "/usr/share/fonts/opentype/inter/InterDisplay-Regular.otf",
+        "/usr/share/fonts/truetype/lato/Lato-Heavy.ttf" if bold else "/usr/share/fonts/truetype/lato/Lato-Medium.ttf",
         "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf" if bold else "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
         "DejaVuSans-Bold.ttf" if bold else "DejaVuSans.ttf",
         "arialbd.ttf" if bold else "arial.ttf",
@@ -196,15 +226,30 @@ def get_font(size: int, bold: bool = False):
 def draw_text(image: Image.Image, text: str, xy: Tuple[int, int], size: int = 28,
               fill=(255, 255, 255, 255), bold: bool = False, stroke: int = 2,
               anchor: str = "la"):
+    """Draw high-contrast text that survives mobile playback compression."""
     draw = ImageDraw.Draw(image)
+    font = get_font(size, bold)
+    alpha = fill[3] if len(fill) > 3 else 255
+    effective_stroke = max(int(stroke), max(1, int(round(size * 0.045))))
+    shadow_offset = max(1, int(round(size * 0.055)))
+    x, y = xy
+    draw.text(
+        (x + shadow_offset, y + shadow_offset),
+        text,
+        font=font,
+        fill=(0, 0, 0, min(205, alpha)),
+        anchor=anchor,
+        stroke_width=effective_stroke + 1,
+        stroke_fill=(0, 0, 0, min(220, alpha)),
+    )
     draw.text(
         xy,
         text,
-        font=get_font(size, bold),
+        font=font,
         fill=fill,
         anchor=anchor,
-        stroke_width=max(0, int(stroke)),
-        stroke_fill=(0, 0, 0, min(225, fill[3] if len(fill) > 3 else 225)),
+        stroke_width=effective_stroke,
+        stroke_fill=(0, 0, 0, min(245, alpha)),
     )
 
 
@@ -213,12 +258,13 @@ def draw_wrapped_text(image: Image.Image, text: str, xy: Tuple[int, int], max_wi
                       line_spacing: int = 6):
     draw = ImageDraw.Draw(image)
     font = get_font(size, bold)
+    stroke_width = max(2, int(round(size * 0.045)))
     words = text.split()
     lines: List[str] = []
     current = ""
     for word in words:
         candidate = word if not current else f"{current} {word}"
-        bb = draw.textbbox((0, 0), candidate, font=font, stroke_width=2)
+        bb = draw.textbbox((0, 0), candidate, font=font, stroke_width=stroke_width)
         if bb[2] - bb[0] <= max_width:
             current = candidate
         else:
@@ -229,9 +275,13 @@ def draw_wrapped_text(image: Image.Image, text: str, xy: Tuple[int, int], max_wi
         lines.append(current)
     x, y = xy
     for line in lines:
-        draw.text((x, y), line, font=font, fill=fill, stroke_width=2, stroke_fill=(0, 0, 0, 220))
-        bb = draw.textbbox((x, y), line, font=font, stroke_width=2)
-        y += bb[3] - bb[1] + line_spacing
+        shadow = max(1, int(round(size * 0.05)))
+        draw.text((x + shadow, y + shadow), line, font=font, fill=(0, 0, 0, 205),
+                  stroke_width=stroke_width + 1, stroke_fill=(0, 0, 0, 225))
+        draw.text((x, y), line, font=font, fill=fill, stroke_width=stroke_width,
+                  stroke_fill=(0, 0, 0, 245))
+        bb = draw.textbbox((x, y), line, font=font, stroke_width=stroke_width)
+        y += bb[3] - bb[1] + max(line_spacing, int(size * 0.20))
 
 
 def make_vignette(width: int, height: int, strength: float) -> np.ndarray:
@@ -244,8 +294,11 @@ def make_vignette(width: int, height: int, strength: float) -> np.ndarray:
 
 def apply_grade(array: np.ndarray) -> np.ndarray:
     image = Image.fromarray(array)
+    image = ImageEnhance.Brightness(image).enhance(CONFIG["brightness"])
     image = ImageEnhance.Contrast(image).enhance(CONFIG["contrast"])
     image = ImageEnhance.Color(image).enhance(CONFIG["saturation"])
+    image = ImageEnhance.Sharpness(image).enhance(CONFIG["sharpness"])
+    image = image.filter(ImageFilter.UnsharpMask(radius=max(1, px(1.2)), percent=115, threshold=3))
     return np.array(image)
 
 
@@ -417,69 +470,68 @@ def save_data_products(named: pd.DataFrame, background: pd.DataFrame, summary: D
 
 
 def create_scientific_plots(named: pd.DataFrame, background: pd.DataFrame):
-    """Write optional diagnostic plots without blocking the video render.
+    """Create optional diagnostic plots without ever blocking video rendering.
 
-    Some Linux installations accidentally mix a distro Matplotlib package with a
-    user-site/pip Matplotlib package. In that state ``mpl_toolkits.mplot3d`` may
-    not import and the ``projection="3d"`` registry entry is unavailable. The
-    cinematic renderer below does not depend on mplot3d, so fall back to three
-    orthographic XYZ views instead of aborting the whole YouTube Short render.
+    Matplotlib's 3D projection is used when available. On installations where
+    ``projection="3d"`` is not registered, the same XYZ data is shown as three
+    orthographic 2D projections instead.
     """
-    sample = background.sample(min(len(background), 1200), random_state=7) if len(background) > 1200 else background
+    sample = (
+        background.sample(min(len(background), 1200), random_state=7)
+        if len(background) > 1200
+        else background
+    )
     focus = named[named["name"] != "Sun"]
     scientific_path = PREVIEW_DIR / "nearby_stars_3d_scientific.png"
 
-    fig = None
-    try:
-        # Explicit import also registers the "3d" projection on older Matplotlib
-        # releases. It raises cleanly when mpl_toolkits comes from another install.
-        from mpl_toolkits.mplot3d import Axes3D  # noqa: F401
-
-        fig = plt.figure(figsize=(7, 6))
-        ax = fig.add_subplot(111, projection="3d")
-        ax.scatter(sample["x_ly"], sample["y_ly"], sample["z_ly"], s=4, alpha=0.22)
-        ax.scatter(focus["x_ly"], focus["y_ly"], focus["z_ly"], s=28)
-        ax.scatter([0], [0], [0], s=70, marker="*")
-        ax.set_title("Nearby-star render sample in Sun-centred XYZ coordinates")
-        ax.set_xlabel("X (light-years)")
-        ax.set_ylabel("Y (light-years)")
-        ax.set_zlabel("Z (light-years)")
-        fig.tight_layout()
-        fig.savefig(scientific_path, dpi=170)
-    except Exception as exc:
-        if fig is not None:
+    rendered_3d = False
+    if HAS_MPL_3D:
+        try:
+            fig = plt.figure(figsize=(7, 6))
+            ax = fig.add_subplot(111, projection="3d")
+            ax.scatter(sample["x_ly"], sample["y_ly"], sample["z_ly"], s=4, alpha=0.22)
+            ax.scatter(focus["x_ly"], focus["y_ly"], focus["z_ly"], s=28)
+            ax.scatter([0], [0], [0], s=70, marker="*")
+            ax.set_title("Nearby-star render sample in Sun-centred XYZ coordinates")
+            ax.set_xlabel("X (light-years)")
+            ax.set_ylabel("Y (light-years)")
+            ax.set_zlabel("Z (light-years)")
+            plt.tight_layout()
+            fig.savefig(scientific_path, dpi=170)
             plt.close(fig)
-        print(
-            "Matplotlib 3D preview unavailable; using 2D XYZ projections instead. "
-            f"Reason: {exc}"
-        )
-        fig, axes = plt.subplots(1, 3, figsize=(12, 4.2))
-        views = [
-            ("x_ly", "y_ly", "X", "Y"),
-            ("x_ly", "z_ly", "X", "Z"),
-            ("y_ly", "z_ly", "Y", "Z"),
+            rendered_3d = True
+        except (ImportError, KeyError, ValueError, AttributeError) as exc:
+            # Close a partially created figure before using the safe fallback.
+            plt.close("all")
+            print(f"3D Matplotlib preview unavailable ({exc}); using 2D XYZ projections.")
+
+    if not rendered_3d:
+        fig, axes = plt.subplots(1, 3, figsize=(13, 4.6))
+        projections = [
+            ("x_ly", "y_ly", "X–Y view"),
+            ("x_ly", "z_ly", "X–Z view"),
+            ("y_ly", "z_ly", "Y–Z view"),
         ]
-        for ax, (horizontal, vertical, h_label, v_label) in zip(axes, views):
-            ax.scatter(sample[horizontal], sample[vertical], s=4, alpha=0.22)
-            ax.scatter(focus[horizontal], focus[vertical], s=28)
+        for ax, (x_col, y_col, title) in zip(axes, projections):
+            ax.scatter(sample[x_col], sample[y_col], s=4, alpha=0.22)
+            ax.scatter(focus[x_col], focus[y_col], s=28)
             ax.scatter([0], [0], s=70, marker="*")
-            ax.set_xlabel(f"{h_label} (light-years)")
-            ax.set_ylabel(f"{v_label} (light-years)")
+            ax.set_title(title)
+            ax.set_xlabel(x_col[0].upper() + " (light-years)")
+            ax.set_ylabel(y_col[0].upper() + " (light-years)")
             ax.set_aspect("equal", adjustable="box")
             ax.grid(alpha=0.18)
-        fig.suptitle("Nearby-star XYZ coordinates — orthographic fallback")
-        fig.tight_layout()
+        fig.suptitle("Nearby-star sample: orthographic Sun-centred XYZ projections")
+        plt.tight_layout()
         fig.savefig(scientific_path, dpi=170)
-    finally:
-        if fig is not None:
-            plt.close(fig)
+        plt.close(fig)
 
     ranks = focus.sort_values("distance_ly").head(12)
     fig, ax = plt.subplots(figsize=(9, 5.5))
     ax.barh(ranks["name"][::-1], ranks["distance_ly"][::-1])
     ax.set_xlabel("Distance (light-years)")
     ax.set_title("Closest highlighted stellar systems")
-    fig.tight_layout()
+    plt.tight_layout()
     fig.savefig(PREVIEW_DIR / "nearest_system_distances.png", dpi=170)
     plt.close(fig)
 
@@ -507,8 +559,8 @@ class NearbyStarsScene:
         return [{
             "x": float(rng.uniform(0, OUT_W)),
             "y": float(rng.uniform(0, OUT_H)),
-            "r": float(rng.uniform(0.4, 1.9) * max(SCALE, 0.55)),
-            "alpha": int(rng.integers(18, 90)),
+            "r": float(rng.uniform(0.55, 2.1) * max(STAR_SCALE, 0.72)),
+            "alpha": int(rng.integers(24, 105)),
             "phase": float(rng.uniform(0, 2 * math.pi)),
         } for _ in range(n)]
 
@@ -541,7 +593,7 @@ class NearbyStarsScene:
         return (220, 230, 245)
 
     def background(self, t: float) -> Image.Image:
-        image = Image.new("RGBA", OUT_SIZE, (2, 6, 14, 255))
+        image = Image.new("RGBA", OUT_SIZE, (3, 9, 22, 255))
         draw = ImageDraw.Draw(image)
         for item in self.space_dust:
             pulse = 0.72 + 0.28 * math.sin(1.7 * t + item["phase"])
@@ -579,21 +631,23 @@ class NearbyStarsScene:
                   center: Tuple[float, float], radius_ly: float = 12.0):
         draw = ImageDraw.Draw(overlay)
         for ring in (4, 8, 12):
-            theta = np.linspace(0, 2 * math.pi, 100)
+            theta = np.linspace(0, 2 * math.pi, 120)
             pts = np.column_stack([ring * np.cos(theta), ring * np.sin(theta), np.zeros_like(theta)])
             sx, sy, depth, _ = self.camera_project(pts, yaw, pitch, zoom, center)
             order = np.argsort(depth)
             coords = [(float(sx[i]), float(sy[i])) for i in order]
-            draw.line(coords, fill=(100, 195, 225, 36 if ring != 12 else 68), width=max(1, int(SCALE)))
+            alpha = 58 if ring != 12 else 108
+            draw.line(coords, fill=(105, 205, 235, alpha), width=max(1, px(2 if ring == 12 else 1.3)))
         axes = [
-            (np.array([[-radius_ly, 0, 0], [radius_ly, 0, 0]]), (255, 120, 110, 90), "X"),
-            (np.array([[0, -radius_ly, 0], [0, radius_ly, 0]]), (110, 230, 160, 90), "Y"),
-            (np.array([[0, 0, -radius_ly], [0, 0, radius_ly]]), (110, 190, 255, 90), "Z"),
+            (np.array([[-radius_ly, 0, 0], [radius_ly, 0, 0]]), (255, 125, 112, 145), "X"),
+            (np.array([[0, -radius_ly, 0], [0, radius_ly, 0]]), (112, 235, 170, 145), "Y"),
+            (np.array([[0, 0, -radius_ly], [0, 0, radius_ly]]), (115, 195, 255, 145), "Z"),
         ]
         for pts, col, label in axes:
             sx, sy, _, _ = self.camera_project(pts, yaw, pitch, zoom, center)
-            draw.line((sx[0], sy[0], sx[1], sy[1]), fill=col, width=max(1, int(2 * SCALE)))
-            draw_text(overlay, label, (int(sx[1]), int(sy[1])), size=int(15 * SCALE), fill=col[:3] + (180,), bold=True, stroke=1, anchor="mm")
+            draw.line((sx[0], sy[0], sx[1], sy[1]), fill=col, width=max(2, px(2.4)))
+            draw_text(overlay, label, (int(sx[1]), int(sy[1])), size=ui(20),
+                      fill=col[:3] + (235,), bold=True, stroke=2, anchor="mm")
 
     def draw_star_map(self, image: Image.Image, t: float, yaw: float, pitch: float, zoom: float,
                       center: Tuple[float, float], reveal: float = 1.0,
@@ -613,15 +667,15 @@ class NearbyStarsScene:
             pts = pts[:visible_n]
             bg2 = bg2.iloc[:visible_n]
             if len(pts):
-                sx, sy, depth, factor = self.camera_project(pts, yaw, pitch, zoom, center)
-                order = np.argsort(depth)[::-1]
-                for idx in order:
-                    if not (-40 <= sx[idx] <= OUT_W + 40 and -40 <= sy[idx] <= OUT_H + 40):
+                sx_bg, sy_bg, depth_bg, factor_bg = self.camera_project(pts, yaw, pitch, zoom, center)
+                order_bg = np.argsort(depth_bg)[::-1]
+                for idx in order_bg:
+                    if not (-40 <= sx_bg[idx] <= OUT_W + 40 and -40 <= sy_bg[idx] <= OUT_H + 40):
                         continue
                     mag = float(bg2.iloc[idx].get("phot_g_mean_mag", 15.0))
-                    radius = clamp((20.5 - mag) / 5.8, 0.45, 2.4) * max(SCALE, 0.58) * clamp(factor[idx], 0.65, 1.7)
+                    radius = clamp((20.5 - mag) / 5.4, 0.62, 2.8) * max(STAR_SCALE, 0.78) * clamp(factor_bg[idx], 0.68, 1.75)
                     colour = self.star_colour(float(bg2.iloc[idx].get("bp_rp", 1.4)))
-                    draw.ellipse((sx[idx] - radius, sy[idx] - radius, sx[idx] + radius, sy[idx] + radius), fill=colour + (95,))
+                    draw.ellipse((sx_bg[idx] - radius, sy_bg[idx] - radius, sx_bg[idx] + radius, sy_bg[idx] + radius), fill=colour + (135,))
 
         named = self.named[np.linalg.norm(self.named[["x_ly", "y_ly", "z_ly"]].to_numpy(float), axis=1) <= radius_limit + 0.2].copy()
         pts = named[["x_ly", "y_ly", "z_ly"]].to_numpy(float)
@@ -630,36 +684,76 @@ class NearbyStarsScene:
         for idx in order:
             row = named.iloc[idx]
             colour = self.spectral_colour(str(row["spectral"]))
-            base = 9.5 if row["name"] == "Sun" else 5.7
-            radius = base * SCALE * clamp(factor[idx], 0.72, 1.55)
-            for mult, alpha in ((2.8, 18), (1.8, 36)):
+            base = 12.5 if row["name"] == "Sun" else 7.2
+            radius = base * STAR_SCALE * clamp(factor[idx], 0.72, 1.58)
+            for mult, alpha in ((3.5, 16), (2.35, 34), (1.55, 62)):
                 rr = radius * mult
                 draw.ellipse((sx[idx] - rr, sy[idx] - rr, sx[idx] + rr, sy[idx] + rr), fill=colour + (alpha,))
-            draw.ellipse((sx[idx] - radius, sy[idx] - radius, sx[idx] + radius, sy[idx] + radius), fill=colour + (245,), outline=(255, 255, 255, 185))
+            draw.ellipse((sx[idx] - radius, sy[idx] - radius, sx[idx] + radius, sy[idx] + radius),
+                         fill=colour + (255,), outline=(255, 255, 255, 235), width=max(1, px(1.5)))
+            core = max(1.5, radius * 0.32)
+            draw.ellipse((sx[idx] - core, sy[idx] - core, sx[idx] + core, sy[idx] + core), fill=(255, 255, 255, 245))
 
             if show_motion and row["name"] != "Sun":
                 pm = float(row["proper_motion_total"])
                 angle = math.atan2(float(row["pmdec"]), float(row["pmra"])) + yaw * 0.4
-                length = clamp(20 + 10 * math.log10(max(pm, 10)), 30, 86) * SCALE
+                length = clamp(27 + 12 * math.log10(max(pm, 10)), 42, 112) * SCALE
                 ex = sx[idx] + math.cos(angle) * length
                 ey = sy[idx] - math.sin(angle) * length
-                draw.line((sx[idx], sy[idx], ex, ey), fill=colour + (170,), width=max(1, int(3 * SCALE)))
-                ah = 8 * SCALE
-                draw.polygon([(ex, ey), (ex - ah * math.cos(angle - 0.5), ey + ah * math.sin(angle - 0.5)), (ex - ah * math.cos(angle + 0.5), ey + ah * math.sin(angle + 0.5))], fill=colour + (190,))
+                draw.line((sx[idx], sy[idx], ex, ey), fill=colour + (225,), width=max(3, px(4)))
+                ah = max(8, px(11))
+                draw.polygon([(ex, ey),
+                              (ex - ah * math.cos(angle - 0.5), ey + ah * math.sin(angle - 0.5)),
+                              (ex - ah * math.cos(angle + 0.5), ey + ah * math.sin(angle + 0.5))],
+                             fill=colour + (235,))
 
         labels = named[named["name"] != "Sun"].sort_values("distance_ly").head(label_count)
-        label_indices = list(labels.index)
-        for data_index in label_indices:
-            local_idx = list(named.index).index(data_index)
+        occupied: List[Tuple[int, int, int, int]] = []
+        named_indices = list(named.index)
+        name_font = get_font(ui(21), True)
+        distance_font = get_font(ui(16), False)
+        for data_index in list(labels.index):
+            local_idx = named_indices.index(data_index)
             row = named.loc[data_index]
-            x, y = sx[local_idx], sy[local_idx]
-            if not (20 < x < OUT_W - 20 and 80 < y < OUT_H - 130):
+            x, y = float(sx[local_idx]), float(sy[local_idx])
+            if not (px(24) < x < OUT_W - px(24) and px(95) < y < OUT_H - px(300)):
                 continue
             colour = self.spectral_colour(str(row["spectral"]))
-            offset_x = 13 * SCALE if x < center[0] else -13 * SCALE
-            anchor = "lm" if x < center[0] else "rm"
-            draw_text(overlay, str(row["name"]), (int(x + offset_x), int(y - 3 * SCALE)), size=int(16 * SCALE), fill=colour + (235,), bold=True, stroke=1, anchor=anchor)
-            draw_text(overlay, f"{row['distance_ly']:.2f} ly", (int(x + offset_x), int(y + 16 * SCALE)), size=int(13 * SCALE), fill=(218, 230, 242, 210), stroke=1, anchor=anchor)
+            name = str(row["name"])
+            distance = f"{row['distance_ly']:.2f} light-years"
+            nb = draw.textbbox((0, 0), name, font=name_font, stroke_width=1)
+            db = draw.textbbox((0, 0), distance, font=distance_font, stroke_width=1)
+            chip_w = max(nb[2] - nb[0], db[2] - db[0]) + px(26)
+            chip_h = (nb[3] - nb[1]) + (db[3] - db[1]) + px(24)
+            preferred_right = x < center[0]
+            candidates = []
+            for vertical in (-chip_h // 2, -chip_h - px(10), px(10)):
+                if preferred_right:
+                    candidates.append((int(x + px(18)), int(y + vertical)))
+                else:
+                    candidates.append((int(x - px(18) - chip_w), int(y + vertical)))
+            chosen = None
+            for cx, cy in candidates:
+                cx = max(px(12), min(cx, OUT_W - chip_w - px(12)))
+                cy = max(px(92), min(cy, OUT_H - px(300) - chip_h))
+                rect = (cx, cy, cx + chip_w, cy + chip_h)
+                if all(rect[2] + px(8) < old[0] or rect[0] > old[2] + px(8) or
+                       rect[3] + px(8) < old[1] or rect[1] > old[3] + px(8) for old in occupied):
+                    chosen = rect
+                    break
+            if chosen is None:
+                continue
+            occupied.append(chosen)
+            cx0, cy0, cx1, cy1 = chosen
+            edge_x = cx0 if preferred_right else cx1
+            edge_y = int((cy0 + cy1) / 2)
+            draw.line((x, y, edge_x, edge_y), fill=colour + (175,), width=max(1, px(2)))
+            draw.rounded_rectangle(chosen, radius=max(8, px(12)), fill=(2, 8, 20, 220),
+                                   outline=colour + (155,), width=max(1, px(1.5)))
+            draw_text(overlay, name, (cx0 + px(13), cy0 + px(8)), size=ui(24),
+                      fill=colour + (255,), bold=True, stroke=2)
+            draw_text(overlay, distance, (cx0 + px(13), cy0 + px(35)), size=ui(16),
+                      fill=(232, 241, 249, 245), stroke=2)
 
         image.alpha_composite(overlay)
 
@@ -670,8 +764,8 @@ class NearbyStarsScene:
         pitch = -0.32
         zoom = lerp(26 * SCALE, 43 * SCALE, progress)
         self.draw_star_map(image, t, yaw, pitch, zoom, (OUT_W * 0.5, OUT_H * 0.43), reveal=progress, label_count=2, radius_limit=6.2, show_background=False)
-        draw_text(image, "4.25 LIGHT-YEARS", (OUT_W // 2, int(OUT_H * 0.67)), size=int(54 * SCALE), fill=(245, 249, 255, 245), bold=True, anchor="ma", stroke=max(1, int(3 * SCALE)))
-        draw_text(image, "to Proxima Centauri", (OUT_W // 2, int(OUT_H * 0.725)), size=int(24 * SCALE), fill=(110, 230, 248, 235), bold=True, anchor="ma", stroke=1)
+        draw_text(image, "4.25 LIGHT-YEARS", (OUT_W // 2, int(OUT_H * 0.67)), size=ui(62), fill=(245, 249, 255, 245), bold=True, anchor="ma", stroke=max(1, int(3 * SCALE)))
+        draw_text(image, "to Proxima Centauri", (OUT_W // 2, int(OUT_H * 0.725)), size=ui(28), fill=(110, 230, 248, 235), bold=True, anchor="ma", stroke=1)
 
     def draw_nearest_cards(self, image: Image.Image, t: float):
         shot_start = 8.0 if not QUICK_MODE else 2.0
@@ -683,18 +777,18 @@ class NearbyStarsScene:
         yaw = -0.25 + 0.55 * frac
         pitch = -0.22 + 0.10 * math.sin(frac * math.pi)
         zoom = 31 * SCALE
-        self.draw_star_map(image, t, yaw, pitch, zoom, (OUT_W * 0.5, OUT_H * 0.39), reveal=1.0, label_count=7, radius_limit=8.2, show_background=False)
+        self.draw_star_map(image, t, yaw, pitch, zoom, (OUT_W * 0.5, OUT_H * 0.39), reveal=1.0, label_count=5, radius_limit=8.2, show_background=False)
 
-        x0, y0 = int(OUT_W * 0.08), int(OUT_H * 0.62)
-        card_w, card_h = int(OUT_W * 0.84), int(OUT_H * 0.15)
+        x0, y0 = int(OUT_W * 0.065), int(OUT_H * 0.60)
+        card_w, card_h = int(OUT_W * 0.87), int(OUT_H * 0.15)
         panel = Image.new("RGBA", OUT_SIZE, (0, 0, 0, 0))
         pdw = ImageDraw.Draw(panel)
-        pdw.rounded_rectangle((x0, y0, x0 + card_w, y0 + card_h), radius=max(12, int(24 * SCALE)), fill=(2, 7, 16, 185), outline=(95, 200, 230, 80), width=1)
+        pdw.rounded_rectangle((x0, y0, x0 + card_w, y0 + card_h), radius=max(12, int(24 * SCALE)), fill=(2, 8, 20, 225), outline=(95, 215, 242, 170), width=max(1, px(2)))
         image.alpha_composite(panel)
         colour = self.spectral_colour(str(row["spectral"]))
-        draw_text(image, f"#{active + 1}  {row['name']}", (x0 + int(24 * SCALE), y0 + int(24 * SCALE)), size=int(27 * SCALE), fill=colour + (245,), bold=True, stroke=1)
-        draw_text(image, f"{row['distance_ly']:.3f} light-years  //  {row['spectral']}", (x0 + int(24 * SCALE), y0 + int(62 * SCALE)), size=int(20 * SCALE), fill=(242, 247, 252, 235), bold=True, stroke=1)
-        draw_text(image, str(row["kind"]), (x0 + int(24 * SCALE), y0 + int(96 * SCALE)), size=int(18 * SCALE), fill=(165, 210, 230, 215), stroke=1)
+        draw_text(image, f"#{active + 1}  {row['name']}", (x0 + int(24 * SCALE), y0 + int(24 * SCALE)), size=ui(39), fill=colour + (245,), bold=True, stroke=1)
+        draw_text(image, f"{row['distance_ly']:.3f} light-years  //  {row['spectral']}", (x0 + int(24 * SCALE), y0 + px(72)), size=ui(25), fill=(242, 247, 252, 235), bold=True, stroke=1)
+        draw_text(image, str(row["kind"]), (x0 + int(24 * SCALE), y0 + px(118)), size=ui(22), fill=(165, 210, 230, 215), stroke=1)
 
     def draw_full_map(self, image: Image.Image, t: float):
         shot_start = 22.0 if not QUICK_MODE else 4.7
@@ -703,9 +797,9 @@ class NearbyStarsScene:
         yaw = -1.15 + frac * 2.15
         pitch = -0.46 + 0.22 * math.sin(frac * math.pi)
         zoom = lerp(29 * SCALE, 23 * SCALE, frac)
-        self.draw_star_map(image, t, yaw, pitch, zoom, (OUT_W * 0.5, OUT_H * 0.46), reveal=smoothstep(frac * 1.7), label_count=10, radius_limit=12.2, show_background=True)
-        draw_text(image, "SUN-CENTRED XYZ MAP", (OUT_W // 2, int(OUT_H * 0.73)), size=int(30 * SCALE), fill=(110, 232, 248, 238), bold=True, anchor="ma", stroke=1)
-        draw_text(image, "distance is encoded as physical depth", (OUT_W // 2, int(OUT_H * 0.77)), size=int(19 * SCALE), fill=(235, 243, 250, 220), anchor="ma", stroke=1)
+        self.draw_star_map(image, t, yaw, pitch, zoom, (OUT_W * 0.5, OUT_H * 0.46), reveal=smoothstep(frac * 1.7), label_count=4, radius_limit=12.2, show_background=True)
+        draw_text(image, "SUN-CENTRED XYZ MAP", (OUT_W // 2, int(OUT_H * 0.73)), size=ui(35), fill=(110, 232, 248, 238), bold=True, anchor="ma", stroke=1)
+        draw_text(image, "distance is encoded as physical depth", (OUT_W // 2, int(OUT_H * 0.77)), size=ui(22), fill=(235, 243, 250, 220), anchor="ma", stroke=1)
 
     def draw_motion(self, image: Image.Image, t: float):
         shot_start = 38.0 if not QUICK_MODE else 7.9
@@ -713,9 +807,9 @@ class NearbyStarsScene:
         frac = clamp((t - shot_start) / duration)
         yaw = 0.65 + frac * 0.75
         pitch = -0.30
-        self.draw_star_map(image, t, yaw, pitch, 26 * SCALE, (OUT_W * 0.5, OUT_H * 0.45), reveal=1.0, label_count=7, radius_limit=12.2, show_background=False, show_motion=True)
-        draw_text(image, "PROPER MOTION", (OUT_W // 2, int(OUT_H * 0.71)), size=int(34 * SCALE), fill=(255, 190, 100, 240), bold=True, anchor="ma", stroke=1)
-        draw_text(image, "arrows show angular motion on the sky", (OUT_W // 2, int(OUT_H * 0.755)), size=int(19 * SCALE), fill=(237, 244, 250, 220), anchor="ma", stroke=1)
+        self.draw_star_map(image, t, yaw, pitch, 26 * SCALE, (OUT_W * 0.5, OUT_H * 0.45), reveal=1.0, label_count=5, radius_limit=12.2, show_background=False, show_motion=True)
+        draw_text(image, "PROPER MOTION", (OUT_W // 2, int(OUT_H * 0.71)), size=ui(34), fill=(255, 190, 100, 240), bold=True, anchor="ma", stroke=1)
+        draw_text(image, "arrows show angular motion on the sky", (OUT_W // 2, int(OUT_H * 0.755)), size=ui(22), fill=(237, 244, 250, 220), anchor="ma", stroke=1)
 
     def draw_outro(self, image: Image.Image, t: float):
         shot_start = 49.5 if not QUICK_MODE else 10.2
@@ -723,34 +817,35 @@ class NearbyStarsScene:
         yaw = 1.45 + frac * 0.7
         pitch = -0.38 + 0.12 * math.sin(frac * math.pi)
         zoom = lerp(25 * SCALE, 18 * SCALE, smoothstep(frac))
-        self.draw_star_map(image, t, yaw, pitch, zoom, (OUT_W * 0.5, OUT_H * 0.39), reveal=1.0, label_count=5, radius_limit=12.2, show_background=True)
+        self.draw_star_map(image, t, yaw, pitch, zoom, (OUT_W * 0.5, OUT_H * 0.39), reveal=1.0, label_count=4, radius_limit=12.2, show_background=True)
 
         x0, y0 = int(OUT_W * 0.08), int(OUT_H * 0.64)
-        w, h = int(OUT_W * 0.84), int(OUT_H * 0.14)
+        w, h = int(OUT_W * 0.84), int(OUT_H * 0.13)
         panel = Image.new("RGBA", OUT_SIZE, (0, 0, 0, 0))
         draw = ImageDraw.Draw(panel)
-        draw.rounded_rectangle((x0, y0, x0 + w, y0 + h), radius=max(12, int(24 * SCALE)), fill=(2, 7, 16, 182), outline=(90, 195, 225, 75), width=1)
+        draw.rounded_rectangle((x0, y0, x0 + w, y0 + h), radius=max(12, int(24 * SCALE)), fill=(2, 8, 20, 225), outline=(90, 205, 235, 150), width=max(1, px(2)))
         image.alpha_composite(panel)
-        draw_text(image, "12 LIGHT-YEAR NEIGHBOURHOOD", (OUT_W // 2, y0 + int(30 * SCALE)), size=int(26 * SCALE), fill=(110, 232, 248, 238), bold=True, anchor="ma", stroke=1)
-        draw_text(image, f"{self.summary['named_systems']} highlighted systems  //  {self.summary['background_rows']:,} map sources", (OUT_W // 2, y0 + int(70 * SCALE)), size=int(17 * SCALE), fill=(240, 246, 252, 225), bold=True, anchor="ma", stroke=1)
-        draw_text(image, "Most nearby stars are faint cool dwarfs", (OUT_W // 2, y0 + int(104 * SCALE)), size=int(18 * SCALE), fill=(255, 183, 105, 228), anchor="ma", stroke=1)
+        draw_text(image, "12 LIGHT-YEAR NEIGHBOURHOOD", (OUT_W // 2, y0 + int(30 * SCALE)), size=ui(31), fill=(110, 232, 248, 238), bold=True, anchor="ma", stroke=1)
+        draw_text(image, f"{self.summary['named_systems']} highlighted systems  //  {self.summary['background_rows']:,} map sources", (OUT_W // 2, y0 + int(70 * SCALE)), size=ui(17), fill=(240, 246, 252, 225), bold=True, anchor="ma", stroke=1)
+        draw_text(image, "Most nearby stars are faint cool dwarfs", (OUT_W // 2, y0 + int(104 * SCALE)), size=ui(21), fill=(255, 183, 105, 228), anchor="ma", stroke=1)
 
     def draw_source_hud(self, image: Image.Image):
         if self.source == "live_gaia_dr3":
-            label = "MAP SOURCE // GAIA DR3 + CURATED LABELS"
-            colour = (110, 232, 248, 230)
+            label = "GAIA DR3 DATA  •  CURATED NAMES"
+            colour = (110, 232, 248, 235)
         else:
-            label = "PREVIEW SOURCE // SPATIAL FIXTURE + CURATED LABELS"
-            colour = (255, 190, 95, 230)
-        draw_text(image, label, (OUT_W - int(46 * SCALE), int(72 * SCALE)), size=int(17 * SCALE), fill=colour, bold=True, anchor="ra", stroke=1)
-        draw_text(image, "ORIGIN // THE SUN", (OUT_W - int(46 * SCALE), int(104 * SCALE)), size=int(15 * SCALE), fill=(160, 205, 225, 200), anchor="ra", stroke=1)
+            label = "OFFLINE PREVIEW  •  CURATED NAMES"
+            colour = (255, 196, 92, 235)
+        # Keep provenance visible without competing with the headline.
+        draw_text(image, label, (OUT_W - px(36), px(42)), size=ui(14),
+                  fill=colour, bold=True, anchor="ra", stroke=2)
 
     def draw_titles(self, image: Image.Image, t: float, shot_name: str):
         alpha = int(255 * smoothstep((t - 0.2) / 0.8) * (1.0 - smoothstep((t - (6.8 if not QUICK_MODE else 1.7)) / 0.7)))
         if alpha > 4:
-            draw_text(image, "THE CLOSEST STARS", (int(56 * SCALE), int(88 * SCALE)), size=int(44 * SCALE), fill=(245, 249, 253, alpha), bold=True)
-            draw_text(image, "TO EARTH IN 3D", (int(56 * SCALE), int(138 * SCALE)), size=int(44 * SCALE), fill=(245, 249, 253, alpha), bold=True)
-            draw_text(image, CONFIG["subtitle"], (int(58 * SCALE), int(194 * SCALE)), size=int(21 * SCALE), fill=(110, 232, 248, min(alpha, 230)), bold=True)
+            draw_text(image, "THE CLOSEST STARS", (int(56 * SCALE), int(88 * SCALE)), size=ui(52), fill=(245, 249, 253, alpha), bold=True)
+            draw_text(image, "TO EARTH IN 3D", (int(56 * SCALE), int(138 * SCALE)), size=ui(52), fill=(245, 249, 253, alpha), bold=True)
+            draw_text(image, CONFIG["subtitle"], (int(58 * SCALE), int(194 * SCALE)), size=ui(21), fill=(110, 232, 248, min(alpha, 230)), bold=True)
         labels = {
             "intro": "THE SOLAR NEIGHBOURHOOD // DEPTH REVEALED",
             "nearest": "NEAREST SYSTEMS // DISTANCE RANKING",
@@ -759,27 +854,33 @@ class NearbyStarsScene:
             "outro": "TWELVE LIGHT-YEARS FROM HOME",
         }
         if t > (5.2 if not QUICK_MODE else 1.4):
-            draw_text(image, labels[shot_name], (int(56 * SCALE), int(62 * SCALE)), size=int(18 * SCALE), fill=(150, 210, 230, 205), bold=True, stroke=1)
+            draw_text(image, labels[shot_name], (int(56 * SCALE), int(62 * SCALE)), size=ui(18), fill=(150, 210, 230, 205), bold=True, stroke=1)
 
     def draw_caption(self, image: Image.Image, t: float):
         text = caption_at(t)
         if not text:
             return
-        y0 = OUT_H - int(244 * SCALE)
+        panel_h = px(196)
+        y0 = OUT_H - px(320)
         panel = Image.new("RGBA", OUT_SIZE, (0, 0, 0, 0))
         draw = ImageDraw.Draw(panel)
-        draw.rounded_rectangle((int(44 * SCALE), y0, OUT_W - int(44 * SCALE), y0 + int(124 * SCALE)), radius=max(10, int(24 * SCALE)), fill=(2, 6, 14, 172), outline=(70, 180, 220, 65), width=1)
+        bounds = (px(34), y0, OUT_W - px(34), y0 + panel_h)
+        draw.rounded_rectangle(bounds, radius=max(12, px(26)), fill=(1, 7, 18, 232),
+                               outline=(90, 210, 242, 155), width=max(1, px(2)))
+        draw.rectangle((px(34), y0 + px(18), px(42), y0 + panel_h - px(18)),
+                       fill=(95, 225, 248, 235))
         image.alpha_composite(panel)
-        draw_wrapped_text(image, text, (int(68 * SCALE), y0 + int(28 * SCALE)), OUT_W - int(136 * SCALE), size=int(29 * SCALE), fill=(245, 249, 253, 245))
+        draw_wrapped_text(image, text, (px(64), y0 + px(29)), OUT_W - px(128),
+                          size=ui(34), fill=(250, 252, 255, 255), bold=True, line_spacing=px(8))
 
     def draw_hud_noise(self, image: Image.Image, t: float):
         overlay = Image.new("RGBA", OUT_SIZE, (0, 0, 0, 0))
         draw = ImageDraw.Draw(overlay)
         offset = int((t * 39) % 7)
         for y in range(offset, OUT_H, 7):
-            draw.line((0, y, OUT_W, y), fill=(120, 200, 240, 10), width=1)
+            draw.line((0, y, OUT_W, y), fill=(120, 200, 240, 4), width=1)
         scan_y = int((t * 160) % (OUT_H + 220)) - 110
-        draw.rectangle((0, scan_y, OUT_W, scan_y + int(46 * SCALE)), fill=(80, 210, 240, 8))
+        draw.rectangle((0, scan_y, OUT_W, scan_y + int(46 * SCALE)), fill=(80, 210, 240, 4))
         image.alpha_composite(overlay)
 
     def render_frame(self, t: float) -> np.ndarray:
@@ -821,8 +922,21 @@ def render_video(scene: NearbyStarsScene):
     final_path = OUTPUT_ROOT / f"{CONFIG['output_basename']}_final.mp4"
     frame_count = int(round(CONFIG["duration_s"] * CONFIG["fps"]))
     times = np.arange(frame_count) / CONFIG["fps"]
-    print(f"Rendering {frame_count:,} frames at {OUT_W}x{OUT_H} ...")
-    with iio.get_writer(raw_path, fps=CONFIG["fps"], codec="libx264", quality=8, pixelformat="yuv420p", macro_block_size=None) as writer:
+    print(f"Rendering {frame_count:,} frames at {OUT_W}x{OUT_H} with high-detail H.264 encoding ...")
+    with iio.get_writer(
+        raw_path,
+        fps=CONFIG["fps"],
+        codec="libx264",
+        pixelformat="yuv420p",
+        macro_block_size=None,
+        ffmpeg_params=[
+            "-crf", "15",
+            "-preset", "slow",
+            "-profile:v", "high",
+            "-level", "4.2",
+            "-movflags", "+faststart",
+        ],
+    ) as writer:
         for t in tqdm(times, desc="Rendering nearby-stars 3D short"):
             writer.append_data(scene.render_frame(float(t)))
     shutil.copyfile(raw_path, final_path)
@@ -835,7 +949,11 @@ def main():
     named, background, source, error_note = load_catalogs()
     summary = summarize_catalog(named, background, source)
     paths = save_data_products(named, background, summary, error_note)
-    create_scientific_plots(named, background)
+    try:
+        create_scientific_plots(named, background)
+    except Exception as exc:
+        # Diagnostic PNGs are optional. Never stop the actual Shorts renderer.
+        print(f"Scientific preview plots skipped: {exc}")
     print("Source:", source)
     if error_note:
         print("Live query note:", error_note)
