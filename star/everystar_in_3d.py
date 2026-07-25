@@ -21,11 +21,6 @@ close or multiple systems can be incomplete or awkward in a single Gaia source
 query. If Gaia is unavailable, a deterministic background fixture is used and is
 clearly labelled on-screen and in the metadata.
 
-Official/reference sources:
-- ESA Gaia Archive: https://gea.esac.esa.int/archive/
-- ESA Gaia programmatic access:
-  https://www.cosmos.esa.int/web/gaia-users/archive/programmatic-access
-- RECONS 100 nearest systems: https://www.recons.org/TOP100.posted.htm
 
 Install:
     pip install numpy pandas matplotlib pillow imageio imageio-ffmpeg tqdm \
@@ -51,17 +46,6 @@ from typing import Dict, Iterable, List, Optional, Tuple
 
 import imageio.v2 as iio
 import matplotlib.pyplot as plt
-
-# Some minimal or partially packaged Matplotlib installations do not register
-# the "3d" projection automatically. Importing mplot3d explicitly fixes the
-# normal case. If it is genuinely unavailable, preview plots fall back to three
-# orthographic 2D views; video rendering is unaffected.
-try:
-    from mpl_toolkits.mplot3d import Axes3D  # noqa: F401
-    HAS_MPL_3D = True
-except Exception:
-    HAS_MPL_3D = False
-
 import numpy as np
 import pandas as pd
 from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont
@@ -470,61 +454,20 @@ def save_data_products(named: pd.DataFrame, background: pd.DataFrame, summary: D
 
 
 def create_scientific_plots(named: pd.DataFrame, background: pd.DataFrame):
-    """Create optional diagnostic plots without ever blocking video rendering.
-
-    Matplotlib's 3D projection is used when available. On installations where
-    ``projection="3d"`` is not registered, the same XYZ data is shown as three
-    orthographic 2D projections instead.
-    """
-    sample = (
-        background.sample(min(len(background), 1200), random_state=7)
-        if len(background) > 1200
-        else background
-    )
+    sample = background.sample(min(len(background), 1200), random_state=7) if len(background) > 1200 else background
+    fig = plt.figure(figsize=(7, 6))
+    ax = fig.add_subplot(111, projection="3d")
+    ax.scatter(sample["x_ly"], sample["y_ly"], sample["z_ly"], s=4, alpha=0.22)
     focus = named[named["name"] != "Sun"]
-    scientific_path = PREVIEW_DIR / "nearby_stars_3d_scientific.png"
-
-    rendered_3d = False
-    if HAS_MPL_3D:
-        try:
-            fig = plt.figure(figsize=(7, 6))
-            ax = fig.add_subplot(111, projection="3d")
-            ax.scatter(sample["x_ly"], sample["y_ly"], sample["z_ly"], s=4, alpha=0.22)
-            ax.scatter(focus["x_ly"], focus["y_ly"], focus["z_ly"], s=28)
-            ax.scatter([0], [0], [0], s=70, marker="*")
-            ax.set_title("Nearby-star render sample in Sun-centred XYZ coordinates")
-            ax.set_xlabel("X (light-years)")
-            ax.set_ylabel("Y (light-years)")
-            ax.set_zlabel("Z (light-years)")
-            plt.tight_layout()
-            fig.savefig(scientific_path, dpi=170)
-            plt.close(fig)
-            rendered_3d = True
-        except (ImportError, KeyError, ValueError, AttributeError) as exc:
-            # Close a partially created figure before using the safe fallback.
-            plt.close("all")
-            print(f"3D Matplotlib preview unavailable ({exc}); using 2D XYZ projections.")
-
-    if not rendered_3d:
-        fig, axes = plt.subplots(1, 3, figsize=(13, 4.6))
-        projections = [
-            ("x_ly", "y_ly", "X–Y view"),
-            ("x_ly", "z_ly", "X–Z view"),
-            ("y_ly", "z_ly", "Y–Z view"),
-        ]
-        for ax, (x_col, y_col, title) in zip(axes, projections):
-            ax.scatter(sample[x_col], sample[y_col], s=4, alpha=0.22)
-            ax.scatter(focus[x_col], focus[y_col], s=28)
-            ax.scatter([0], [0], s=70, marker="*")
-            ax.set_title(title)
-            ax.set_xlabel(x_col[0].upper() + " (light-years)")
-            ax.set_ylabel(y_col[0].upper() + " (light-years)")
-            ax.set_aspect("equal", adjustable="box")
-            ax.grid(alpha=0.18)
-        fig.suptitle("Nearby-star sample: orthographic Sun-centred XYZ projections")
-        plt.tight_layout()
-        fig.savefig(scientific_path, dpi=170)
-        plt.close(fig)
+    ax.scatter(focus["x_ly"], focus["y_ly"], focus["z_ly"], s=28)
+    ax.scatter([0], [0], [0], s=70, marker="*")
+    ax.set_title("Nearby-star render sample in Sun-centred XYZ coordinates")
+    ax.set_xlabel("X (light-years)")
+    ax.set_ylabel("Y (light-years)")
+    ax.set_zlabel("Z (light-years)")
+    plt.tight_layout()
+    plt.savefig(PREVIEW_DIR / "nearby_stars_3d_scientific.png", dpi=170)
+    plt.close(fig)
 
     ranks = focus.sort_values("distance_ly").head(12)
     fig, ax = plt.subplots(figsize=(9, 5.5))
@@ -532,7 +475,7 @@ def create_scientific_plots(named: pd.DataFrame, background: pd.DataFrame):
     ax.set_xlabel("Distance (light-years)")
     ax.set_title("Closest highlighted stellar systems")
     plt.tight_layout()
-    fig.savefig(PREVIEW_DIR / "nearest_system_distances.png", dpi=170)
+    plt.savefig(PREVIEW_DIR / "nearest_system_distances.png", dpi=170)
     plt.close(fig)
 
 
@@ -949,11 +892,7 @@ def main():
     named, background, source, error_note = load_catalogs()
     summary = summarize_catalog(named, background, source)
     paths = save_data_products(named, background, summary, error_note)
-    try:
-        create_scientific_plots(named, background)
-    except Exception as exc:
-        # Diagnostic PNGs are optional. Never stop the actual Shorts renderer.
-        print(f"Scientific preview plots skipped: {exc}")
+    create_scientific_plots(named, background)
     print("Source:", source)
     if error_note:
         print("Live query note:", error_note)
