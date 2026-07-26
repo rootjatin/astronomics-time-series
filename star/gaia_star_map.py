@@ -18,7 +18,10 @@ Current mission context used by the story:
 - Gaia measures tiny annual parallax shifts and proper motions, while colour and
   brightness reveal stellar populations in a colour-magnitude diagram.
 
-
+Official sources:
+- https://www.esa.int/Science_Exploration/Space_Science/Gaia
+- https://www.cosmos.esa.int/web/gaia/dr3
+- https://gea.esac.esa.int/archive/
 
 Recommended install:
     pip install numpy pandas matplotlib pillow imageio imageio-ffmpeg tqdm \
