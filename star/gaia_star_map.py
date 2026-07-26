@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 """
+Result : https://youtube.com/shorts/OhXaEZEM30E
 Gaia Mapped Billions of Stars — cinematic YouTube Short renderer
 
 Creates a vertical 1080x1920 astronomy short about ESA's Gaia mission and the
