@@ -4,6 +4,8 @@ from __future__ import annotations
 """
 How Fast Are Galaxies Moving Away From Us? — YouTube Shorts renderer
 
+result : https://www.youtube.com/shorts/AmE2i9Mga4g
+
 A vertical, no-Matplotlib astronomy animation explaining the
 Hubble-Lemaître law:
 
