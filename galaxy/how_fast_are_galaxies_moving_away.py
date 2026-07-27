@@ -28,6 +28,10 @@ Quick preview:
 Full render:
     python3 how_fast_are_galaxies_moving_away.py
 
+References:
+- NASA Science: Hubble Cosmological Redshift
+- NASA Science: Hubble Constant and Tension
+- ESA: Galaxies and the Expanding Universe
 
 """
 
