@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 """
+Result : https://www.youtube.com/shorts/1l6cspK0-VE
 Watch a Solar Storm Hit Earth — cinematic vertical YouTube Short renderer.
 
 Concept
