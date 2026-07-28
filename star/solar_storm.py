@@ -28,7 +28,13 @@ NOAA / SWPC grounding:
   of Earth are effectively immediate because the radiation travels at the speed
   of light.
 
-
+Live-data behavior
+------------------
+The script tries to fetch NASA DONKI event feeds (flares, CMEs, geomagnetic
+storm entries) for the May 2024 storm. If that fails, it falls back to an
+embedded event timeline and a proxy Kp series anchored to NASA/NOAA's published
+storm timing and severity. The fallback preview is suitable for validating the
+visual story, but it is not a substitute for the live event feeds.
 
 Usage
 -----
