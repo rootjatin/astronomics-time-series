@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 """
+Result : https://youtube.com/shorts/oM69uJxVD-I
+
 The Night Sky 100,000 Years From Now — cinematic YouTube Short renderer
 
 Creates a vertical 1080x1920 astronomy short projecting how the nearby-star
