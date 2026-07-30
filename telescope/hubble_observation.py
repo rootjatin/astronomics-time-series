@@ -14,7 +14,14 @@ Preferred live source
 MAST observation service:
     https://mast.stsci.edu/api/v0/invoke
 
+The renderer queries Mast.Caom.Filtered for public HST science image records
+and uses archive-level metadata including:
 
+- observation identifier
+- target coordinates (ICRS right ascension and declination)
+- observation start time (MJD)
+- exposure time in seconds
+- instrument, filter, target, and proposal metadata
 
 Only records with exposure time at or above the configurable minimum are
 requested by default. The returned observations are binned on the sky, and the
