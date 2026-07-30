@@ -9,6 +9,11 @@ animation places Hubble image observations at their real sky coordinates, sums
 exposure time in small equal-angle cells as a transparent depth proxy, labels
 canonical Hubble deep fields, and plays the archive chronologically.
 
+Preferred live source
+---------------------
+MAST observation service:
+    https://mast.stsci.edu/api/v0/invoke
+
 
 
 Only records with exposure time at or above the configurable minimum are
