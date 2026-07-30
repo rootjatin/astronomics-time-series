@@ -1,6 +1,8 @@
 from __future__ import annotations
-#Result : https://www.youtube.com/shorts/1Qr0ojFBQ3o
+
 """
+Result : https://www.youtube.com/shorts/1Qr0ojFBQ3o
+
 Hubble's Deepest Observations on One Sky Map — cinematic YouTube Short renderer
 
 Creates a vertical 1080x1920 astronomy short from public Hubble Space Telescope
