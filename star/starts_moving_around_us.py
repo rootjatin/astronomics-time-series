@@ -21,7 +21,11 @@ close or multiple systems can be incomplete or awkward in a single Gaia source
 query. If Gaia is unavailable, a deterministic background fixture is used and is
 clearly labelled on-screen and in the metadata.
 
-
+Official/reference sources:
+- ESA Gaia Archive: https://gea.esac.esa.int/archive/
+- ESA Gaia programmatic access:
+  https://www.cosmos.esa.int/web/gaia-users/archive/programmatic-access
+- RECONS 100 nearest systems: https://www.recons.org/TOP100.posted.htm
 
 Install:
     pip install numpy pandas pillow imageio imageio-ffmpeg tqdm \
