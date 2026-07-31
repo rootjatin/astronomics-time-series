@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 """
+Result : https://www.youtube.com/shorts/QiRbv64Zm7M
+
 Stars Are Moving Around Us — cinematic YouTube Short renderer
 
 Creates a vertical 1080x1920 astronomy short showing that nearby stars are
