@@ -21,25 +21,21 @@ close or multiple systems can be incomplete or awkward in a single Gaia source
 query. If Gaia is unavailable, a deterministic background fixture is used and is
 clearly labelled on-screen and in the metadata.
 
-Official/reference sources:
-- ESA Gaia Archive: https://gea.esac.esa.int/archive/
-- ESA Gaia programmatic access:
-  https://www.cosmos.esa.int/web/gaia-users/archive/programmatic-access
-- RECONS 100 nearest systems: https://www.recons.org/TOP100.posted.htm
+
 
 Install:
-    pip install numpy pandas matplotlib pillow imageio imageio-ffmpeg tqdm \
+    pip install numpy pandas pillow imageio imageio-ffmpeg tqdm \
         astropy astroquery
 
 Full render:
-    python the_closest_stars_to_earth_in_3d_short.py
+    python stars_are_moving_around_us_short.py
 
 Quick preview:
-    NEARBY_STARS_SHORT_QUICK=1 python the_closest_stars_to_earth_in_3d_short.py
+    NEARBY_STARS_SHORT_QUICK=1 python stars_are_moving_around_us_short.py
 
 Forced offline preview:
     NEARBY_STARS_SHORT_QUICK=1 NEARBY_STARS_SHORT_OFFLINE=1 \
-        python the_closest_stars_to_earth_in_3d_short.py
+        python stars_are_moving_around_us_short.py
 """
 
 import json
@@ -50,7 +46,6 @@ from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Tuple
 
 import imageio.v2 as iio
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont
@@ -69,6 +64,8 @@ except Exception:
 QUICK_MODE = os.environ.get("NEARBY_STARS_SHORT_QUICK", "0") == "1"
 FORCE_OFFLINE = os.environ.get("NEARBY_STARS_SHORT_OFFLINE", "0") == "1"
 
+SCRIPT_BUILD = "NO-MATPLOTLIB-FIX-2026-07-25"
+
 OUTPUT_ROOT = Path("stars_are_moving_around_us_short_output")
 DATA_ROOT = OUTPUT_ROOT / "data"
 PREVIEW_DIR = OUTPUT_ROOT / "previews"
@@ -83,8 +80,7 @@ This 3D animation visualises the proper motion of nearby stars around our Sun.
 The arrows are exaggerated so their motion is visible on screen. Over thousands
 of years, familiar constellations will slowly change shape.
 
-Created with Python using NumPy, Pandas, Pillow, Matplotlib and Gaia-inspired
-stellar data.
+Created with Python using NumPy, Pandas, Pillow and Gaia-inspired stellar data.
 
 #Space #Astronomy #Stars #Python #Science #Shorts
 """
@@ -455,14 +451,14 @@ def summarize_catalog(named: pd.DataFrame, background: pd.DataFrame, source: str
 def save_data_products(named: pd.DataFrame, background: pd.DataFrame, summary: Dict, error_note: Optional[str]):
     named_path = DATA_ROOT / "named_nearby_star_systems.csv"
     background_path = DATA_ROOT / "nearby_gaia_or_fixture_sample.csv"
-    summary_path = DATA_ROOT / "closest_stars_3d_summary.json"
+    summary_path = DATA_ROOT / "moving_stars_summary.json"
     named.to_csv(named_path, index=False)
     background.to_csv(background_path, index=False)
     summary_path.write_text(json.dumps({
         "summary": summary,
         "live_query_error": error_note,
         "offline_warning": "The offline background is a deterministic spatial fixture, not observational data.",
-        "named_table_note": "Named positions/distances are a compact rounded reference table for visual storytelling.",
+        "named_table_note": "Named positions, distances and proper motions are a compact rounded reference table for visual storytelling.",
         "official_sources": [
             "https://gea.esac.esa.int/archive/",
             "https://www.cosmos.esa.int/web/gaia-users/archive/programmatic-access",
@@ -473,29 +469,125 @@ def save_data_products(named: pd.DataFrame, background: pd.DataFrame, summary: D
 
 
 def create_scientific_plots(named: pd.DataFrame, background: pd.DataFrame):
-    sample = background.sample(min(len(background), 1200), random_state=7) if len(background) > 1200 else background
-    fig = plt.figure(figsize=(7, 6))
-    ax = fig.add_subplot(111, projection="3d")
-    ax.scatter(sample["x_ly"], sample["y_ly"], sample["z_ly"], s=4, alpha=0.22)
-    focus = named[named["name"] != "Sun"]
-    ax.scatter(focus["x_ly"], focus["y_ly"], focus["z_ly"], s=28)
-    ax.scatter([0], [0], [0], s=70, marker="*")
-    ax.set_title("Nearby-star render sample in Sun-centred XYZ coordinates")
-    ax.set_xlabel("X (light-years)")
-    ax.set_ylabel("Y (light-years)")
-    ax.set_zlabel("Z (light-years)")
-    plt.tight_layout()
-    plt.savefig(PREVIEW_DIR / "nearby_stars_3d_scientific.png", dpi=170)
-    plt.close(fig)
+    """Create optional diagnostic PNGs with Pillow only.
 
-    ranks = focus.sort_values("distance_ly").head(12)
-    fig, ax = plt.subplots(figsize=(9, 5.5))
-    ax.barh(ranks["name"][::-1], ranks["distance_ly"][::-1])
-    ax.set_xlabel("Distance (light-years)")
-    ax.set_title("Closest highlighted stellar systems")
-    plt.tight_layout()
-    plt.savefig(PREVIEW_DIR / "nearest_system_distances.png", dpi=170)
-    plt.close(fig)
+    Matplotlib is intentionally not imported anywhere in this project. This
+    avoids Axes3D/version conflicts and keeps diagnostic images independent of
+    the actual video renderer.
+    """
+    try:
+        focus = named[named["name"] != "Sun"].copy()
+        sample = (
+            background.sample(min(len(background), 1200), random_state=7)
+            if len(background) > 1200
+            else background
+        )
+
+        # ------------------------------------------------------------------
+        # Top-down X/Y neighbourhood map
+        # ------------------------------------------------------------------
+        width, height = 1400, 1100
+        margin = 110
+        chart = Image.new("RGB", (width, height), (3, 9, 22))
+        draw = ImageDraw.Draw(chart, "RGBA")
+        title_font = get_font(54, True)
+        label_font = get_font(27, False)
+        small_font = get_font(21, False)
+
+        draw.text((margin, 48), "Nearby stars — top-down X/Y view", font=title_font,
+                  fill=(245, 249, 255, 255))
+        draw.text((margin, 112), "Pillow diagnostic preview · video projection remains fully 3D",
+                  font=label_font, fill=(125, 220, 242, 235))
+
+        all_x = np.concatenate([sample["x_ly"].to_numpy(float), focus["x_ly"].to_numpy(float), np.array([0.0])])
+        all_y = np.concatenate([sample["y_ly"].to_numpy(float), focus["y_ly"].to_numpy(float), np.array([0.0])])
+        limit = max(12.5, float(np.nanpercentile(np.abs(np.concatenate([all_x, all_y])), 96)))
+        plot_left, plot_top = margin, 190
+        plot_right, plot_bottom = width - margin, height - 100
+        plot_w, plot_h = plot_right - plot_left, plot_bottom - plot_top
+
+        def project_xy(x: float, y: float) -> Tuple[float, float]:
+            sx = plot_left + (x + limit) / (2.0 * limit) * plot_w
+            sy = plot_bottom - (y + limit) / (2.0 * limit) * plot_h
+            return sx, sy
+
+        for ring in (4, 8, 12):
+            radius_x = ring / (2.0 * limit) * plot_w
+            radius_y = ring / (2.0 * limit) * plot_h
+            cx, cy = project_xy(0.0, 0.0)
+            draw.ellipse((cx - radius_x, cy - radius_y, cx + radius_x, cy + radius_y),
+                         outline=(100, 210, 238, 75), width=2)
+            draw.text((cx + radius_x + 8, cy - 14), f"{ring} ly", font=small_font,
+                      fill=(145, 210, 228, 180))
+
+        x0, y0 = project_xy(-limit, 0.0)
+        x1, y1 = project_xy(limit, 0.0)
+        draw.line((x0, y0, x1, y1), fill=(255, 130, 115, 105), width=2)
+        x0, y0 = project_xy(0.0, -limit)
+        x1, y1 = project_xy(0.0, limit)
+        draw.line((x0, y0, x1, y1), fill=(110, 235, 175, 105), width=2)
+
+        for row in sample.itertuples(index=False):
+            x, y = project_xy(float(row.x_ly), float(row.y_ly))
+            mag = float(getattr(row, "phot_g_mean_mag", 15.0))
+            radius = max(1.2, min(4.0, (20.0 - mag) / 4.8))
+            colour = NearbyStarsScene.star_colour(float(getattr(row, "bp_rp", 1.4)))
+            draw.ellipse((x - radius, y - radius, x + radius, y + radius),
+                         fill=colour + (120,))
+
+        closest = focus.sort_values("distance_ly").head(12)
+        for row in closest.itertuples(index=False):
+            x, y = project_xy(float(row.x_ly), float(row.y_ly))
+            colour = NearbyStarsScene.spectral_colour(str(row.spectral))
+            draw.ellipse((x - 7, y - 7, x + 7, y + 7), fill=colour + (255,),
+                         outline=(255, 255, 255, 230), width=2)
+            draw.text((x + 10, y - 12), str(row.name), font=small_font,
+                      fill=(245, 249, 255, 230), stroke_width=2,
+                      stroke_fill=(0, 0, 0, 230))
+
+        sx, sy = project_xy(0.0, 0.0)
+        draw.regular_polygon((sx, sy, 15), n_sides=8, rotation=22.5,
+                             fill=(255, 232, 145, 255), outline=(255, 255, 255, 255))
+        draw.text((sx + 20, sy - 14), "Sun", font=label_font, fill=(255, 235, 160, 255),
+                  stroke_width=2, stroke_fill=(0, 0, 0, 230))
+        chart.save(PREVIEW_DIR / "nearby_stars_xy_scientific.png", quality=95)
+
+        # ------------------------------------------------------------------
+        # Distance ranking chart
+        # ------------------------------------------------------------------
+        ranks = focus.sort_values("distance_ly").head(12).iloc[::-1]
+        width, height = 1600, 1050
+        chart = Image.new("RGB", (width, height), (3, 9, 22))
+        draw = ImageDraw.Draw(chart, "RGBA")
+        title_font = get_font(52, True)
+        name_font = get_font(26, True)
+        value_font = get_font(23, False)
+        draw.text((80, 46), "Closest highlighted stellar systems", font=title_font,
+                  fill=(245, 249, 255, 255))
+        draw.text((82, 112), "Distance from the Sun in light-years", font=get_font(28, False),
+                  fill=(125, 220, 242, 235))
+
+        chart_left, chart_right = 470, width - 120
+        top, row_h = 185, 64
+        max_distance = max(12.0, float(ranks["distance_ly"].max()) * 1.05)
+        for index, row in enumerate(ranks.itertuples(index=False)):
+            y = top + index * row_h
+            name = str(row.name)
+            distance = float(row.distance_ly)
+            colour = NearbyStarsScene.spectral_colour(str(row.spectral))
+            draw.text((70, y + 9), name, font=name_font, fill=(242, 247, 252, 255))
+            draw.rounded_rectangle((chart_left, y + 10, chart_right, y + 43), radius=14,
+                                   fill=(20, 38, 58, 210))
+            bar_end = chart_left + int((distance / max_distance) * (chart_right - chart_left))
+            draw.rounded_rectangle((chart_left, y + 10, max(chart_left + 8, bar_end), y + 43),
+                                   radius=14, fill=colour + (235,))
+            draw.text((min(bar_end + 14, chart_right - 115), y + 8), f"{distance:.2f} ly",
+                      font=value_font, fill=(245, 249, 255, 245), stroke_width=2,
+                      stroke_fill=(0, 0, 0, 220))
+        chart.save(PREVIEW_DIR / "nearest_system_distances.png", quality=95)
+    except Exception as exc:
+        # Diagnostic images are optional and must never block video rendering.
+        print(f"Skipping optional Pillow diagnostic plots: {exc}")
 
 
 # -----------------------------------------------------------------------------
@@ -899,7 +991,7 @@ def render_video(scene: NearbyStarsScene):
             "-movflags", "+faststart",
         ],
     ) as writer:
-        for t in tqdm(times, desc="Rendering nearby-stars 3D short"):
+        for t in tqdm(times, desc="Rendering moving-stars short"):
             writer.append_data(scene.render_frame(float(t)))
     shutil.copyfile(raw_path, final_path)
     print("Final video:", final_path.resolve())
@@ -916,6 +1008,9 @@ def write_youtube_metadata():
 
 
 def main():
+    print(f"Running script: {Path(__file__).resolve()}")
+    print(f"Build: {SCRIPT_BUILD}")
+    print("Renderer: Pillow/NumPy only — Matplotlib is not used")
     metadata_path = write_youtube_metadata()
     print("YouTube metadata:", metadata_path.resolve())
     print("Loading nearby-star data ...")
