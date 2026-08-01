@@ -4,6 +4,26 @@ from __future__ import annotations
 ONE LIGHT-DAY: VOYAGER'S LAST CONVERSATION
 ===========================================
 
+SCIENTIFIC FOUNDATION
+---------------------
+At runtime, the script asks NASA/JPL Horizons for Voyager 1 vectors relative to
+both the Sun and Earth at the selected epoch. The Earth-relative range is used
+to calculate one-way radio light time. If Horizons is unavailable, a clearly
+labelled approximation is generated from NASA's published one-light-day
+milestone date and a representative Voyager 1 cruise rate.
+
+The following are data-driven:
+    - selected epoch
+    - Voyager 1 Earth-relative and heliocentric range
+    - one-way light time
+
+The following are artistic visualisations:
+    - camera paths and compressed chronology
+    - relative object sizes
+    - heliosphere/heliopause geometry
+    - star, nebula, plasma, and galaxy fields
+    - soundtrack and radio-wave graphics
+
 A self-contained cinematic micro-documentary renderer written in Python.
 The default output is a 60-second vertical film (1080x1920, 24 fps) designed
 for YouTube Shorts, Reels, and TikTok. Wide and square masters are supported.
