@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 """
+output : https://youtu.be/Y2_xez10MIY
 RED FRONTIER: MARS BEFORE FOOTSTEPS
 ===================================
 
