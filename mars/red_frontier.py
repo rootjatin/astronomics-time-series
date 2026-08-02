@@ -10,6 +10,31 @@ The default output is a 3.5-minute widescreen film about Mars: its ancient
 water, colossal landscapes, robot explorers, and the possibility of future
 human arrival.
 
+The style goal is atmospheric, premium, and emotionally paced rather than a
+fast explainer. The film is divided into eight cinematic acts:
+    1. The red light in the dark
+    2. Earth looks toward Mars
+    3. Arrival in orbit
+    4. When Mars had water
+    5. Olympus Mons and Valles Marineris
+    6. Dust, rovers, and the blue sunset
+    7. The first human footsteps (speculative)
+    8. The waiting frontier
+
+LOCAL ASSET SUPPORT
+-------------------
+The renderer looks for an img folder beside the script, or at COSMIC_IMG_DIR.
+It can use files such as:
+    img/Mars.jpg
+    img/Earth.jpg
+    img/Jupiter.jpg
+    img/Saturn.jpg
+    img/Sun.jpg
+    img/Stars.jpg
+    img/Saturn ring.png
+
+If these assets are not found, the script falls back to fully procedural
+planet textures and backgrounds.
 
 
 SCIENTIFIC HONESTY
