@@ -22,7 +22,17 @@ NASA/JPL SBDB Close-Approach Data API:
     https://ssd-api.jpl.nasa.gov/cad.api
     https://ssd-api.jpl.nasa.gov/doc/cad.html
 
-
+ interpretation rules
+------------------------------
+- "Fastest" in this video means the highest published Earth-relative
+  close-approach speed (`v_rel`) among asteroid close-approach records returned
+  by the JPL CAD API for the configured date span.
+- This is not the same as the asteroid's maximum heliocentric speed around the
+  Sun, and it is not a measure of impact energy.
+- The same asteroid may appear many times in the close-approach database. The
+  script keeps only the single fastest encounter for each asteroid.
+- Rankings may change if JPL's database, orbit solutions, or future date span
+  changes.
 
 
 Offline fallback
