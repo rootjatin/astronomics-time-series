@@ -22,7 +22,7 @@ NASA/JPL SBDB Close-Approach Data API:
     https://ssd-api.jpl.nasa.gov/cad.api
     https://ssd-api.jpl.nasa.gov/doc/cad.html
 
- interpretation rules
+Honesty / interpretation rules
 ------------------------------
 - "Fastest" in this video means the highest published Earth-relative
   close-approach speed (`v_rel`) among asteroid close-approach records returned
@@ -33,7 +33,6 @@ NASA/JPL SBDB Close-Approach Data API:
   script keeps only the single fastest encounter for each asteroid.
 - Rankings may change if JPL's database, orbit solutions, or future date span
   changes.
-
 
 Offline fallback
 ----------------
@@ -856,7 +855,38 @@ def render_video(scene: FastAsteroidsScene) -> Path:
 
 
 def make_contact_sheet(paths: Sequence[Path], out_path: Path):
-    """todo : """ 
+    thumbs = []
+    for path in paths[:6]:
+        image = Image.open(path).convert("RGB").resize((270, 480))
+        draw = ImageDraw.Draw(image)
+        draw.rectangle((8, 8, 120, 38), fill=(0, 0, 0))
+        draw.text((18, 13), path.stem.replace("preview_", ""), fill=(255, 255, 255))
+        thumbs.append(image)
+    sheet = Image.new("RGB", (600, 1520), (8, 11, 18))
+    for index, thumb in enumerate(thumbs):
+        row, col = divmod(index, 2)
+        sheet.paste(thumb, (20 + col * 290, 20 + row * 500))
+    sheet.save(out_path, quality=92)
+
+
+
+def main():
+    print("Collecting fast asteroid data ...")
+    ranked, summary = collect_data()
+    csv_path, json_path = save_data(ranked, summary)
+    print("Data:", csv_path.resolve())
+    print("Summary:", json_path.resolve())
+
+    scene = FastAsteroidsScene(ranked, summary)
+    preview_times = [1.0, min(10.0, CONFIG["duration_s"] * 0.22), min(24.0, CONFIG["duration_s"] * 0.42), min(37.0, CONFIG["duration_s"] * 0.64), min(47.0, CONFIG["duration_s"] * 0.83), CONFIG["duration_s"] - 1]
+    preview_paths = []
+    for t in tqdm(preview_times, desc="Preview frames"):
+        path = PREVIEW_ROOT / f"preview_{int(t):02d}s.png"
+        Image.fromarray(scene.render_frame(float(t))).save(path)
+        preview_paths.append(path)
+    make_contact_sheet(preview_paths, PREVIEW_ROOT / "the_fastest_asteroids_ever_discovered_contact_sheet.jpg")
+    video_path = render_video(scene)
+    print("Video:", video_path.resolve())
     print("Source status:", summary)
 
 
