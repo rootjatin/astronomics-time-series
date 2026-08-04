@@ -16,6 +16,13 @@ What the video shows
 - A bar-chart leaderboard, detailed cards, a timeline of encounter dates, and
   speed comparisons against familiar benchmarks.
 
+Official live source
+--------------------
+NASA/JPL SBDB Close-Approach Data API:
+    https://ssd-api.jpl.nasa.gov/cad.api
+    https://ssd-api.jpl.nasa.gov/doc/cad.html
+
+
 
 
 Offline fallback
