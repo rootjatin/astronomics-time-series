@@ -8,6 +8,20 @@ Type Ia supernova distance–redshift catalogue. The animation reveals the
 observational pattern behind cosmic expansion: more distant supernovae are,
 on average, measured at larger cosmological redshift.
 
+Preferred live source
+---------------------
+Pantheon+SH0ES public data release:
+    Pantheon+_Data/4_DISTANCES_AND_COVAR/Pantheon+SH0ES.dat
+
+The script downloads the official whitespace-delimited table, keeps valid
+spectroscopically confirmed Type Ia supernova measurements, combines repeated
+light-curve entries by supernova identifier, and derives:
+
+- Hubble-diagram coordinates: redshift z_HD versus distance modulus.
+- Luminosity distance in megaparsecs from the released distance modulus.
+- A descriptive low-redshift slope using v ≈ cz and a line through the origin.
+- Redshift-bin medians and quantiles for a robust visual trend.
+- The scale factor at emission, a = 1 / (1 + z), for selected real objects.
 
 
 Science story
