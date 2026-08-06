@@ -27,6 +27,14 @@ culmination. That geometric advantage is combined with darkness and atmosphere
 proxies. The result is an illustrative shortlist ranking, not a professional
 site survey or an exhaustive search of every point on Earth.
 
+Real-data sources
+-----------------
+- NASA Earth at Night / Black Marble 2016 grayscale map:
+  https://science.nasa.gov/earth/earth-observatory/earth-at-night/maps/
+- Open-Meteo Historical Weather API using ERA5 / ERA5-Land reanalysis:
+  https://open-meteo.com/en/docs/historical-weather-api
+
+
 modes
 ---------------
 Standard full-screen vertical:
