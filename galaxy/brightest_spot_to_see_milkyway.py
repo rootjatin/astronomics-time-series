@@ -1276,5 +1276,59 @@ def render_video(scene: MilkyWayScene) -> Path:
     print("Final video:", final_video.resolve())
     return final_video
 
+def main():
+    print("Loading NASA night-light map ...")
+    night_map, night_source, night_notes = load_nightlight_map()
+    print("Loading historical climate proxies ...")
+    climate, climate_source, climate_notes, request_urls = load_climate_metrics()
+    notes = night_notes + climate_notes
+    print("Scoring Milky Way viewing candidates ...")
+    scores, summary = score_sites(climate, night_map)
+    ranking_path, summary_path = save_data_products(
+        scores,
+        summary,
+        climate_source,
+        night_source,
+        notes,
+        request_urls,
+    )
+    create_scientific_plots(scores)
+
+    winner = scores.iloc[0]
+    print("Climate source:", climate_source)
+    print("Night-light source:", night_source)
+    print("Candidate sites:", len(scores))
+    print("Galactic Centre geometry uses declination approximately -29 degrees")
+    print("Top Milky Way visibility candidate:", winner["name"], "//", winner["region"])
+    print("Milky Way proxy score:", f"{winner['milky_way_score_100']:.2f}/100")
+    print("Clear-sunshine fraction:", f"{winner['mean_clear_sunshine_fraction'] * 100.0:.1f}%")
+    print("Annual precipitation proxy:", f"{winner['annual_precipitation_mm']:.1f} mm")
+    print("Elevation:", f"{winner['elevation_m']:.0f} m")
+    print("Galactic Centre maximum altitude:", f"{winner['galactic_core_max_altitude_deg']:.1f} degrees")
+    for note in notes:
+        print("Data note:", note)
+    print("Ranking data:", ranking_path.resolve())
+    print("Summary:", summary_path.resolve())
+
+    scene = MilkyWayScene(scores, summary, night_map, climate_source, night_source)
+    preview_times = [
+        1.0,
+        min(10.0, float(CONFIG["duration_s"]) * 0.20),
+        min(20.0, float(CONFIG["duration_s"]) * 0.37),
+        min(31.0, float(CONFIG["duration_s"]) * 0.56),
+        min(40.0, float(CONFIG["duration_s"]) * 0.72),
+        min(49.0, float(CONFIG["duration_s"]) * 0.86),
+        float(CONFIG["duration_s"]) - 0.7,
+    ]
+    for preview_time in tqdm(preview_times, desc="Preview frames"):
+        Image.fromarray(scene.render_frame(float(preview_time))).save(PREVIEW_DIR / f"preview_{int(preview_time):02d}s.png")
+    render_video(scene)
+    print("Output directory:", OUTPUT_ROOT.resolve())
+    for path in sorted(OUTPUT_ROOT.glob("*")):
+        print("-", path.name)
+
+
+if __name__ == "__main__":
+    main()
 
 
