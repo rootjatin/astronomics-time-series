@@ -9,7 +9,23 @@ Creates a borderless vertical science film in 1080x1920, with an optional true
 dive, satellite night-light imagery, climate proxies, a transparent scoring
 model, and a procedural drone-style desert flyover beneath a luminous Milky Way.
 
+Question answered
+-----------------
+The script does not claim to measure the intrinsic brightness of the Milky Way.
+Instead, it ranks a curated international shortlist by an explicit visibility
+proxy built from:
 
+- local artificial-light brightness sampled from NASA Black Marble imagery
+- clear-sky proxy from sunshine duration divided by daylight duration
+- annual precipitation as a broad dryness proxy
+- elevation
+- maximum altitude of the Galactic Centre, whose declination is approximated
+  as -29 degrees for this cinematic calculation
+
+A site near latitude -29 degrees places the Galactic Centre almost overhead at
+culmination. That geometric advantage is combined with darkness and atmosphere
+proxies. The result is an illustrative shortlist ranking, not a professional
+site survey or an exhaustive search of every point on Earth.
 
 modes
 ---------------
