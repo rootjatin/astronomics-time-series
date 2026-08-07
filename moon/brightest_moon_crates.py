@@ -2,6 +2,26 @@ from __future__ import annotations
 
 """
 The Moon's Brightest Craters — And Why They Outshine the Surface
+The Moon's Brightest Craters — And Why They Outshine the Surface
+
+A vertical, cinematic YouTube Shorts renderer with minimal text, procedural
+lunar visuals, a procedural stereo soundtrack, and a small real-metadata table
+for prominent high-albedo / rayed lunar craters.
+
+
+
+The code avoids presenting a made-up global albedo ranking. Aristarchus is the
+headline feature; the others are shown as prominent bright/rayed examples.
+
+Official source pages used for framing and metadata are written to the output
+summary and README. The lunar surface imagery in this renderer is procedural,
+not a replacement for calibrated LRO reflectance products.
+
+Usage
+-----
+Standard vertical render:
+    python the_moons_brightest_craters_cinematic_short.py
+
 
 
 """
