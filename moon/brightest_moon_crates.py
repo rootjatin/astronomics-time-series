@@ -8,7 +8,22 @@ A vertical, cinematic YouTube Shorts renderer with minimal text, procedural
 lunar visuals, a procedural stereo soundtrack, and a small real-metadata table
 for prominent high-albedo / rayed lunar craters.
 
+Scientific framing
+------------------
+These craters are not self-luminous. They look bright because they reflect more
+sunlight than much of the surrounding lunar surface. Fresh impacts expose and
+spread comparatively immature material. Over time, solar-wind irradiation and
+micrometeoroid bombardment alter and generally darken/redden exposed regolith —
+a family of processes called space weathering. Composition and illumination /
+viewing geometry also affect apparent brightness.
 
+Featured examples
+-----------------
+- Aristarchus: one of the Moon's brightest features; ~40 km diameter
+- Tycho: ~85 km diameter; ~110 million years old; enormous bright ray system
+- Copernicus: ~93 km diameter; prominent bright rays
+- Kepler: ~32 km diameter; bright rays over dark Oceanus Procellarum
+- Proclus: ~28 km diameter; conspicuous asymmetric bright rays
 
 The code avoids presenting a made-up global albedo ranking. Aristarchus is the
 headline feature; the others are shown as prominent bright/rayed examples.
