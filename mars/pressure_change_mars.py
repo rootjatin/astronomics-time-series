@@ -2,7 +2,18 @@
 from __future__ import annotations
 
 """
+The Real Pressure Changes on Mars — cinematic YouTube Shorts renderer
 
+Creates a clean, vertical science short focused on Curiosity / REMS pressure
+changes at Gale Crater over one Martian year.
+
+Design goals
+------------
+- minimal text overlays; each caption stays on screen only briefly
+- one elegant annual pressure ribbon instead of chart-heavy dashboards
+- procedural visuals: orbit, polar-cap breathing, pressure timeline,
+  Gale Crater fly-in, rover silhouette, dust haze, and finale
+- procedural stereo soundtrack so the MP4 has audio without external music
 """
 
 import csv
