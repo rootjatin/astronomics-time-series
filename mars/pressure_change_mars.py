@@ -14,6 +14,21 @@ Design goals
 - procedural visuals: orbit, polar-cap breathing, pressure timeline,
   Gale Crater fly-in, rover silhouette, dust haze, and finale
 - procedural stereo soundtrack so the MP4 has audio without external music
+
+Data note
+---------
+Mars does not have one single surface pressure. This script tells the story
+using Gale Crater pressure behaviour observed by Curiosity's REMS instrument.
+
+For a truly data-faithful production, provide a CSV with columns like:
+    sol_frac, pressure_pa
+where sol_frac runs from 0 to 1 across one Martian year.
+
+If no CSV is supplied, the script falls back to a hand-entered seasonal profile
+that matches the well-known annual Gale range (~700 to ~970 Pa) and the broad
+shape of the seasonal cycle. The fallback is clearly labelled in metadata and
+is intended as a production template when exact CSV data is not yet supplied.
+
 """
 
 import csv
