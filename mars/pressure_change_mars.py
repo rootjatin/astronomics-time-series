@@ -29,6 +29,18 @@ that matches the well-known annual Gale range (~700 to ~970 Pa) and the broad
 shape of the seasonal cycle. The fallback is clearly labelled in metadata and
 is intended as a production template when exact CSV data is not yet supplied.
 
+Usage
+-----
+Standard render:
+    python the_real_pressure_changes_on_mars_cinematic_short.py
+
+Quick preview:
+    MARS_PRESSURE_SHORT_QUICK=1 python the_real_pressure_changes_on_mars_cinematic_short.py
+
+Optional exact data input:
+    MARS_PRESSURE_DATA_PATH=/path/to/gale_pressure.csv \
+        python the_real_pressure_changes_on_mars_cinematic_short.py
+
 """
 
 import csv
