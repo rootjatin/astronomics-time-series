@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 """
@@ -40,7 +39,6 @@ Quick preview:
 Optional exact data input:
     MARS_PRESSURE_DATA_PATH=/path/to/gale_pressure.csv \
         python the_real_pressure_changes_on_mars_cinematic_short.py
-
 """
 
 import csv
@@ -72,7 +70,18 @@ for p in (OUTPUT_ROOT, PREVIEW_DIR, DATA_DIR):
     p.mkdir(parents=True, exist_ok=True)
 
 CONFIG: Dict[str, Any] = {
-    
+    "video_width": 540 if QUICK_MODE else (2160 if FOUR_K_MODE else 1080),
+    "video_height": 960 if QUICK_MODE else (3840 if FOUR_K_MODE else 1920),
+    "fps": 8 if QUICK_MODE else 24,
+    "duration_s": 13 if QUICK_MODE else 52,
+    "audio_rate": 44100,
+    "title": "THE REAL PRESSURE CHANGES ON MARS",
+    "subtitle": "Curiosity at Gale Crater • One Martian Year",
+    "output_basename": "the_real_pressure_changes_on_mars",
+    "background_stars": 180 if QUICK_MODE else 700,
+    "contrast": 1.08,
+    "saturation": 1.08,
+    "vignette": 0.25,
 }
 
 OUT_W = int(CONFIG["video_width"])
@@ -842,6 +851,7 @@ def save_summary(path: Path, source_label: str, pressure_x: np.ndarray, pressure
     }
     import json
     path.write_text(json.dumps(summary, indent=2), encoding="utf-8")
+
 
 def main():
     pressure_x, pressure_y, source_label, csv_copy = load_pressure_profile()
