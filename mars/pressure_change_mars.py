@@ -843,4 +843,31 @@ def save_summary(path: Path, source_label: str, pressure_x: np.ndarray, pressure
     import json
     path.write_text(json.dumps(summary, indent=2), encoding="utf-8")
 
+def main():
+    pressure_x, pressure_y, source_label, csv_copy = load_pressure_profile()
+    scene = MarsPressureScene(pressure_x, pressure_y, source_label)
 
+    silent_video = OUTPUT_ROOT / f"{CONFIG['output_basename']}_silent.mp4"
+    audio_path = OUTPUT_ROOT / f"{CONFIG['output_basename']}_audio.wav"
+    final_video = OUTPUT_ROOT / f"{CONFIG['output_basename']}.mp4"
+    srt_path = OUTPUT_ROOT / f"{CONFIG['output_basename']}.srt"
+    summary_path = OUTPUT_ROOT / f"{CONFIG['output_basename']}_summary.json"
+
+    print(f"Rendering frames to {silent_video} ...")
+    render_video(scene, silent_video)
+    print(f"Creating soundtrack at {audio_path} ...")
+    make_audio(audio_path, DURATION)
+    print(f"Muxing final video to {final_video} ...")
+    used_audio = mux_audio(silent_video, audio_path, final_video)
+    write_srt(CAPTIONS, srt_path)
+    save_summary(summary_path, source_label, pressure_x, pressure_y, used_audio)
+
+    print("Done.")
+    print(f"Final video: {final_video.resolve()}")
+    print(f"Subtitles : {srt_path.resolve()}")
+    print(f"Profile CSV: {csv_copy.resolve()}")
+    print(f"Summary   : {summary_path.resolve()}")
+
+
+if __name__ == "__main__":
+    main()
