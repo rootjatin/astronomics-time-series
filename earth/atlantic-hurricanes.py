@@ -1680,5 +1680,52 @@ def render_video(scene: AtlanticHurricaneScene) -> Path:
 # Main
 # -----------------------------------------------------------------------------
 
-__main__":
+def main():
+    print("Loading Atlantic HURDAT2 tracks ...")
+    storms, source, data_notes, source_path = load_hurdat2()
+
+    print("Loading coastline geometry ...")
+    land_polygons, land_source, land_notes = load_land_polygons()
+    notes = data_notes + land_notes
+
+    summary = storm_summary(storms, source, land_source)
+    tracks_path, summary_path = save_data_products(storms, summary, notes)
+
+    print("Data source:", source)
+    print("Land source:", land_source)
+    print("Inclusive seasons:", summary["title_years_inclusive"])
+    print("Hurricanes:", summary["hurricanes"])
+    print("Major hurricanes:", summary["major_hurricanes"])
+    if summary["strongest_storm_in_archive"]:
+        strongest = summary["strongest_storm_in_archive"]
+        print(
+            "Strongest by listed maximum wind:",
+            strongest["name"], strongest["year"], f"{strongest['max_wind_kt']:.0f} kt",
+        )
+    if source_path is not None:
+        print("Cached source:", source_path.resolve())
+    for note in notes:
+        print("Data note:", note)
+    print("Tracks CSV:", tracks_path.resolve())
+    print("Summary JSON:", summary_path.resolve())
+
+    scene = AtlanticHurricaneScene(storms, source, land_polygons, summary)
+
+    preview_times_full = [1.2, 10.5, 25.0, 38.5, 49.0, 55.5]
+    if QUICK_MODE:
+        preview_times = [value * float(CONFIG["duration_s"]) / 58.0 for value in preview_times_full]
+    else:
+        preview_times = preview_times_full
+    for preview_time in tqdm(preview_times, desc="Preview frames"):
+        frame = scene.render_frame(float(preview_time))
+        Image.fromarray(frame).save(PREVIEW_DIR / f"preview_{preview_time:05.2f}s.png")
+
+    final_video = render_video(scene)
+    print("Final output:", final_video.resolve())
+    print("Output directory:", OUTPUT_ROOT.resolve())
+    for path in sorted(OUTPUT_ROOT.glob("*")):
+        print("-", path.name)
+
+
+if __name__ == "__main__":
     main()
