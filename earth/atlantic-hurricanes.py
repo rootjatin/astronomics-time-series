@@ -36,13 +36,6 @@ If NOAA or Natural Earth cannot be reached, deterministic procedural fixture
 tracks and coarse built-in land polygons are used. The result remains useful
 for timing and layout previews, but is clearly labeled as synthetic.
 
-Primary sources
----------------
-- NOAA NHC Data Archive: https://www.nhc.noaa.gov/data/
-- HURDAT2 format: https://www.nhc.noaa.gov/data/hurdat/hurdat2-format-atlantic.pdf
-- NOAA Historical Hurricane Tracks: https://coast.noaa.gov/hurricanes/
-- Natural Earth land polygons: https://www.naturalearthdata.com/
-
 Recommended install
 -------------------
     pip install numpy pandas pillow imageio imageio-ffmpeg tqdm pyshp
@@ -55,7 +48,21 @@ Force offline fixture mode
 --------------------------
     ATLANTIC_HURRICANES_SHORT_OFFLINE=1 python 175_years_atlantic_hurricanes_short.py
 
+Outputs
+-------
+- final vertical MP4 with generated ambient audio when ffmpeg is available
+- silent MP4 fallback
+- SRT subtitle sidecar
+- preview PNG frames
+- parsed storm summary JSON
+- cached NOAA HURDAT2 and Natural Earth files
 
+Primary sources
+---------------
+- NOAA NHC Data Archive: https://www.nhc.noaa.gov/data/
+- HURDAT2 format: https://www.nhc.noaa.gov/data/hurdat/hurdat2-format-atlantic.pdf
+- NOAA Historical Hurricane Tracks: https://coast.noaa.gov/hurricanes/
+- Natural Earth land polygons: https://www.naturalearthdata.com/
 """
 
 import json
@@ -103,7 +110,31 @@ PREVIEW_DIR = OUTPUT_ROOT / "previews"
 for directory in [OUTPUT_ROOT, DATA_ROOT, CACHE_ROOT, PREVIEW_DIR]:
     directory.mkdir(parents=True, exist_ok=True)
 
-
+CONFIG: Dict[str, Any] = {
+    "video_width": 540 if QUICK_MODE else 1080,
+    "video_height": 960 if QUICK_MODE else 1920,
+    "fps": 6 if QUICK_MODE else 24,
+    "duration_s": 12.0 if QUICK_MODE else 58.0,
+    "output_basename": "175_years_of_atlantic_hurricanes",
+    "title": "175 YEARS OF ATLANTIC HURRICANES",
+    "subtitle": "1851—2025 // NOAA HURDAT2",
+    "start_year": 1851,
+    "end_year": 2025,
+    "map_lon_min": -105.0,
+    "map_lon_max": 10.0,
+    "map_lat_min": 0.0,
+    "map_lat_max": 58.0,
+    "map_margin_x": 38 if QUICK_MODE else 74,
+    "map_top": 116 if QUICK_MODE else 228,
+    "map_bottom": 790 if QUICK_MODE else 1590,
+    "background_particles": 180 if QUICK_MODE else 420,
+    "rain_particles": 90 if QUICK_MODE else 240,
+    "track_alpha": 150,
+    "contrast": 1.08,
+    "saturation": 1.02,
+    "vignette": 0.34,
+    "grain_strength": 4.0,
+    "soundtrack_sample_rate": 44100,
 }
 
 OUT_W = int(CONFIG["video_width"])
@@ -1645,3 +1676,9 @@ def render_video(scene: AtlanticHurricaneScene) -> Path:
     return final_video
 
 
+# -----------------------------------------------------------------------------
+# Main
+# -----------------------------------------------------------------------------
+
+__main__":
+    main()
