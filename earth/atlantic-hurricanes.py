@@ -36,6 +36,13 @@ If NOAA or Natural Earth cannot be reached, deterministic procedural fixture
 tracks and coarse built-in land polygons are used. The result remains useful
 for timing and layout previews, but is clearly labeled as synthetic.
 
+Primary sources
+---------------
+- NOAA NHC Data Archive: https://www.nhc.noaa.gov/data/
+- HURDAT2 format: https://www.nhc.noaa.gov/data/hurdat/hurdat2-format-atlantic.pdf
+- NOAA Historical Hurricane Tracks: https://coast.noaa.gov/hurricanes/
+- Natural Earth land polygons: https://www.naturalearthdata.com/
+
 Recommended install
 -------------------
     pip install numpy pandas pillow imageio imageio-ffmpeg tqdm pyshp
