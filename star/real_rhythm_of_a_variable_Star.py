@@ -12,7 +12,15 @@ Preferred live sources
 1. NASA TESS light-curve products downloaded through Lightkurve / MAST.
 2. AAVSO VSX object metadata for the catalog period and classification.
 
-
+The renderer tells this science story:
+- A variable star is measured as a sequence of brightness samples: a light curve.
+- RR Lyrae's raw time series can look complicated, especially across gaps and
+  slow amplitude modulation.
+- A period search tests many candidate cycle lengths.
+- Folding every measurement by the best period reveals the repeating pulse.
+- RR Lyrae brightens quickly and fades more slowly during a radial pulsation.
+- The cycle is about 0.567 day, or roughly 13 hours 36 minutes.
+- RR Lyrae also shows the Blazhko effect, so real cycles are not perfectly cloned.
 
 Offline behavior
 ----------------
