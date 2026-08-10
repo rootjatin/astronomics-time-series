@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 """
+Result : https://www.youtube.com/shorts/9rcvtCXuIRs
 The Real Rhythm of a Variable Star — cinematic YouTube Short renderer
 
 Creates a vertical 1080x1920 astronomy short that reveals the repeating pulse
