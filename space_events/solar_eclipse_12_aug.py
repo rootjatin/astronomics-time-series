@@ -9,6 +9,31 @@ Europe's August 12, 2026 total solar eclipse.
 
 The renderer is intentionally split into two layers:
 
+REAL DATA (hard-coded from NASA/GSFC sources)
+---------------------------------------------
+- Eclipse date/type: Total Solar Eclipse, 2026-08-12
+- NASA GSFC central-line path coordinates sampled every 2 minutes
+- Greatest eclipse: ~17:45:53.8 UTC, 65°13.5'N 25°13.7'W
+- Maximum central duration: ~2m18.2s
+- Path width near greatest eclipse: ~294 km
+- Eclipse magnitude: ~1.039 (NASA tables; search engine gives 1.0386)
+- Selected NASA city circumstances for Reykjavik, Leon, Zaragoza, Valencia,
+  Madrid, Barcelona, London, Paris, Berlin, and Dublin
+
+CINEMATIC / EXPLANATORY VISUALS
+-------------------------------
+- Procedural Sun, Moon, corona, stars, Earth shading, atmosphere, and clouds
+- Simplified coastline polygons for geographic context
+- Exaggerated Sun/Moon/Earth separations in the alignment scene
+- Stylized shadow cone and low-horizon Spain sunset reconstruction
+
+No internet connection is required at render time.
+
+NASA source references used to prepare the embedded data:
+- https://eclipse.gsfc.nasa.gov/SEpath/SEpath2001/SE2026Aug12Tpath.html
+- https://eclipse.gsfc.nasa.gov/SEsearch/SEdata.php?Ecl=20260812
+- https://science.nasa.gov/eclipses/future-eclipses/total-solar-eclipse-on-august-12-2026/
+- https://science.nasa.gov/eclipses/safety/
 
 Install
 -------
