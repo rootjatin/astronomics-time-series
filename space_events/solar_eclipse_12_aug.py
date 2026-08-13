@@ -988,3 +988,6 @@ def main():
     print(f"Path CSV:  {csvp}")
     print(f"Fact JSON: {jsonp}")
     print("\nScience credit: Eclipse Predictions by Fred Espenak, NASA's GSFC.")
+
+if __name__ == "__main__":
+    main()
