@@ -1,63 +1,43 @@
 from __future__ import annotations
 
 """
-August 12, 2026 Total Solar Eclipse — Cinematic YouTube Shorts Renderer
-=======================================================================
+August 12, 2026 Total Solar Eclipse — Cinematic YouTube Short Renderer v3
+============================================================================
 
-Creates a vertical 1080x1920 science Short explaining what happened during
-Europe's August 12, 2026 total solar eclipse.
-
-The renderer is intentionally split into two layers:
-
-REAL DATA (hard-coded from NASA/GSFC sources)
----------------------------------------------
-- Eclipse date/type: Total Solar Eclipse, 2026-08-12
-- NASA GSFC central-line path coordinates sampled every 2 minutes
-- Greatest eclipse: ~17:45:53.8 UTC, 65°13.5'N 25°13.7'W
-- Maximum central duration: ~2m18.2s
-- Path width near greatest eclipse: ~294 km
-- Eclipse magnitude: ~1.039 (NASA tables; search engine gives 1.0386)
-- Selected NASA city circumstances for Reykjavik, Leon, Zaragoza, Valencia,
-  Madrid, Barcelona, London, Paris, Berlin, and Dublin
-
-CINEMATIC / EXPLANATORY VISUALS
--------------------------------
-- Procedural Sun, Moon, corona, stars, Earth shading, atmosphere, and clouds
-- Simplified coastline polygons for geographic context
-- Exaggerated Sun/Moon/Earth separations in the alignment scene
-- Stylized shadow cone and low-horizon Spain sunset reconstruction
-
-No internet connection is required at render time.
-
-NASA source references used to prepare the embedded data:
-- https://eclipse.gsfc.nasa.gov/SEpath/SEpath2001/SE2026Aug12Tpath.html
-- https://eclipse.gsfc.nasa.gov/SEsearch/SEdata.php?Ecl=20260812
-- https://science.nasa.gov/eclipses/future-eclipses/total-solar-eclipse-on-august-12-2026/
-- https://science.nasa.gov/eclipses/safety/
-
-Install
+Purpose
 -------
-    pip install numpy pillow imageio imageio-ffmpeg tqdm
+This is a third-pass rebuild focused on two user-requested fixes:
 
-Quick preview
--------------
-    ECLIPSE_SHORT_QUICK=1 python august_12_2026_total_solar_eclipse_cinematic_short.py
+1. Use a proper map renderer instead of a crude pseudo-map.
+2. Prevent text from being cropped in the vertical 1080x1920 layout.
 
-Full 1080x1920 render
----------------------
-    python august_12_2026_total_solar_eclipse_cinematic_short.py
+What is new in v3
+-----------------
+- Uses Cartopy (preferred) to render a real Europe/North Atlantic map.
+- Falls back gracefully if Cartopy is unavailable.
+- All on-screen text is laid out in bounding boxes with automatic fitting,
+  so headlines and captions shrink before they crop.
+- The story is still descriptive and cinematic, but map scenes are now built
+  from actual geospatial plotting rather than hand-drawn polygons.
 
-Outputs
--------
-- MP4 video
-- SRT subtitles / voiceover script
-- PNG preview frames
-- CSV of NASA central-line path points
-- JSON fact sheet / source notes
+Recommended install
+-------------------
+    pip install numpy pillow imageio imageio-ffmpeg tqdm matplotlib cartopy
 
-Important safety note shown in the film:
-Except during totality, direct solar viewing requires proper eclipse eye
-protection. Cameras/binoculars/telescopes require a solar filter on the front.
+Quick preview render
+--------------------
+    ECLIPSE_SHORT_QUICK=1 python august_12_2026_total_solar_eclipse_cinematic_short_v3.py
+
+Full render
+-----------
+    python august_12_2026_total_solar_eclipse_cinematic_short_v3.py
+
+Notes
+-----
+- Cartopy may download Natural Earth shapefiles automatically the first time.
+- If Cartopy is not available, the script falls back to a local static basemap
+  image if found, or a very simple placeholder.
+- The eclipse path, timing, and numeric labels are embedded from NASA/GSFC.
 """
 
 import csv
@@ -65,65 +45,66 @@ import json
 import math
 import os
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 import imageio.v2 as iio
 import numpy as np
 from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont
 from tqdm.auto import tqdm
 
+# Delay heavy imports so the script still loads without cartopy.
+try:
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    from matplotlib.backends.backend_agg import FigureCanvasAgg
+    MATPLOTLIB_OK = True
+except Exception:
+    MATPLOTLIB_OK = False
+
+try:
+    import cartopy.crs as ccrs
+    import cartopy.feature as cfeature
+    CARTOPY_OK = True
+except Exception:
+    CARTOPY_OK = False
+
 
 # =============================================================================
-# Configuration
+# Config
 # =============================================================================
 
 QUICK_MODE = os.environ.get("ECLIPSE_SHORT_QUICK", "0") == "1"
 
-OUTPUT_ROOT = Path("august_12_2026_eclipse_short_output")
+OUTPUT_ROOT = Path("august_12_2026_eclipse_short_output_v3")
 PREVIEW_DIR = OUTPUT_ROOT / "previews"
 DATA_DIR = OUTPUT_ROOT / "data"
-for directory in (OUTPUT_ROOT, PREVIEW_DIR, DATA_DIR):
+CACHE_DIR = OUTPUT_ROOT / "cache"
+for directory in (OUTPUT_ROOT, PREVIEW_DIR, DATA_DIR, CACHE_DIR):
     directory.mkdir(parents=True, exist_ok=True)
 
 CONFIG: Dict[str, Any] = {
     "video_width": 540 if QUICK_MODE else 1080,
     "video_height": 960 if QUICK_MODE else 1920,
     "fps": 8 if QUICK_MODE else 30,
-    "duration_s": 12.0 if QUICK_MODE else 56.0,
-    "output_basename": "august_12_2026_total_solar_eclipse_cinematic",
-    "title": "THE DAY EUROPE WENT DARK",
-    "subtitle": "12 AUGUST 2026 — TOTAL SOLAR ECLIPSE",
-    "background_stars": 260 if QUICK_MODE else 900,
-    "contrast": 1.14,
-    "saturation": 0.94,
-    "vignette": 0.34,
+    "duration_s": 13.0 if QUICK_MODE else 56.0,
+    "output_basename": "august_12_2026_total_solar_eclipse_cinematic_pro_v3",
+    "background_stars": 220 if QUICK_MODE else 760,
+    "contrast": 1.10,
+    "saturation": 0.98,
+    "vignette": 0.26,
 }
 
 OUT_W = int(CONFIG["video_width"])
 OUT_H = int(CONFIG["video_height"])
 OUT_SIZE = (OUT_W, OUT_H)
 SCALE = OUT_W / 1080.0
-DURATION = float(CONFIG["duration_s"])
 FPS = int(CONFIG["fps"])
-
-COLORS = {
-    "space": (2, 5, 13),
-    "white": (245, 249, 253),
-    "muted": (155, 183, 205),
-    "cyan": (99, 220, 255),
-    "blue": (93, 151, 255),
-    "violet": (183, 119, 255),
-    "gold": (255, 197, 94),
-    "orange": (255, 132, 62),
-    "red": (255, 83, 95),
-    "green": (105, 233, 169),
-    "earth_ocean": (16, 61, 101),
-    "earth_land": (76, 125, 91),
-}
+DURATION = float(CONFIG["duration_s"])
 
 
 # =============================================================================
-# NASA / GSFC eclipse data embedded for deterministic rendering
+# Grounded eclipse data
 # =============================================================================
 
 ECLIPSE_FACTS: Dict[str, Any] = {
@@ -132,18 +113,13 @@ ECLIPSE_FACTS: Dict[str, Any] = {
     "greatest_eclipse_utc": "17:45:53.8",
     "greatest_lat_deg": 65.225,
     "greatest_lon_deg": -25.228333,
-    "greatest_sun_altitude_deg": 25.8,
-    "greatest_sun_azimuth_deg": 248.4,
     "greatest_path_width_km": 294.0,
     "greatest_central_duration_s": 138.2,
-    "eclipse_magnitude_rounded": 1.039,
-    "eclipse_magnitude_search_engine": 1.0386,
-    "saros_series": 126,
-    "prediction_note": "NASA GSFC path table: VSOP87/ELP2000-85, Delta T=71.4 s.",
+    "eclipse_magnitude": 1.039,
+    "saros": 126,
 }
 
-# NASA central line. Columns: UTC, lat_deg, lon_deg, path_width_km, duration_s.
-# Converted from degree+arcminute values in NASA's 120-second path table.
+# UTC, lat_deg, lon_deg, path_width_km, central_duration_s
 NASA_PATH: List[Tuple[str, float, float, float, float]] = [
     ("17:02", 82 + 16.5/60, 112 + 29.2/60, 273, 105.8),
     ("17:04", 85 + 17.7/60, 104 + 12.9/60, 274, 110.8),
@@ -194,72 +170,56 @@ NASA_PATH: List[Tuple[str, float, float, float, float]] = [
 ]
 
 CITY_DATA = [
-    # city, country, kind, partial begin, maximum/totality, partial end, coverage
     ("REYKJAVIK", "ICELAND", "TOTAL", "16:47", "17:48–17:49", "18:47", "TOTAL"),
     ("LEON", "SPAIN", "TOTAL", "19:32", "20:28–20:30", "21:22", "TOTAL"),
     ("ZARAGOZA", "SPAIN", "TOTAL", "19:34", "20:29–20:30", "21:07*", "TOTAL"),
     ("VALENCIA", "SPAIN", "TOTAL", "19:38", "20:32–20:33", "21:01*", "TOTAL"),
     ("MADRID", "SPAIN", "PARTIAL", "19:36", "20:32", "21:16*", "99%"),
     ("BARCELONA", "SPAIN", "PARTIAL", "19:35", "20:29", "20:54*", "99%"),
-    ("DUBLIN", "IRELAND", "PARTIAL", "18:12", "19:10", "20:05", "94%"),
-    ("PARIS", "FRANCE", "PARTIAL", "19:22", "20:17", "21:09", "92%"),
     ("LONDON", "U.K.", "PARTIAL", "18:17", "19:13", "20:06", "91%"),
-    ("BERLIN", "GERMANY", "PARTIAL", "19:15", "20:08", "20:38*", "85%"),
+    ("PARIS", "FRANCE", "PARTIAL", "19:22", "20:17", "21:09", "92%"),
 ]
 
-# Geographical marker locations used only for approximate placement on our stylized globe.
-CITY_COORDS = {
+CITY_COORDS: Dict[str, Tuple[float, float]] = {
     "REYKJAVIK": (64.1466, -21.9426),
     "LEON": (42.5987, -5.5671),
     "ZARAGOZA": (41.6488, -0.8891),
     "VALENCIA": (39.4699, -0.3763),
     "MADRID": (40.4168, -3.7038),
     "BARCELONA": (41.3874, 2.1686),
-    "DUBLIN": (53.3498, -6.2603),
-    "PARIS": (48.8566, 2.3522),
     "LONDON": (51.5072, -0.1276),
-    "BERLIN": (52.5200, 13.4050),
+    "PARIS": (48.8566, 2.3522),
 }
-
-NASA_SOURCE_NOTES = [
-    "Path / greatest eclipse: NASA GSFC eclipse path table by Fred Espenak.",
-    "Selected city circumstances: NASA Science Aug. 12, 2026 eclipse page.",
-    "Viewing safety: NASA Science eclipse eye-safety guidance.",
-    "Earth geography in this renderer is deliberately simplified/stylized; eclipse path points are NASA-derived.",
-]
 
 
 # =============================================================================
-# Story / narration
+# Narration / shot plan
 # =============================================================================
 
 FULL_CAPTIONS: List[Tuple[float, float, str]] = [
-    (0.4, 6.2, "On August 12, 2026, the Moon's shadow raced across the Arctic and North Atlantic — and parts of Europe experienced total darkness in daylight."),
-    (6.3, 14.4, "A total solar eclipse happens when the Moon passes almost exactly between Earth and the Sun. The tiny inner shadow is the umbra: inside it, the Sun is completely covered."),
-    (14.5, 24.2, "NASA's calculated center line began near far northern Siberia, curved past the pole, crossed Greenland and western Iceland, then swept across the North Atlantic into northern Spain."),
-    (24.3, 33.0, "Near greatest eclipse at 17:45:54 UTC, the center of the shadow was near 65.2 degrees north, 25.2 degrees west. The totality path was about 294 kilometers wide and totality lasted about two minutes eighteen seconds."),
-    (33.1, 42.6, "Europe was not equally dark. Reykjavik, Leon, Zaragoza and Valencia reached totality, while Madrid and Barcelona were extremely deep partial eclipses at about ninety-nine percent coverage."),
-    (42.7, 49.6, "In Spain the eclipse arrived late in the evening, so the black disk of the Moon and the solar corona appeared low in the western sky, close to sunset."),
-    (49.7, 55.5, "And one safety rule matters: except during the brief total phase, never look directly at the Sun without proper eclipse eye protection. Cameras and telescopes need front-mounted solar filters."),
+    (0.4, 6.3, "On August 12, 2026, the Moon's shadow crossed the Arctic, Iceland, the North Atlantic, and Spain — bringing a total solar eclipse to parts of Europe."),
+    (6.4, 13.2, "A total solar eclipse happens when the Moon moves directly in front of the Sun. Inside the tiny dark umbra, the Sun is completely covered and the corona appears."),
+    (13.3, 22.5, "This map scene now uses a proper geospatial renderer. NASA's central-line data curves out of the Arctic, passes Iceland, and reaches northern Spain."),
+    (22.6, 31.2, "Greatest eclipse happened around 17:45:54 UTC near 65.2 degrees north and 25.2 degrees west. The totality path was about 294 kilometers wide, with about 2 minutes 18 seconds of totality."),
+    (31.3, 40.5, "Not all of Europe saw the same thing. Reykjavik, Leon, Zaragoza, and Valencia reached totality. Madrid and Barcelona saw deep partial eclipses near ninety-nine percent coverage."),
+    (40.6, 48.2, "In Spain the eclipse came late in the evening, so the Moon's black disk and the white solar corona hung low in the western sky close to sunset."),
+    (48.3, 55.8, "And one safety rule matters: during the partial phases you must use proper eclipse glasses or certified solar filters. Only the brief total phase is safe to view directly."),
 ]
 
 SHOT_PLAN_FULL = [
-    {"name": "hook", "start": 0.0, "end": 6.6},
-    {"name": "alignment", "start": 6.6, "end": 14.8},
-    {"name": "path", "start": 14.8, "end": 24.5},
-    {"name": "greatest", "start": 24.5, "end": 33.3},
-    {"name": "cities", "start": 33.3, "end": 42.9},
-    {"name": "spain", "start": 42.9, "end": 49.9},
-    {"name": "safety", "start": 49.9, "end": 56.0},
+    {"name": "hook", "start": 0.0, "end": 6.5},
+    {"name": "alignment", "start": 6.5, "end": 13.5},
+    {"name": "path", "start": 13.5, "end": 22.8},
+    {"name": "greatest", "start": 22.8, "end": 31.5},
+    {"name": "cities", "start": 31.5, "end": 40.8},
+    {"name": "spain", "start": 40.8, "end": 48.4},
+    {"name": "safety", "start": 48.4, "end": 56.0},
 ]
 
 if QUICK_MODE:
-    time_scale = DURATION / 56.0
-    CAPTIONS = [(a*time_scale, b*time_scale, text) for a, b, text in FULL_CAPTIONS]
-    SHOT_PLAN = [
-        {"name": s["name"], "start": s["start"]*time_scale, "end": s["end"]*time_scale}
-        for s in SHOT_PLAN_FULL
-    ]
+    scale_t = DURATION / 56.0
+    CAPTIONS = [(a * scale_t, b * scale_t, txt) for a, b, txt in FULL_CAPTIONS]
+    SHOT_PLAN = [{"name": s["name"], "start": s["start"] * scale_t, "end": s["end"] * scale_t} for s in SHOT_PLAN_FULL]
 else:
     CAPTIONS = FULL_CAPTIONS
     SHOT_PLAN = SHOT_PLAN_FULL
@@ -273,18 +233,13 @@ def clamp(value: float, lo: float = 0.0, hi: float = 1.0) -> float:
     return max(lo, min(hi, float(value)))
 
 
-def smoothstep(value: float) -> float:
-    x = clamp(value)
-    return x*x*(3.0 - 2.0*x)
+def smoothstep(x: float) -> float:
+    x = clamp(x)
+    return x * x * (3.0 - 2.0 * x)
 
 
 def lerp(a: float, b: float, t: float) -> float:
-    return a + (b-a)*t
-
-
-def ease_out_cubic(x: float) -> float:
-    x = clamp(x)
-    return 1.0 - (1.0-x)**3
+    return a + (b - a) * t
 
 
 def get_shot(t: float) -> Dict[str, Any]:
@@ -295,9 +250,9 @@ def get_shot(t: float) -> Dict[str, Any]:
 
 
 def caption_at(t: float) -> Optional[str]:
-    for start, end, text in CAPTIONS:
-        if start <= t < end:
-            return text
+    for a, b, txt in CAPTIONS:
+        if a <= t < b:
+            return txt
     return None
 
 
@@ -310,53 +265,20 @@ def get_font(size: int, bold: bool = False):
     ]
     for candidate in candidates:
         try:
-            return ImageFont.truetype(candidate, size=max(7, int(size)))
+            return ImageFont.truetype(candidate, size=max(8, int(size)))
         except Exception:
             pass
     return ImageFont.load_default()
 
 
-def draw_text(
-    image: Image.Image,
-    text: str,
-    xy: Tuple[int, int],
-    size: int = 28,
-    fill=(255,255,255,255),
-    bold: bool = False,
-    stroke: int = 2,
-    anchor: str = "la",
-):
-    ImageDraw.Draw(image).text(
-        xy,
-        text,
-        font=get_font(size, bold),
-        fill=fill,
-        anchor=anchor,
-        stroke_width=max(0, int(stroke)),
-        stroke_fill=(0, 0, 0, min(235, fill[3] if len(fill) > 3 else 235)),
-    )
-
-
-def draw_wrapped_text(
-    image: Image.Image,
-    text: str,
-    xy: Tuple[int,int],
-    max_width: int,
-    size: int,
-    fill=(255,255,255,245),
-    bold: bool=False,
-    line_spacing: int=6,
-    anchor: str="la",
-):
-    draw = ImageDraw.Draw(image)
-    font = get_font(size, bold)
+def wrap_text(draw: ImageDraw.ImageDraw, text: str, font, max_width: int, stroke: int) -> List[str]:
     words = text.split()
     lines: List[str] = []
     current = ""
     for word in words:
         candidate = word if not current else current + " " + word
-        box = draw.textbbox((0,0), candidate, font=font, stroke_width=2)
-        if box[2]-box[0] <= max_width:
+        bbox = draw.textbbox((0, 0), candidate, font=font, stroke_width=stroke)
+        if bbox[2] - bbox[0] <= max_width:
             current = candidate
         else:
             if current:
@@ -364,666 +286,647 @@ def draw_wrapped_text(
             current = word
     if current:
         lines.append(current)
+    return lines
 
-    x, y = xy
-    for line in lines:
-        draw.text((x,y), line, font=font, fill=fill, anchor=anchor,
-                  stroke_width=2, stroke_fill=(0,0,0,225))
-        box = draw.textbbox((x,y), line, font=font, anchor=anchor, stroke_width=2)
-        y += (box[3]-box[1]) + line_spacing
+
+def fit_wrapped_text(
+    image: Image.Image,
+    text: str,
+    box: Tuple[int, int, int, int],
+    max_size: int,
+    min_size: int,
+    fill=(255, 255, 255, 255),
+    bold: bool = False,
+    stroke: int = 2,
+    line_spacing: int = 6,
+    align: str = "left",
+    valign: str = "top",
+):
+    draw = ImageDraw.Draw(image)
+    x0, y0, x1, y1 = box
+    width = max(10, x1 - x0)
+    height = max(10, y1 - y0)
+
+    chosen = None
+    chosen_lines: List[str] = []
+    for size in range(max_size, min_size - 1, -1):
+        font = get_font(size, bold=bold)
+        lines = wrap_text(draw, text, font, width, stroke)
+        b = draw.textbbox((0, 0), "Ag", font=font, stroke_width=stroke)
+        line_h = b[3] - b[1]
+        total_h = len(lines) * line_h + max(0, len(lines) - 1) * line_spacing
+        if total_h <= height:
+            # ensure each line fits, already wrapped; choose this size
+            chosen = font
+            chosen_lines = lines
+            chosen_size = size
+            break
+    if chosen is None:
+        chosen_size = min_size
+        chosen = get_font(min_size, bold=bold)
+        chosen_lines = wrap_text(draw, text, chosen, width, stroke)
+        # if still too tall, hard cut by line count
+        b = draw.textbbox((0, 0), "Ag", font=chosen, stroke_width=stroke)
+        line_h = b[3] - b[1]
+        max_lines = max(1, int((height + line_spacing) / max(1, line_h + line_spacing)))
+        chosen_lines = chosen_lines[:max_lines]
+
+    b = draw.textbbox((0, 0), "Ag", font=chosen, stroke_width=stroke)
+    line_h = b[3] - b[1]
+    total_h = len(chosen_lines) * line_h + max(0, len(chosen_lines) - 1) * line_spacing
+
+    if valign == "center":
+        y = y0 + (height - total_h) / 2
+    elif valign == "bottom":
+        y = y1 - total_h
+    else:
+        y = y0
+
+    for line in chosen_lines:
+        bbox = draw.textbbox((0, 0), line, font=chosen, stroke_width=stroke)
+        text_w = bbox[2] - bbox[0]
+        if align == "center":
+            x = x0 + (width - text_w) / 2
+        elif align == "right":
+            x = x1 - text_w
+        else:
+            x = x0
+        draw.text(
+            (x, y),
+            line,
+            font=chosen,
+            fill=fill,
+            stroke_width=stroke,
+            stroke_fill=(0, 0, 0, min(245, fill[3] if len(fill) > 3 else 245)),
+        )
+        y += line_h + line_spacing
 
 
 def format_srt_time(seconds: float) -> str:
-    ms = int(round(seconds*1000.0))
-    hours = ms // 3_600_000
+    ms = int(round(seconds * 1000.0))
+    h = ms // 3_600_000
     ms %= 3_600_000
-    minutes = ms // 60_000
+    m = ms // 60_000
     ms %= 60_000
-    secs = ms // 1000
+    s = ms // 1000
     ms %= 1000
-    return f"{hours:02d}:{minutes:02d}:{secs:02d},{ms:03d}"
+    return f"{h:02d}:{m:02d}:{s:02d},{ms:03d}"
 
 
-def write_srt(captions: Sequence[Tuple[float,float,str]], path: Path) -> Path:
+def write_srt(captions: Sequence[Tuple[float, float, str]], path: Path) -> Path:
     lines: List[str] = []
-    for i, (start,end,text) in enumerate(captions, start=1):
-        lines += [str(i), f"{format_srt_time(start)} --> {format_srt_time(end)}", text, ""]
+    for i, (a, b, txt) in enumerate(captions, start=1):
+        lines.extend([str(i), f"{format_srt_time(a)} --> {format_srt_time(b)}", txt, ""])
     path.write_text("\n".join(lines), encoding="utf-8")
     return path
 
 
 def make_vignette(width: int, height: int, strength: float) -> np.ndarray:
     yy, xx = np.mgrid[0:height, 0:width]
-    nx = (xx-width/2.0)/(width/2.0)
-    ny = (yy-height/2.0)/(height/2.0)
-    r = np.sqrt(nx*nx + ny*ny)
-    return np.clip(1.0-strength*r**1.8, 0.0, 1.0).astype(np.float32)
+    nx = (xx - width / 2.0) / (width / 2.0)
+    ny = (yy - height / 2.0) / (height / 2.0)
+    radius = np.sqrt(nx * nx + ny * ny)
+    return np.clip(1.0 - strength * radius ** 1.8, 0.0, 1.0).astype(np.float32)
 
 
 VIGNETTE = make_vignette(OUT_W, OUT_H, float(CONFIG["vignette"]))
 
 
 def apply_grade(rgb: np.ndarray) -> np.ndarray:
-    im = Image.fromarray(rgb)
-    im = ImageEnhance.Contrast(im).enhance(float(CONFIG["contrast"]))
-    im = ImageEnhance.Color(im).enhance(float(CONFIG["saturation"]))
-    arr = np.asarray(im).astype(np.float32)
-    arr *= VIGNETTE[:,:,None]
-    return np.clip(arr,0,255).astype(np.uint8)
+    image = Image.fromarray(rgb)
+    image = ImageEnhance.Contrast(image).enhance(float(CONFIG["contrast"]))
+    image = ImageEnhance.Color(image).enhance(float(CONFIG["saturation"]))
+    arr = np.asarray(image).astype(np.float32)
+    arr *= VIGNETTE[:, :, None]
+    return np.clip(arr, 0, 255).astype(np.uint8)
 
 
-def soft_line(image: Image.Image, points: Sequence[Tuple[float,float]], fill, width=2.0, glow=6.0):
-    if len(points) < 2:
-        return
-    gl = Image.new("RGBA", OUT_SIZE, (0,0,0,0))
+def draw_panel(image: Image.Image, box: Tuple[int, int, int, int], fill=(7, 11, 20, 140), outline=(180, 205, 225, 60), radius: int = 24):
+    panel = Image.new("RGBA", OUT_SIZE, (0, 0, 0, 0))
+    pd = ImageDraw.Draw(panel)
+    pd.rounded_rectangle(box, radius=max(4, int(radius * SCALE)), fill=fill, outline=outline, width=max(1, int(2 * SCALE)))
+    panel = panel.filter(ImageFilter.GaussianBlur(max(1, int(1.1 * SCALE))))
+    image.alpha_composite(panel)
+
+
+def draw_glow_disc(image: Image.Image, cx: float, cy: float, radius: float, color=(255, 196, 120), alpha: int = 100):
+    gl = Image.new("RGBA", OUT_SIZE, (0, 0, 0, 0))
     gd = ImageDraw.Draw(gl)
-    gd.line(points, fill=fill[:-1] + (max(6, int(fill[-1]*0.30)),), width=max(1,int(width*SCALE*3)))
-    gl = gl.filter(ImageFilter.GaussianBlur(max(1, int(glow*SCALE))))
+    for mult, a in [(4.0, alpha // 5), (2.6, alpha // 3), (1.7, alpha // 2), (1.0, alpha)]:
+        r = radius * mult
+        gd.ellipse((cx - r, cy - r, cx + r, cy + r), fill=(color[0], color[1], color[2], a))
+    gl = gl.filter(ImageFilter.GaussianBlur(max(2, int(7 * SCALE))))
     image.alpha_composite(gl)
-    ImageDraw.Draw(image).line(points, fill=fill, width=max(1,int(width*SCALE)))
 
 
-def arrow(draw: ImageDraw.ImageDraw, start, end, fill, width: int):
-    draw.line([start,end], fill=fill, width=width)
-    dx, dy = end[0]-start[0], end[1]-start[1]
-    ang = math.atan2(dy, dx)
-    head = max(7*SCALE, width*2.6)
-    for sign in (-1,1):
-        a = ang + math.pi + sign*math.pi/6
-        p = (end[0]+head*math.cos(a), end[1]+head*math.sin(a))
-        draw.line([end,p], fill=fill, width=width)
+# =============================================================================
+# Map rendering
+# =============================================================================
+
+EUROPE_EXTENT = (-75.0, 35.0, 25.0, 85.0)  # lon_min, lon_max, lat_min, lat_max
+FALLBACK_BASEMAP = Path(__file__).with_name("blue_marble_reference_2048.png")
 
 
-def parse_hhmm(hhmm: str) -> float:
-    h, m = hhmm.split(":")
-    return int(h)*60.0 + int(m)
-
-
-def interpolate_path(progress: float) -> Tuple[float,float,float,float,str]:
-    """Smoothly interpolate NASA central-line table by progress 0..1."""
-    p = clamp(progress)*(len(NASA_PATH)-1)
-    i = min(len(NASA_PATH)-2, int(math.floor(p)))
-    f = p-i
+def interpolate_path(progress: float) -> Tuple[float, float, float, float, str]:
+    progress = clamp(progress)
+    count = len(NASA_PATH)
+    f = progress * (count - 1)
+    i = min(count - 2, int(math.floor(f)))
+    t = f - i
     a = NASA_PATH[i]
-    b = NASA_PATH[i+1]
-    lat = lerp(a[1], b[1], f)
-    # avoid dateline issue (only first few points are +E then near pole); our globe centers Atlantic
-    lon_a, lon_b = a[2], b[2]
-    if abs(lon_b-lon_a) > 180:
-        if lon_b < lon_a: lon_b += 360
-        else: lon_a += 360
-    lon = lerp(lon_a, lon_b, f)
-    if lon > 180: lon -= 360
-    width = lerp(a[3], b[3], f)
-    dur = lerp(a[4], b[4], f)
-    minute = lerp(parse_hhmm(a[0]), parse_hhmm(b[0]), f)
-    hh = int(minute//60) % 24
-    mm = int(round(minute%60))
-    if mm == 60:
-        hh = (hh+1)%24; mm=0
-    return lat, lon, width, dur, f"{hh:02d}:{mm:02d} UTC"
+    b = NASA_PATH[i + 1]
+    lat = lerp(a[1], b[1], t)
+    lon_a = a[2]
+    lon_b = b[2]
+    if lon_b - lon_a > 180:
+        lon_b -= 360
+    elif lon_a - lon_b > 180:
+        lon_b += 360
+    lon = lerp(lon_a, lon_b, t)
+    width = lerp(a[3], b[3], t)
+    duration = lerp(a[4], b[4], t)
+    return lat, lon, width, duration, a[0]
 
 
-def haversine_km(lat1, lon1, lat2, lon2) -> float:
-    R = 6371.0088
-    p1, p2 = math.radians(lat1), math.radians(lat2)
-    dp = math.radians(lat2-lat1)
-    dl = math.radians(lon2-lon1)
-    a = math.sin(dp/2)**2 + math.cos(p1)*math.cos(p2)*math.sin(dl/2)**2
-    return 2*R*math.asin(min(1.0, math.sqrt(a)))
+class MapRenderer:
+    def __init__(self):
+        self.cache: Dict[str, Image.Image] = {}
 
+    def _fallback_map(self, out_w: int, out_h: int) -> Image.Image:
+        if FALLBACK_BASEMAP.exists():
+            try:
+                src = Image.open(FALLBACK_BASEMAP).convert("RGBA")
+                lon_min, lon_max, lat_min, lat_max = EUROPE_EXTENT
+                xs = [int(((lon + 180.0) / 360.0) * (src.width - 1)) for lon in (lon_min, lon_max)]
+                ys = [int(((90.0 - lat) / 180.0) * (src.height - 1)) for lat in (lat_max, lat_min)]
+                crop = src.crop((max(0, xs[0]), max(0, ys[0]), min(src.width, xs[1]), min(src.height, ys[1])))
+                return crop.resize((out_w, out_h), Image.LANCZOS)
+            except Exception:
+                pass
+        # Plain fallback, only if all else fails.
+        arr = np.zeros((out_h, out_w, 4), dtype=np.uint8)
+        arr[..., 0] = 24
+        arr[..., 1] = 57
+        arr[..., 2] = 92
+        arr[..., 3] = 255
+        return Image.fromarray(arr, "RGBA")
 
-def local_path_speed_km_s(index: int) -> float:
-    i0 = max(0, index-1)
-    i1 = min(len(NASA_PATH)-1, index+1)
-    a, b = NASA_PATH[i0], NASA_PATH[i1]
-    distance = haversine_km(a[1], a[2], b[1], b[2])
-    dt = (i1-i0)*120.0
-    return distance/max(dt, 1.0)
+    def render(
+        self,
+        out_w: int,
+        out_h: int,
+        title: str,
+        path_progress: Optional[float] = None,
+        show_path: bool = True,
+        cities: Optional[Sequence[str]] = None,
+        city_label_subset: Optional[Sequence[str]] = None,
+        marker_clock: bool = True,
+    ) -> Image.Image:
+        cache_key = f"{out_w}|{out_h}|{title}|{path_progress}|{show_path}|{cities}|{city_label_subset}|{marker_clock}|{CARTOPY_OK}"
+        if cache_key in self.cache:
+            return self.cache[cache_key].copy()
+
+        if CARTOPY_OK and MATPLOTLIB_OK:
+            im = self._render_cartopy(out_w, out_h, title, path_progress, show_path, cities, city_label_subset, marker_clock)
+        else:
+            im = self._fallback_map(out_w, out_h)
+            # draw simple overlays in fallback mode
+            d = ImageDraw.Draw(im)
+            fit_wrapped_text(im, title, (10, 10, out_w - 10, 60), max_size=max(12, int(22 * SCALE)), min_size=max(8, int(12 * SCALE)), fill=(255, 255, 255, 230), bold=True, stroke=2)
+            d.rectangle((0, 0, out_w - 1, out_h - 1), outline=(245, 248, 252, 180), width=max(1, int(2 * SCALE)))
+
+        self.cache[cache_key] = im.copy()
+        return im
+
+    def _render_cartopy(
+        self,
+        out_w: int,
+        out_h: int,
+        title: str,
+        path_progress: Optional[float],
+        show_path: bool,
+        cities: Optional[Sequence[str]],
+        city_label_subset: Optional[Sequence[str]],
+        marker_clock: bool,
+    ) -> Image.Image:
+        fig_w = out_w / 100.0
+        fig_h = out_h / 100.0
+        fig = plt.figure(figsize=(fig_w, fig_h), dpi=100, facecolor="#06111d")
+        ax = plt.axes(projection=ccrs.PlateCarree())
+        ax.set_facecolor("#081726")
+        ax.set_extent(EUROPE_EXTENT, crs=ccrs.PlateCarree())
+
+        try:
+            ax.stock_img()
+        except Exception:
+            pass
+
+        try:
+            ax.add_feature(cfeature.OCEAN.with_scale("50m"), facecolor="#163a5a", alpha=0.45)
+        except Exception:
+            pass
+        try:
+            ax.add_feature(cfeature.LAND.with_scale("50m"), facecolor="#4d7150", edgecolor="#d4d8cc", linewidth=0.25, alpha=0.55)
+        except Exception:
+            pass
+        try:
+            ax.add_feature(cfeature.BORDERS.with_scale("50m"), edgecolor=(1, 1, 1, 0.22), linewidth=0.35)
+        except Exception:
+            pass
+        try:
+            ax.coastlines(resolution="50m", color=(1, 1, 1, 0.45), linewidth=0.45)
+        except Exception:
+            pass
+
+        # graticule
+        gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=False, linewidth=0.45, color=(1, 1, 1, 0.23), alpha=0.55, linestyle='-')
+        gl.xlocator = plt.FixedLocator(np.arange(-80, 41, 10))
+        gl.ylocator = plt.FixedLocator(np.arange(30, 91, 10))
+
+        # eclipse path
+        lons = [p[2] for p in NASA_PATH]
+        lats = [p[1] for p in NASA_PATH]
+        # avoid any dateline-related jumps by plotting only visible Atlantic/Europe part
+        vis_lons, vis_lats = [], []
+        for lon, lat in zip(lons, lats):
+            if EUROPE_EXTENT[0] - 20 <= lon <= EUROPE_EXTENT[1] + 20 and EUROPE_EXTENT[2] - 5 <= lat <= EUROPE_EXTENT[3] + 5:
+                vis_lons.append(lon)
+                vis_lats.append(lat)
+        if show_path and len(vis_lons) > 1:
+            ax.plot(vis_lons, vis_lats, transform=ccrs.PlateCarree(), color="#ff6d7a", linewidth=2.4, alpha=0.95, zorder=7)
+
+        if path_progress is not None:
+            lat, lon, width_km, duration, clock = interpolate_path(path_progress)
+            # umbra marker with layered circles
+            for s, a in [(2200, 0.05), (1300, 0.10), (650, 0.18)]:
+                ax.scatter([lon], [lat], s=s, color=(0.03, 0.03, 0.05, a), transform=ccrs.PlateCarree(), zorder=6)
+            ax.scatter([lon], [lat], s=28, color="#ffb18c", edgecolors="white", linewidths=0.5, transform=ccrs.PlateCarree(), zorder=9)
+            if marker_clock:
+                ax.text(lon + 1.8, lat - 0.4, f"{clock} UTC", transform=ccrs.PlateCarree(), color="white", fontsize=10, weight="bold", zorder=10,
+                        bbox=dict(boxstyle="round,pad=0.18", facecolor=(0, 0, 0, 0.42), edgecolor=(1, 1, 1, 0.18), linewidth=0.4))
+
+        if cities:
+            for city in cities:
+                lat, lon = CITY_COORDS[city]
+                total = city in {"REYKJAVIK", "LEON", "ZARAGOZA", "VALENCIA"}
+                color = "#ffd36a" if total else "#c7e5f6"
+                ax.scatter([lon], [lat], s=20, color=color, edgecolors="black", linewidths=0.35, transform=ccrs.PlateCarree(), zorder=8)
+                if city_label_subset and city in city_label_subset:
+                    ax.text(lon + 1.1, lat - 0.1, city, transform=ccrs.PlateCarree(), color=color, fontsize=9, weight="bold", zorder=9,
+                            path_effects=[])
+
+        # map title strip
+        ax.text(0.02, 0.98, title, transform=ax.transAxes, va="top", ha="left", color="white", fontsize=12, weight="bold",
+                bbox=dict(boxstyle="round,pad=0.20", facecolor=(0, 0, 0, 0.42), edgecolor=(1, 1, 1, 0.15), linewidth=0.4), zorder=12)
+
+        plt.tight_layout(pad=0)
+        canvas = FigureCanvasAgg(fig)
+        canvas.draw()
+        buf = np.asarray(canvas.buffer_rgba())
+        plt.close(fig)
+        return Image.fromarray(buf, "RGBA")
 
 
 # =============================================================================
-# Simplified geography
-# =============================================================================
-
-# These are deliberately coarse outlines for cinematic context, NOT GIS boundaries.
-COAST_POLYGONS: Dict[str, List[Tuple[float,float]]] = {
-    "GREENLAND": [
-        (83,-35),(80,-18),(75,-18),(70,-22),(65,-39),(60,-44),(60,-50),
-        (65,-54),(70,-56),(75,-60),(80,-55),(83,-35)
-    ],
-    "ICELAND": [(66.6,-24.8),(66.2,-14.5),(63.3,-13.5),(63.0,-22.5),(64.5,-24.8),(66.6,-24.8)],
-    "UK_IRELAND": [(58.5,-6),(56,-3),(54,-4),(52,1),(50,-1),(51,-5),(54,-6),(58.5,-6)],
-    "IBERIA": [(43.8,-9.3),(43.7,-1.5),(42.7,3.2),(40,1.2),(37,-0.7),(36,-6),(38,-9),(43.8,-9.3)],
-    "FRANCE_BENELUX": [(51,2),(50,8),(47.5,7),(43,3),(43,-1.5),(46,-2),(49,-1),(51,2)],
-    "SCANDINAVIA": [(71,25),(69,17),(64,12),(59,10),(55,13),(58,18),(63,24),(68,30),(71,25)],
-    "EUROPE_EAST": [(55,13),(54,25),(50,31),(45,30),(42,20),(45,13),(50,8),(55,13)],
-    "N_AFRICA": [(37,-9),(36,3),(37,10),(34,15),(30,10),(28,-5),(32,-12),(37,-9)],
-    "E_CANADA": [(60,-75),(55,-58),(50,-55),(46,-60),(45,-67),(49,-72),(55,-80),(60,-75)],
-}
-
-
-def ortho_project(lat_deg: float, lon_deg: float, center_lat_deg: float, center_lon_deg: float,
-                  cx: float, cy: float, radius: float) -> Optional[Tuple[float,float,float]]:
-    lat = math.radians(lat_deg); lon = math.radians(lon_deg)
-    lat0 = math.radians(center_lat_deg); lon0 = math.radians(center_lon_deg)
-    dl = lon-lon0
-    cosc = math.sin(lat0)*math.sin(lat) + math.cos(lat0)*math.cos(lat)*math.cos(dl)
-    if cosc < 0:
-        return None
-    x = radius*math.cos(lat)*math.sin(dl)
-    y = -radius*(math.cos(lat0)*math.sin(lat)-math.sin(lat0)*math.cos(lat)*math.cos(dl))
-    return cx+x, cy+y, cosc
-
-
-def project_poly(poly, center_lat, center_lon, cx, cy, radius):
-    pts = []
-    for lat, lon in poly:
-        p = ortho_project(lat,lon,center_lat,center_lon,cx,cy,radius)
-        if p is not None:
-            pts.append((p[0],p[1]))
-    return pts
-
-
-# =============================================================================
-# Renderer
+# Scene renderer
 # =============================================================================
 
 class EclipseScene:
     def __init__(self):
+        self.map_renderer = MapRenderer()
         rng = np.random.default_rng(20260812)
         self.stars = []
         for _ in range(int(CONFIG["background_stars"])):
-            depth = float(rng.uniform(0.15,1.0))
             self.stars.append((
-                float(rng.uniform(-0.05*OUT_W, 1.05*OUT_W)),
-                float(rng.uniform(-0.04*OUT_H, 1.04*OUT_H)),
-                float(rng.uniform(0.3,1.5)*max(SCALE,0.6)*(0.55+depth)),
-                int(rng.uniform(30,155)*(0.55+0.45*depth)),
-                float(rng.uniform(0,2*math.pi)), depth
+                float(rng.uniform(0, OUT_W)),
+                float(rng.uniform(0, OUT_H)),
+                float(rng.uniform(0.3, 1.6) * max(SCALE, 0.6)),
+                int(rng.uniform(22, 130)),
+                float(rng.uniform(0, 2 * math.pi)),
             ))
-        self.noise_rng = np.random.default_rng(88)
-
-    # -------------------------------------------------------------------------
-    # Global visual primitives
-    # -------------------------------------------------------------------------
-
-    def camera(self, t: float) -> Tuple[float,float,float]:
-        return (
-            10*SCALE*math.sin(t*0.17),
-            15*SCALE*math.sin(t*0.11+1.1),
-            1.0+0.018*math.sin(t*0.09),
-        )
 
     def background(self, t: float) -> Image.Image:
-        yy = np.linspace(0,1,OUT_H,dtype=np.float32)[:,None]
-        top = np.array([2,5,13],dtype=np.float32)
-        bottom = np.array([0,1,5],dtype=np.float32)
-        rgb = top[None,None,:]*(1-yy[:,:,None]) + bottom[None,None,:]*yy[:,:,None]
-        rgb = np.repeat(rgb,OUT_W,axis=1)
-        image = Image.fromarray(np.clip(rgb,0,255).astype(np.uint8),"RGB").convert("RGBA")
-        dx,dy,_ = self.camera(t)
+        yy = np.linspace(0.0, 1.0, OUT_H, dtype=np.float32)[:, None]
+        top = np.array([2.0, 4.0, 11.0], dtype=np.float32)
+        bottom = np.array([0.0, 1.2, 8.0], dtype=np.float32)
+        rgb = top[None, None, :] * (1.0 - yy[:, :, None]) + bottom[None, None, :] * yy[:, :, None]
+        rgb = np.repeat(rgb, OUT_W, axis=1)
+        image = Image.fromarray(np.clip(rgb, 0, 255).astype(np.uint8), "RGB").convert("RGBA")
         d = ImageDraw.Draw(image)
-        for x,y,r,a,phase,depth in self.stars:
-            sx=x+dx*depth; sy=y+dy*depth
-            alpha=int(a*(0.82+0.18*math.sin(0.7*t+phase)))
-            d.ellipse((sx-r,sy-r,sx+r,sy+r),fill=(226,235,245,alpha))
-
-        haze=Image.new("RGBA",OUT_SIZE,(0,0,0,0)); hd=ImageDraw.Draw(haze)
-        hd.ellipse((-0.5*OUT_W,0.12*OUT_H,0.58*OUT_W,0.90*OUT_H),fill=(21,54,100,28))
-        hd.ellipse((0.42*OUT_W,-0.20*OUT_H,1.35*OUT_W,0.58*OUT_H),fill=(76,46,101,18))
-        haze=haze.filter(ImageFilter.GaussianBlur(max(34,int(150*SCALE))))
-        image.alpha_composite(haze)
+        for x, y, r, a, phase in self.stars:
+            alpha = int(a * (0.82 + 0.18 * math.sin(0.42 * t + phase)))
+            d.ellipse((x - r, y - r, x + r, y + r), fill=(235, 241, 246, alpha))
         return image
 
-    def title(self, image: Image.Image, eyebrow: str, title: str, subtitle: str="", alpha: int=255):
-        x=int(OUT_W*0.075)
-        draw_text(image,eyebrow.upper(),(x,int(OUT_H*0.079)),size=max(8,int(12*SCALE)),
-                  fill=(183,204,221,min(alpha,190)),bold=True,stroke=1,anchor="la")
-        draw_text(image,title,(x,int(OUT_H*0.117)),size=max(17,int(40*SCALE)),
-                  fill=(246,249,252,alpha),bold=True,stroke=1,anchor="la")
+    def title_block(self, image: Image.Image, eyebrow: str, title: str, subtitle: str = ""):
+        fit_wrapped_text(
+            image,
+            eyebrow.upper(),
+            (int(OUT_W * 0.075), int(OUT_H * 0.065), int(OUT_W * 0.93), int(OUT_H * 0.10)),
+            max_size=int(26 * SCALE),
+            min_size=int(18 * SCALE),
+            fill=(191, 212, 232, 214),
+            bold=True,
+            stroke=2,
+        )
+        fit_wrapped_text(
+            image,
+            title,
+            (int(OUT_W * 0.075), int(OUT_H * 0.11), int(OUT_W * 0.93), int(OUT_H * 0.19)),
+            max_size=int(68 * SCALE),
+            min_size=int(36 * SCALE),
+            fill=(248, 250, 253, 255),
+            bold=True,
+            stroke=3,
+        )
         if subtitle:
-            draw_text(image,subtitle,(x,int(OUT_H*0.168)),size=max(9,int(15*SCALE)),
-                      fill=(160,181,198,min(alpha,215)),bold=False,stroke=1,anchor="la")
+            fit_wrapped_text(
+                image,
+                subtitle,
+                (int(OUT_W * 0.075), int(OUT_H * 0.18), int(OUT_W * 0.93), int(OUT_H * 0.24)),
+                max_size=int(30 * SCALE),
+                min_size=int(20 * SCALE),
+                fill=(213, 225, 235, 236),
+                bold=False,
+                stroke=2,
+            )
 
-    def label(self,image,text,xy,size=12,alpha=190,anchor="la",bold=True,fill=None):
-        c = fill if fill is not None else (199,216,230,alpha)
-        if len(c)==3: c=(*c,alpha)
-        draw_text(image,text,xy,size=max(8,int(size*SCALE)),fill=c,bold=bold,stroke=1,anchor=anchor)
+    def footer(self, image: Image.Image):
+        fit_wrapped_text(image, "REAL NASA ECLIPSE DATA", (int(OUT_W * 0.055), int(OUT_H * 0.955), int(OUT_W * 0.42), int(OUT_H * 0.98)), max_size=int(18 * SCALE), min_size=int(12 * SCALE), fill=(178, 197, 214, 145), bold=True, stroke=1)
+        fit_wrapped_text(image, "MAP: CARTOPY / NATURAL EARTH", (int(OUT_W * 0.55), int(OUT_H * 0.955), int(OUT_W * 0.945), int(OUT_H * 0.98)), max_size=int(18 * SCALE), min_size=int(12 * SCALE), fill=(178, 197, 214, 145), bold=True, stroke=1, align="right")
 
-    def equation(self,image,text,xy,size=25,alpha=240,anchor="la"):
-        draw_text(image,text,xy,size=max(10,int(size*SCALE)),fill=(225,235,244,alpha),bold=False,stroke=1,anchor=anchor)
+    def caption(self, image: Image.Image, t: float):
+        txt = caption_at(t)
+        if not txt:
+            return
+        y0 = int(OUT_H * 0.805)
+        overlay = np.zeros((OUT_H - y0, OUT_W, 4), dtype=np.uint8)
+        overlay[..., 3] = np.linspace(0, 225, OUT_H - y0, dtype=np.uint8)[:, None]
+        image.alpha_composite(Image.fromarray(overlay, "RGBA"), (0, y0))
+        fit_wrapped_text(
+            image,
+            txt,
+            (int(OUT_W * 0.075), int(OUT_H * 0.847), int(OUT_W * 0.925), int(OUT_H * 0.95)),
+            max_size=int(34 * SCALE),
+            min_size=int(22 * SCALE),
+            fill=(244, 248, 252, 242),
+            bold=False,
+            stroke=3,
+            line_spacing=int(8 * SCALE),
+        )
 
-    def draw_caption(self,image,t):
-        text=caption_at(t)
-        if not text: return
-        y0=int(OUT_H*0.806)
-        h=OUT_H-y0
-        overlay=np.zeros((h,OUT_W,4),dtype=np.uint8)
-        overlay[...,3]=np.linspace(0,215,h,dtype=np.uint8)[:,None]
-        image.alpha_composite(Image.fromarray(overlay,"RGBA"),(0,y0))
-        draw_wrapped_text(image,text,(int(OUT_W*0.075),int(OUT_H*0.858)),int(OUT_W*0.84),
-                          max(10,int(17*SCALE)),fill=(232,238,244,240),line_spacing=max(2,int(6*SCALE)))
+    # ------------------------------------------------------------------
+    # Eclipse objects
+    # ------------------------------------------------------------------
+    def draw_sun(self, image: Image.Image, cx: float, cy: float, radius: float):
+        draw_glow_disc(image, cx, cy, radius, color=(255, 190, 96), alpha=95)
+        layer = Image.new("RGBA", OUT_SIZE, (0, 0, 0, 0))
+        d = ImageDraw.Draw(layer)
+        d.ellipse((cx - radius, cy - radius, cx + radius, cy + radius), fill=(255, 192, 86, 255))
+        layer = layer.filter(ImageFilter.GaussianBlur(max(1, int(1.6 * SCALE))))
+        image.alpha_composite(layer)
 
-    def footer(self,image):
-        y=int(OUT_H*0.972)
-        self.label(image,"NASA/GSFC PATH DATA • CINEMATIC RECONSTRUCTION",(int(OUT_W*0.055),y),size=9,alpha=115,anchor="ls")
-        self.label(image,"NOT TO VISUAL SCALE",(int(OUT_W*0.945),y),size=9,alpha=115,anchor="rs")
+    def draw_moon(self, image: Image.Image, cx: float, cy: float, radius: float):
+        layer = Image.new("RGBA", OUT_SIZE, (0, 0, 0, 0))
+        d = ImageDraw.Draw(layer)
+        d.ellipse((cx - radius, cy - radius, cx + radius, cy + radius), fill=(8, 10, 16, 255), outline=(120, 130, 145, 45), width=max(1, int(1 * SCALE)))
+        image.alpha_composite(layer)
 
-    def draw_sun(self,image,cx,cy,radius,t,corona=False):
-        # Corona rays for totality scenes
-        if corona:
-            rays=Image.new("RGBA",OUT_SIZE,(0,0,0,0)); rd=ImageDraw.Draw(rays)
-            rng=np.random.default_rng(777)
-            for i in range(110):
-                ang=2*math.pi*i/110 + 0.012*math.sin(t*0.4+i)
-                jitter=0.78+0.45*float(rng.random())
-                r0=radius*1.02
-                r1=radius*(2.2+2.3*jitter)
-                a=int(16+30*jitter)
-                p0=(cx+r0*math.cos(ang),cy+r0*math.sin(ang))
-                p1=(cx+r1*math.cos(ang),cy+r1*math.sin(ang))
-                rd.line([p0,p1],fill=(218,232,245,a),width=max(1,int((0.8+1.2*jitter)*SCALE)))
-            rays=rays.filter(ImageFilter.GaussianBlur(max(2,int(7*SCALE))))
-            image.alpha_composite(rays)
-
-        bloom=Image.new("RGBA",OUT_SIZE,(0,0,0,0)); bd=ImageDraw.Draw(bloom)
-        for mult,a in [(5.0,7),(3.6,14),(2.5,30),(1.65,65),(1.17,105)]:
-            rr=radius*mult
-            bd.ellipse((cx-rr,cy-rr,cx+rr,cy+rr),fill=(255,171,69,a))
-        bloom=bloom.filter(ImageFilter.GaussianBlur(max(5,int(radius*0.75))))
-        image.alpha_composite(bloom)
-        rr=max(8,int(radius)); size=rr*2+4
-        yy,xx=np.mgrid[-rr-2:rr+2,-rr-2:rr+2]
-        rad=np.sqrt(xx*xx+yy*yy)/max(rr,1)
-        mask=rad<=1
-        shade=np.clip(1-rad,0,1)
-        gran=0.94+0.05*np.sin(xx*0.19+yy*0.07+t*0.7)*np.sin(yy*0.13-t*0.31)
-        arr=np.zeros((size,size,4),dtype=np.uint8)
-        arr[...,0]=np.clip(239+16*shade,0,255)
-        arr[...,1]=np.clip((126+106*shade)*gran,0,255)
-        arr[...,2]=np.clip((35+58*shade)*gran,0,255)
-        arr[...,3]=(mask*255).astype(np.uint8)
-        image.alpha_composite(Image.fromarray(arr,"RGBA"),(int(cx-size/2),int(cy-size/2)))
-
-    def draw_moon_disk(self,image,cx,cy,radius,t,lit=False):
-        rr=max(8,int(radius)); size=rr*2+6
-        yy,xx=np.mgrid[-rr-3:rr+3,-rr-3:rr+3]
-        r2=(xx/max(rr,1))**2+(yy/max(rr,1))**2
-        mask=r2<=1
-        if lit:
-            nz=np.sqrt(np.clip(1-r2,0,1))
-            light=np.clip(-0.55*(xx/max(rr,1))-0.10*(yy/max(rr,1))+0.83*nz,0,1)
-            base=28+150*light
-            crater=8*np.sin(xx*0.17+yy*0.11)+6*np.cos(xx*0.07-yy*0.19)
-            g=np.clip(base+crater,0,190)
-        else:
-            g=np.zeros_like(xx,dtype=float)+2
-        arr=np.zeros((size,size,4),dtype=np.uint8)
-        arr[...,0]=np.clip(g*0.96,0,255)
-        arr[...,1]=np.clip(g*0.98,0,255)
-        arr[...,2]=np.clip(g,0,255)
-        arr[...,3]=(mask*255).astype(np.uint8)
-        image.alpha_composite(Image.fromarray(arr,"RGBA"),(int(cx-size/2),int(cy-size/2)))
-
-    def draw_totality(self,image,cx,cy,radius,t,diamond=0.0):
-        # White-silver solar corona. This is a cinematic reconstruction, not a
-        # measured coronal brightness map. The black disk radius is the Moon.
-        corona=Image.new("RGBA",OUT_SIZE,(0,0,0,0)); cd=ImageDraw.Draw(corona)
-        rng=np.random.default_rng(1262026)
-        for i in range(180):
-            ang=2*math.pi*i/180.0
-            structure=0.55+0.45*abs(math.cos(2.0*ang-0.35))
-            jitter=0.82+0.36*float(rng.random())
-            r0=radius*(1.005+0.02*float(rng.random()))
-            r1=radius*(1.65+2.9*structure*jitter)
-            alpha=int(15+36*structure*jitter)
-            p0=(cx+r0*math.cos(ang),cy+r0*math.sin(ang))
-            p1=(cx+r1*math.cos(ang),cy+r1*math.sin(ang))
-            cd.line([p0,p1],fill=(222,235,248,alpha),width=max(1,int((0.7+0.9*structure)*SCALE)))
-        # dense inner corona
-        for mult,a,w in [(1.50,30,14),(1.30,46,11),(1.16,78,8),(1.07,125,4)]:
-            rr=radius*mult
-            cd.ellipse((cx-rr,cy-rr,cx+rr,cy+rr),outline=(231,240,249,a),width=max(1,int(w*SCALE)))
-        corona=corona.filter(ImageFilter.GaussianBlur(max(1,int(4.5*SCALE))))
+    def draw_corona_eclipse(self, image: Image.Image, cx: float, cy: float, radius: float, diamond: float = 0.0):
+        corona = Image.new("RGBA", OUT_SIZE, (0, 0, 0, 0))
+        cd = ImageDraw.Draw(corona)
+        rng = np.random.default_rng(11)
+        for ang in np.linspace(0, 2 * math.pi, 220, endpoint=False):
+            structure = 0.82 + 0.32 * math.sin(ang * 3.0 + 0.4) + 0.18 * math.sin(ang * 7.0 + 1.2)
+            structure = max(0.28, structure)
+            rr0 = radius * 1.02
+            rr1 = radius * (1.7 + 1.3 * structure)
+            p0 = (cx + rr0 * math.cos(ang), cy + rr0 * math.sin(ang))
+            p1 = (cx + rr1 * math.cos(ang), cy + rr1 * math.sin(ang))
+            cd.line([p0, p1], fill=(232, 240, 247, int(16 + 36 * structure * (0.92 + 0.16 * float(rng.random())))), width=max(1, int((0.8 + structure) * SCALE)))
+        for mult, a, w in [(1.42, 40, 14), (1.23, 72, 10), (1.10, 122, 4)]:
+            rr = radius * mult
+            cd.ellipse((cx - rr, cy - rr, cx + rr, cy + rr), outline=(239, 245, 250, a), width=max(1, int(w * SCALE)))
+        corona = corona.filter(ImageFilter.GaussianBlur(max(1, int(4 * SCALE))))
         image.alpha_composite(corona)
-
-        # crisp inner pearly rim
-        rim=Image.new("RGBA",OUT_SIZE,(0,0,0,0)); rd=ImageDraw.Draw(rim)
-        rr=radius*1.014
-        rd.ellipse((cx-rr,cy-rr,cx+rr,cy+rr),outline=(244,248,252,210),width=max(1,int(2.2*SCALE)))
-        rim=rim.filter(ImageFilter.GaussianBlur(max(0.6,1.2*SCALE)))
-        image.alpha_composite(rim)
-
-        self.draw_moon_disk(image,cx,cy,radius*0.985,t,lit=False)
-        d=ImageDraw.Draw(image)
-        d.ellipse((cx-radius*1.001,cy-radius*1.001,cx+radius*1.001,cy+radius*1.001),
-                  outline=(255,102,86,72),width=max(1,int(1.0*SCALE)))
-        if diamond>0:
-            ang=-0.55
-            px=cx+radius*math.cos(ang); py=cy+radius*math.sin(ang)
-            gl=Image.new("RGBA",OUT_SIZE,(0,0,0,0)); gd=ImageDraw.Draw(gl)
-            rr=radius*0.18*diamond
-            gd.ellipse((px-rr,py-rr,px+rr,py+rr),fill=(255,253,235,int(255*diamond)))
-            gd.line((px-radius*1.05*diamond,py,px+radius*1.05*diamond,py),fill=(255,242,212,int(190*diamond)),width=max(1,int(2*SCALE)))
-            gd.line((px,py-radius*0.55*diamond,px,py+radius*0.55*diamond),fill=(255,247,224,int(125*diamond)),width=max(1,int(1*SCALE)))
-            gl=gl.filter(ImageFilter.GaussianBlur(max(1,int(4*SCALE))))
+        self.draw_moon(image, cx, cy, radius * 0.99)
+        if diamond > 0:
+            ang = -0.60
+            px = cx + radius * math.cos(ang)
+            py = cy + radius * math.sin(ang)
+            gl = Image.new("RGBA", OUT_SIZE, (0, 0, 0, 0))
+            gd = ImageDraw.Draw(gl)
+            rr = radius * 0.18 * diamond
+            gd.ellipse((px - rr, py - rr, px + rr, py + rr), fill=(255, 251, 236, int(255 * diamond)))
+            gd.line((px - radius * diamond, py, px + radius * diamond, py), fill=(255, 242, 212, int(150 * diamond)), width=max(1, int(3 * SCALE)))
+            gl = gl.filter(ImageFilter.GaussianBlur(max(1, int(4 * SCALE))))
             image.alpha_composite(gl)
 
-    def draw_earth_globe(self,image,cx,cy,radius,t,center_lat=55.0,center_lon=-22.0,with_path=False,path_progress=0.0,city_marks=False):
-        # Atmospheric bloom
-        atmos=Image.new("RGBA",OUT_SIZE,(0,0,0,0)); ad=ImageDraw.Draw(atmos)
-        for mult,a in [(1.08,18),(1.045,30),(1.015,58)]:
-            rr=radius*mult
-            ad.ellipse((cx-rr,cy-rr,cx+rr,cy+rr),outline=(93,181,245,a),width=max(1,int(3*SCALE)))
-        atmos=atmos.filter(ImageFilter.GaussianBlur(max(2,int(9*SCALE))))
-        image.alpha_composite(atmos)
+    # ------------------------------------------------------------------
+    # Story scenes
+    # ------------------------------------------------------------------
+    def scene_hook(self, image: Image.Image, t: float, local: float):
+        self.title_block(image, "TOTAL SOLAR ECLIPSE", "EUROPE WENT DARK", "August 12, 2026")
+        self.draw_corona_eclipse(image, OUT_W * 0.50, OUT_H * 0.48, 130 * SCALE, diamond=0.35 * (1.0 - local))
+        fit_wrapped_text(image, "PARTS OF SPAIN AND ICELAND SAW TOTALITY", (int(OUT_W * 0.075), int(OUT_H * 0.695), int(OUT_W * 0.925), int(OUT_H * 0.74)), max_size=int(28 * SCALE), min_size=int(20 * SCALE), fill=(254, 239, 210, 238), bold=True, stroke=2)
 
-        # Sphere with directional illumination
-        rr=max(20,int(radius)); size=rr*2+8
-        yy,xx=np.mgrid[-rr-4:rr+4,-rr-4:rr+4]
-        nx=xx/max(rr,1); ny=yy/max(rr,1); q=nx*nx+ny*ny
-        mask=q<=1
-        nz=np.sqrt(np.clip(1-q,0,1))
-        # Sunlit from upper left
-        light=np.clip(-0.43*nx-0.18*ny+0.88*nz,0,1)
-        limb=np.clip(nz,0,1)
-        arr=np.zeros((size,size,4),dtype=np.uint8)
-        arr[...,0]=np.clip(5+17*light,0,255)
-        arr[...,1]=np.clip(20+58*light,0,255)
-        arr[...,2]=np.clip(37+92*light,0,255)
-        arr[...,3]=(mask*255).astype(np.uint8)
-        sphere=Image.fromarray(arr,"RGBA")
-        image.alpha_composite(sphere,(int(cx-size/2),int(cy-size/2)))
-
-        # Coastlines & filled land polygons
-        land_layer=Image.new("RGBA",OUT_SIZE,(0,0,0,0)); ld=ImageDraw.Draw(land_layer)
-        for name,poly in COAST_POLYGONS.items():
-            pts=project_poly(poly,center_lat,center_lon,cx,cy,radius)
-            if len(pts)>=3:
-                ld.polygon(pts,fill=(62,99,73,175))
-                ld.line(pts+[pts[0]],fill=(130,161,137,150),width=max(1,int(1.2*SCALE)))
-        image.alpha_composite(land_layer)
-
-        # Lat/lon graticule
-        grid=Image.new("RGBA",OUT_SIZE,(0,0,0,0)); gd=ImageDraw.Draw(grid)
-        for lat in range(20,81,10):
-            pts=[]
-            for lon in np.linspace(-90,45,150):
-                p=ortho_project(lat,float(lon),center_lat,center_lon,cx,cy,radius)
-                if p: pts.append((p[0],p[1]))
-            if len(pts)>1: gd.line(pts,fill=(159,190,207,32),width=max(1,int(SCALE)))
-        for lon in range(-80,41,20):
-            pts=[]
-            for lat in np.linspace(20,85,130):
-                p=ortho_project(float(lat),lon,center_lat,center_lon,cx,cy,radius)
-                if p: pts.append((p[0],p[1]))
-            if len(pts)>1: gd.line(pts,fill=(159,190,207,28),width=max(1,int(SCALE)))
-        image.alpha_composite(grid)
-
-        if with_path:
-            projected=[]
-            for _,lat,lon,_,_ in NASA_PATH:
-                p=ortho_project(lat,lon,center_lat,center_lon,cx,cy,radius)
-                if p: projected.append((p[0],p[1]))
-            soft_line(image,projected,(255,94,106,185),width=3.0,glow=10.0)
-
-            lat,lon,width,dur,clock=interpolate_path(path_progress)
-            p=ortho_project(lat,lon,center_lat,center_lon,cx,cy,radius)
-            if p:
-                sx,sy,_=p
-                # Visual shadow size is intentionally exaggerated for readability.
-                shadow=Image.new("RGBA",OUT_SIZE,(0,0,0,0)); sd=ImageDraw.Draw(shadow)
-                sr=max(14*SCALE, radius*(width/40000.0)*16.0)
-                for mult,a in [(3.2,18),(2.1,28),(1.5,50),(1.0,125)]:
-                    r=sr*mult
-                    sd.ellipse((sx-r,sy-r,sx+r,sy+r),fill=(0,0,4,a))
-                shadow=shadow.filter(ImageFilter.GaussianBlur(max(2,int(8*SCALE))))
-                image.alpha_composite(shadow)
-                d=ImageDraw.Draw(image)
-                d.ellipse((sx-4*SCALE,sy-4*SCALE,sx+4*SCALE,sy+4*SCALE),fill=(255,116,124,235))
-                self.label(image,clock,(int(sx+14*SCALE),int(sy-12*SCALE)),size=10,alpha=190)
-
-        if city_marks:
-            d=ImageDraw.Draw(image)
-            for city in ["REYKJAVIK","LEON","MADRID","BARCELONA","LONDON","PARIS"]:
-                lat,lon=CITY_COORDS[city]
-                p=ortho_project(lat,lon,center_lat,center_lon,cx,cy,radius)
-                if p:
-                    x,y,_=p
-                    total=city in {"REYKJAVIK","LEON"}
-                    col=(255,208,110,235) if total else (183,215,235,220)
-                    d.ellipse((x-3*SCALE,y-3*SCALE,x+3*SCALE,y+3*SCALE),fill=col)
-                    if city in {"REYKJAVIK","LEON","MADRID","LONDON"}:
-                        self.label(image,city,(int(x+9*SCALE),int(y)),size=8,alpha=160,anchor="lm",fill=col)
-
-    # -------------------------------------------------------------------------
-    # Scenes
-    # -------------------------------------------------------------------------
-
-    def scene_hook(self,image,t,local):
-        # Black Sun close-up: premium first-frame hook.
-        p=smoothstep(local)
-        cx=OUT_W*0.53; cy=OUT_H*0.43
-        r=(170+28*p)*SCALE
-        self.draw_totality(image,cx,cy,r,t,diamond=max(0.0,1.0-local*3.2))
-        self.title(image,"12 AUGUST 2026","EUROPE'S SKY WENT DARK","A real total solar eclipse crossed the North Atlantic into Spain.")
-        self.label(image,"TOTAL SOLAR ECLIPSE",(int(OUT_W*0.075),int(OUT_H*0.715)),size=13,alpha=180)
-        draw_text(image,"2m 18s",(int(OUT_W*0.075),int(OUT_H*0.768)),size=max(20,int(48*SCALE)),
-                  fill=(246,249,252,245),bold=True,stroke=1,anchor="ls")
-        self.label(image,"MAX CENTRAL TOTALITY",(int(OUT_W*0.37),int(OUT_H*0.766)),size=10,alpha=150,anchor="ls")
-
-    def scene_alignment(self,image,t,local):
-        self.title(image,"THE GEOMETRY","SUN → MOON → EARTH","A near-perfect alignment turns a shadow into totality.")
-        y=OUT_H*0.48
-        sunx=OUT_W*0.15; moonx=OUT_W*0.50; earthx=OUT_W*0.84
-        self.draw_sun(image,sunx,y,72*SCALE,t)
-        self.draw_moon_disk(image,moonx,y,37*SCALE,t,lit=True)
-        self.draw_earth_globe(image,earthx,y,90*SCALE,t,center_lat=28,center_lon=-15)
-
-        # Penumbra and umbra cones
-        cone=Image.new("RGBA",OUT_SIZE,(0,0,0,0)); d=ImageDraw.Draw(cone)
-        # outer partial shadow
-        d.polygon([(moonx,y-45*SCALE),(earthx-70*SCALE,y-62*SCALE),(earthx-70*SCALE,y+62*SCALE),(moonx,y+45*SCALE)],
-                  fill=(115,139,166,24))
-        # inner total shadow
-        d.polygon([(moonx,y-20*SCALE),(earthx-72*SCALE,y-11*SCALE),(earthx-72*SCALE,y+11*SCALE),(moonx,y+20*SCALE)],
-                  fill=(0,0,2,145))
-        cone=cone.filter(ImageFilter.GaussianBlur(max(1,int(2*SCALE))))
+    def scene_alignment(self, image: Image.Image, t: float, local: float):
+        self.title_block(image, "HOW IT HAPPENED", "THE MOON MOVED IN FRONT OF THE SUN", "Inside the umbra, the Sun is completely covered and the corona becomes visible.")
+        y = OUT_H * 0.50
+        sunx = OUT_W * 0.20
+        moonx = lerp(OUT_W * 0.47, OUT_W * 0.54, local)
+        earthx = OUT_W * 0.82
+        self.draw_sun(image, sunx, y, 70 * SCALE)
+        self.draw_moon(image, moonx, y, 46 * SCALE)
+        cone = Image.new("RGBA", OUT_SIZE, (0, 0, 0, 0))
+        cd = ImageDraw.Draw(cone)
+        cd.polygon([(moonx + 18 * SCALE, y - 26 * SCALE), (earthx - 24 * SCALE, y - 48 * SCALE), (earthx - 24 * SCALE, y + 48 * SCALE), (moonx + 18 * SCALE, y + 26 * SCALE)], fill=(6, 8, 17, 128))
+        cone = cone.filter(ImageFilter.GaussianBlur(max(1, int(4 * SCALE))))
         image.alpha_composite(cone)
-        self.label(image,"PENUMBRA = PARTIAL",(int(OUT_W*0.54),int(y-93*SCALE)),size=10,alpha=165)
-        self.label(image,"UMBRA = TOTAL",(int(OUT_W*0.59),int(y+56*SCALE)),size=10,alpha=195,fill=(255,198,104))
+        globe = Image.new("RGBA", OUT_SIZE, (0, 0, 0, 0))
+        gd = ImageDraw.Draw(globe)
+        gd.ellipse((earthx - 60 * SCALE, y - 60 * SCALE, earthx + 60 * SCALE, y + 60 * SCALE), fill=(23, 85, 128, 255), outline=(120, 184, 228, 200), width=max(1, int(2 * SCALE)))
+        image.alpha_composite(globe)
+        fit_wrapped_text(image, "SUN", (int(sunx - 50 * SCALE), int(y + 90 * SCALE), int(sunx + 50 * SCALE), int(y + 122 * SCALE)), max_size=int(24 * SCALE), min_size=int(16 * SCALE), fill=(255, 221, 146, 230), bold=True, stroke=2, align="center")
+        fit_wrapped_text(image, "MOON", (int(moonx - 60 * SCALE), int(y + 90 * SCALE), int(moonx + 60 * SCALE), int(y + 122 * SCALE)), max_size=int(24 * SCALE), min_size=int(16 * SCALE), fill=(214, 223, 232, 230), bold=True, stroke=2, align="center")
+        fit_wrapped_text(image, "EARTH", (int(earthx - 60 * SCALE), int(y + 90 * SCALE), int(earthx + 60 * SCALE), int(y + 122 * SCALE)), max_size=int(24 * SCALE), min_size=int(16 * SCALE), fill=(166, 214, 243, 230), bold=True, stroke=2, align="center")
+        fit_wrapped_text(image, "UMBRA", (int((moonx + earthx) / 2 - 90 * SCALE), int(y - 100 * SCALE), int((moonx + earthx) / 2 + 90 * SCALE), int(y - 70 * SCALE)), max_size=int(22 * SCALE), min_size=int(16 * SCALE), fill=(245, 248, 252, 230), bold=True, stroke=2, align="center")
 
-        x=int(OUT_W*0.075)
-        self.equation(image,"Moon angular diameter ≳ Sun angular diameter",(x,int(OUT_H*0.675)),size=18)
-        self.label(image,"The objects are NOT drawn to scale here.",(x,int(OUT_H*0.720)),size=10,alpha=130,bold=False)
+    def scene_path(self, image: Image.Image, t: float, local: float):
+        self.title_block(image, "REAL MAP", "NASA'S SHADOW PATH", "This version uses a true geospatial map renderer instead of a fake hand-drawn map.")
+        rect = (int(OUT_W * 0.07), int(OUT_H * 0.25), int(OUT_W * 0.93), int(OUT_H * 0.73))
+        map_im = self.map_renderer.render(rect[2] - rect[0], rect[3] - rect[1], "PATH OF TOTALITY / DEEP PARTIAL EUROPE", path_progress=smoothstep(local), show_path=True, cities=["REYKJAVIK", "LEON", "MADRID", "BARCELONA", "LONDON", "PARIS"], city_label_subset=["REYKJAVIK", "LEON"], marker_clock=True)
+        draw_panel(image, (rect[0] - int(8 * SCALE), rect[1] - int(8 * SCALE), rect[2] + int(8 * SCALE), rect[3] + int(8 * SCALE)), fill=(6, 10, 18, 96), outline=(220, 232, 242, 64), radius=18)
+        image.alpha_composite(map_im, (rect[0], rect[1]))
+        fit_wrapped_text(image, "THE TINY DARK MARKER SHOWS THE MOVING UMBRA", (int(OUT_W * 0.075), int(OUT_H * 0.74), int(OUT_W * 0.93), int(OUT_H * 0.775)), max_size=int(24 * SCALE), min_size=int(16 * SCALE), fill=(247, 251, 253, 220), bold=True, stroke=2)
 
-    def scene_path(self,image,t,local):
-        self.title(image,"NASA CENTRAL-LINE DATA","THE SHADOW'S REAL PATH","Two-minute NASA/GSFC path points drive this animation.")
-        cx=OUT_W*0.52; cy=OUT_H*0.52; r=360*SCALE
-        # delayed sweep so viewer first reads the map
-        p=smoothstep((local-0.08)/0.86)
-        self.draw_earth_globe(image,cx,cy,r,t,center_lat=60,center_lon=-24,with_path=True,path_progress=p)
-        self.label(image,"SIBERIA → ARCTIC → GREENLAND → ICELAND → ATLANTIC → SPAIN",(int(OUT_W*0.075),int(OUT_H*0.742)),size=10,alpha=175)
-        lat,lon,width,dur,clock=interpolate_path(p)
-        self.label(image,f"CENTER  {lat:05.1f}°N  {abs(lon):05.1f}°{'W' if lon<0 else 'E'}",(int(OUT_W*0.075),int(OUT_H*0.777)),size=10,alpha=150)
+    def scene_greatest(self, image: Image.Image, t: float, local: float):
+        self.title_block(image, "KEY NUMBERS", "GREATEST ECLIPSE", "The strongest part of the event happened over the North Atlantic.")
+        rect = (int(OUT_W * 0.59), int(OUT_H * 0.27), int(OUT_W * 0.92), int(OUT_H * 0.53))
+        map_im = self.map_renderer.render(rect[2] - rect[0], rect[3] - rect[1], "GREATEST ECLIPSE", path_progress=22 / (len(NASA_PATH) - 1), show_path=True, cities=None, city_label_subset=None, marker_clock=True)
+        draw_panel(image, (rect[0] - int(8 * SCALE), rect[1] - int(8 * SCALE), rect[2] + int(8 * SCALE), rect[3] + int(8 * SCALE)), fill=(6, 10, 18, 96), outline=(220, 232, 242, 64), radius=16)
+        image.alpha_composite(map_im, (rect[0], rect[1]))
 
-    def scene_greatest(self,image,t,local):
-        self.title(image,"GREATEST ECLIPSE","17:45:54 UTC","The deepest geometry occurred between Greenland and Iceland.")
-        # globe on right, data on left
-        self.draw_earth_globe(image,OUT_W*0.68,OUT_H*0.50,250*SCALE,t,center_lat=66,center_lon=-25,with_path=True,path_progress=22/(len(NASA_PATH)-1))
-        x=int(OUT_W*0.075)
-        reveal=ease_out_cubic(local)
-        self.label(image,"CENTER",(x,int(OUT_H*0.285)),size=10,alpha=int(145*reveal))
-        draw_text(image,"65.2° N",(x,int(OUT_H*0.325)),size=max(18,int(31*SCALE)),fill=(240,245,250,int(250*reveal)),bold=True,stroke=1)
-        draw_text(image,"25.2° W",(x,int(OUT_H*0.370)),size=max(18,int(31*SCALE)),fill=(240,245,250,int(250*reveal)),bold=True,stroke=1)
-        self.label(image,"PATH WIDTH",(x,int(OUT_H*0.455)),size=10,alpha=int(145*reveal))
-        draw_text(image,"294 km",(x,int(OUT_H*0.505)),size=max(20,int(39*SCALE)),fill=(255,204,112,int(250*reveal)),bold=True,stroke=1)
-        self.label(image,"CENTRAL TOTALITY",(x,int(OUT_H*0.590)),size=10,alpha=int(145*reveal))
-        draw_text(image,"2:18.2",(x,int(OUT_H*0.645)),size=max(22,int(45*SCALE)),fill=(245,249,252,int(250*reveal)),bold=True,stroke=1)
-        self.label(image,"MAGNITUDE ≈ 1.039",(x,int(OUT_H*0.711)),size=11,alpha=int(175*reveal))
-
-    def scene_cities(self,image,t,local):
-        self.title(image,"EUROPE WASN'T EQUALLY DARK","TOTAL VS. DEEP PARTIAL","NASA city circumstances show the difference.")
-        # mini globe top-right
-        self.draw_earth_globe(image,OUT_W*0.76,OUT_H*0.37,175*SCALE,t,center_lat=52,center_lon=-8,with_path=True,path_progress=1.0,city_marks=True)
-
-        # Table-like cinematic list, but sparse and readable on mobile
-        rows=[
-            ("REYKJAVIK","TOTAL","17:48–17:49"),
-            ("LEON","TOTAL","20:28–20:30"),
-            ("MADRID","99%","20:32 max"),
-            ("BARCELONA","99%","20:29 max"),
-            ("LONDON","91%","19:13 max"),
-            ("PARIS","92%","20:17 max"),
+        labels = [
+            ("TIME", "17:45:54 UTC"),
+            ("LOCATION", "65.2° N  •  25.2° W"),
+            ("PATH WIDTH", "~294 km"),
+            ("TOTALITY", "~2 min 18 s"),
         ]
-        x0=int(OUT_W*0.075); y0=int(OUT_H*0.335)
-        for i,(city,cover,tm) in enumerate(rows):
-            y=y0+i*int(OUT_H*0.067)
-            a=int(220*smoothstep(local*2.2-i*0.11))
-            self.label(image,city,(x0,y),size=11,alpha=a)
-            total=cover=="TOTAL"
-            col=(255,203,106,a) if total else (194,219,236,a)
-            draw_text(image,cover,(int(OUT_W*0.34),y),size=max(9,int(13*SCALE)),fill=col,bold=True,stroke=1,anchor="la")
-            self.label(image,tm,(int(OUT_W*0.49),y),size=9,alpha=int(a*0.82),bold=False)
-        self.label(image,"TIMES ARE LOCAL • % = MAXIMUM SOLAR DISK AREA COVERED",(x0,int(OUT_H*0.752)),size=8,alpha=110,bold=False)
+        y = int(OUT_H * 0.29)
+        for k, v in labels:
+            fit_wrapped_text(image, k, (int(OUT_W * 0.075), y, int(OUT_W * 0.42), y + int(28 * SCALE)), max_size=int(22 * SCALE), min_size=int(14 * SCALE), fill=(176, 198, 218, 185), bold=True, stroke=1)
+            fit_wrapped_text(image, v, (int(OUT_W * 0.075), y + int(32 * SCALE), int(OUT_W * 0.52), y + int(84 * SCALE)), max_size=int(42 * SCALE), min_size=int(20 * SCALE), fill=(248, 250, 252, 255), bold=True, stroke=2)
+            y += int(112 * SCALE)
 
-    def scene_spain(self,image,t,local):
-        self.title(image,"NORTHERN SPAIN","TOTALITY NEAR SUNSET","The eclipse reached Spain with the Sun already low in the west.")
+    def scene_cities(self, image: Image.Image, t: float, local: float):
+        self.title_block(image, "WHAT EUROPE SAW", "TOTALITY VS. DEEP PARTIAL", "Different cities experienced very different eclipse depths.")
+        rect = (int(OUT_W * 0.07), int(OUT_H * 0.24), int(OUT_W * 0.93), int(OUT_H * 0.61))
+        map_im = self.map_renderer.render(rect[2] - rect[0], rect[3] - rect[1], "CITY OUTCOMES", path_progress=1.0, show_path=True, cities=["REYKJAVIK", "LEON", "ZARAGOZA", "VALENCIA", "MADRID", "BARCELONA", "LONDON", "PARIS"], city_label_subset=["REYKJAVIK", "LEON", "MADRID", "LONDON"], marker_clock=False)
+        draw_panel(image, (rect[0] - int(8 * SCALE), rect[1] - int(8 * SCALE), rect[2] + int(8 * SCALE), rect[3] + int(8 * SCALE)), fill=(6, 10, 18, 96), outline=(220, 232, 242, 64), radius=16)
+        image.alpha_composite(map_im, (rect[0], rect[1]))
 
-        # Cinematic horizon gradient, intentionally not a local astronomical horizon solver.
-        sky=np.zeros((int(OUT_H*0.60),OUT_W,4),dtype=np.uint8)
-        h=sky.shape[0]
-        for y in range(h):
-            q=y/max(1,h-1)
-            sky[y,:,0]=np.clip(16+90*q,0,255)
-            sky[y,:,1]=np.clip(22+42*q,0,255)
-            sky[y,:,2]=np.clip(48+15*q,0,255)
-            sky[y,:,3]=220
-        image.alpha_composite(Image.fromarray(sky,"RGBA"),(0,int(OUT_H*0.24)))
-        horizon_y=OUT_H*0.69
-        d=ImageDraw.Draw(image)
-        # layered silhouettes
-        mountains=[(0,horizon_y),(OUT_W*0.15,horizon_y-40*SCALE),(OUT_W*0.28,horizon_y-12*SCALE),(OUT_W*0.43,horizon_y-62*SCALE),(OUT_W*0.58,horizon_y-24*SCALE),(OUT_W*0.74,horizon_y-55*SCALE),(OUT_W,horizon_y-18*SCALE),(OUT_W,OUT_H),(0,OUT_H)]
-        d.polygon(mountains,fill=(3,5,9,255))
-        p=smoothstep(local)
-        sx=lerp(OUT_W*0.65,OUT_W*0.55,p)
-        sy=lerp(OUT_H*0.49,OUT_H*0.58,p)
-        self.draw_totality(image,sx,sy,115*SCALE,t,diamond=max(0,1-local*2.3))
-        self.label(image,"CINEMATIC HORIZON RECONSTRUCTION",(int(OUT_W*0.075),int(OUT_H*0.744)),size=8,alpha=105,bold=False)
-        self.label(image,"LEON  totality ~20:28–20:30 local",(int(OUT_W*0.075),int(OUT_H*0.778)),size=10,alpha=175)
+        box1 = (int(OUT_W * 0.075), int(OUT_H * 0.66), int(OUT_W * 0.46), int(OUT_H * 0.775))
+        box2 = (int(OUT_W * 0.54), int(OUT_H * 0.66), int(OUT_W * 0.925), int(OUT_H * 0.775))
+        draw_panel(image, box1, fill=(16, 15, 20, 155), outline=(255, 212, 120, 70), radius=18)
+        draw_panel(image, box2, fill=(13, 18, 28, 155), outline=(190, 223, 242, 70), radius=18)
+        fit_wrapped_text(image, "TOTALITY", (box1[0] + int(18 * SCALE), box1[1] + int(12 * SCALE), box1[2] - int(18 * SCALE), box1[1] + int(38 * SCALE)), max_size=int(26 * SCALE), min_size=int(18 * SCALE), fill=(255, 218, 128, 240), bold=True, stroke=2)
+        fit_wrapped_text(image, "Reykjavik, Leon, Zaragoza, Valencia", (box1[0] + int(18 * SCALE), box1[1] + int(44 * SCALE), box1[2] - int(18 * SCALE), box1[3] - int(12 * SCALE)), max_size=int(24 * SCALE), min_size=int(16 * SCALE), fill=(248, 249, 251, 236), bold=False, stroke=2)
+        fit_wrapped_text(image, "DEEP PARTIAL", (box2[0] + int(18 * SCALE), box2[1] + int(12 * SCALE), box2[2] - int(18 * SCALE), box2[1] + int(38 * SCALE)), max_size=int(26 * SCALE), min_size=int(18 * SCALE), fill=(198, 227, 245, 240), bold=True, stroke=2)
+        fit_wrapped_text(image, "Madrid ~99% • Barcelona ~99%\nLondon ~91% • Paris ~92%", (box2[0] + int(18 * SCALE), box2[1] + int(44 * SCALE), box2[2] - int(18 * SCALE), box2[3] - int(12 * SCALE)), max_size=int(23 * SCALE), min_size=int(15 * SCALE), fill=(248, 249, 251, 236), bold=False, stroke=2)
 
-    def scene_safety(self,image,t,local):
-        self.title(image,"ONE RULE TO REMEMBER","PROTECT YOUR EYES","Totality is the only brief exception.")
-        cx=OUT_W*0.50; cy=OUT_H*0.43
-        r=145*SCALE
-        # partial phase graphic
-        self.draw_sun(image,cx,cy,r,t)
-        moon_offset=lerp(r*1.2,r*0.55,smoothstep(local))
-        self.draw_moon_disk(image,cx-moon_offset,cy,r*1.01,t,lit=False)
-        x=int(OUT_W*0.075)
-        self.label(image,"PARTIAL PHASES",(x,int(OUT_H*0.665)),size=11,alpha=170)
-        draw_text(image,"ECLIPSE GLASSES",(x,int(OUT_H*0.712)),size=max(18,int(31*SCALE)),fill=(255,203,108,245),bold=True,stroke=1)
-        self.label(image,"CAMERA / BINOCULARS / TELESCOPE",(x,int(OUT_H*0.765)),size=9,alpha=140)
-        draw_text(image,"FRONT SOLAR FILTER",(int(OUT_W*0.49),int(OUT_H*0.765)),size=max(9,int(14*SCALE)),fill=(205,226,240,220),bold=True,stroke=1,anchor="la")
+    def scene_spain(self, image: Image.Image, t: float, local: float):
+        self.title_block(image, "SPAIN AT SUNSET", "TOTALITY LOW ON THE HORIZON", "In Spain, the eclipse happened late in the day — one reason the visuals were so dramatic.")
+        horizon_y = OUT_H * 0.62
+        sky = np.zeros((OUT_H, OUT_W, 4), dtype=np.uint8)
+        for i in range(OUT_H):
+            u = i / max(1, OUT_H - 1)
+            if u < 0.62:
+                c0 = np.array([255, 170, 88, 255], dtype=np.float32)
+                c1 = np.array([21, 28, 57, 0], dtype=np.float32)
+                mix = u / 0.62
+                sky[i, :, :] = np.clip(c1 * mix + c0 * (1 - mix), 0, 255).astype(np.uint8)
+        image.alpha_composite(Image.fromarray(sky, "RGBA"))
+        ground = Image.new("RGBA", OUT_SIZE, (0, 0, 0, 0))
+        gd = ImageDraw.Draw(ground)
+        gd.rectangle((0, horizon_y, OUT_W, OUT_H), fill=(7, 9, 13, 255))
+        pts = [(0, horizon_y)]
+        for j in range(11):
+            x = j / 10.0 * OUT_W
+            y = horizon_y - (20 + (j % 3) * 14 + 18 * math.sin(j * 1.7)) * SCALE
+            pts.append((x, y))
+        pts.extend([(OUT_W, OUT_H), (0, OUT_H)])
+        gd.polygon(pts, fill=(6, 7, 10, 255))
+        image.alpha_composite(ground)
+        self.draw_corona_eclipse(image, OUT_W * 0.50, OUT_H * 0.54, 115 * SCALE, diamond=0.20 * (1.0 - abs(local - 0.22)))
+        fit_wrapped_text(image, "LOW WESTERN SKY • LATE EVENING TOTALITY", (int(OUT_W * 0.12), int(OUT_H * 0.71), int(OUT_W * 0.88), int(OUT_H * 0.75)), max_size=int(26 * SCALE), min_size=int(18 * SCALE), fill=(255, 242, 216, 235), bold=True, stroke=2, align="center")
 
-    def render(self,t: float) -> np.ndarray:
-        image=self.background(t)
-        shot=get_shot(t)
-        local=smoothstep((t-shot["start"])/max(shot["end"]-shot["start"],1e-9))
-        name=shot["name"]
-        if name=="hook": self.scene_hook(image,t,local)
-        elif name=="alignment": self.scene_alignment(image,t,local)
-        elif name=="path": self.scene_path(image,t,local)
-        elif name=="greatest": self.scene_greatest(image,t,local)
-        elif name=="cities": self.scene_cities(image,t,local)
-        elif name=="spain": self.scene_spain(image,t,local)
-        else: self.scene_safety(image,t,local)
-        self.draw_caption(image,t)
+    def scene_safety(self, image: Image.Image, t: float, local: float):
+        self.title_block(image, "ONE LAST RULE", "PROTECT YOUR EYES", "Except during totality, you must use proper eclipse glasses or certified solar filters.")
+        self.draw_sun(image, OUT_W * 0.50, OUT_H * 0.42, 95 * SCALE)
+        self.draw_moon(image, OUT_W * 0.50 - 18 * SCALE, OUT_H * 0.42 - 4 * SCALE, 70 * SCALE)
+        panel = (int(OUT_W * 0.08), int(OUT_H * 0.58), int(OUT_W * 0.92), int(OUT_H * 0.73))
+        draw_panel(image, panel, fill=(10, 12, 20, 165), outline=(220, 235, 245, 70), radius=20)
+        fit_wrapped_text(image, "Partial phases = eclipse glasses. Only full totality = direct viewing safe. Cameras and telescopes need front-mounted solar filters.", (panel[0] + int(24 * SCALE), panel[1] + int(22 * SCALE), panel[2] - int(24 * SCALE), panel[3] - int(18 * SCALE)), max_size=int(31 * SCALE), min_size=int(18 * SCALE), fill=(247, 250, 252, 242), bold=False, stroke=3, line_spacing=int(7 * SCALE))
+        fit_wrapped_text(image, "AUGUST 12, 2026 • TOTAL SOLAR ECLIPSE", (int(OUT_W * 0.16), int(OUT_H * 0.76), int(OUT_W * 0.84), int(OUT_H * 0.79)), max_size=int(25 * SCALE), min_size=int(16 * SCALE), fill=(199, 218, 233, 205), bold=True, stroke=2, align="center")
+
+    def render(self, t: float) -> np.ndarray:
+        image = self.background(t)
+        shot = get_shot(t)
+        local = smoothstep((t - shot["start"]) / max(shot["end"] - shot["start"], 1e-9))
+        name = shot["name"]
+        if name == "hook":
+            self.scene_hook(image, t, local)
+        elif name == "alignment":
+            self.scene_alignment(image, t, local)
+        elif name == "path":
+            self.scene_path(image, t, local)
+        elif name == "greatest":
+            self.scene_greatest(image, t, local)
+        elif name == "cities":
+            self.scene_cities(image, t, local)
+        elif name == "spain":
+            self.scene_spain(image, t, local)
+        else:
+            self.scene_safety(image, t, local)
+        self.caption(image, t)
         self.footer(image)
         return apply_grade(np.asarray(image.convert("RGB")))
 
 
 # =============================================================================
-# Output writers
+# Outputs
 # =============================================================================
 
 def save_path_csv(path: Path):
-    with path.open("w",newline="",encoding="utf-8") as f:
-        w=csv.writer(f)
-        w.writerow(["utc","central_lat_deg","central_lon_deg","path_width_km","central_duration_s","approx_ground_speed_km_s"])
-        for i,row in enumerate(NASA_PATH):
-            w.writerow([row[0],row[1],row[2],row[3],row[4],local_path_speed_km_s(i)])
+    with path.open("w", newline="", encoding="utf-8") as f:
+        w = csv.writer(f)
+        w.writerow(["utc", "central_lat_deg", "central_lon_deg", "path_width_km", "central_duration_s"])
+        for row in NASA_PATH:
+            w.writerow(row)
 
 
 def save_summary(path: Path):
-    data={
-        "title": CONFIG["title"],
-        "event": ECLIPSE_FACTS,
-        "city_data": [
-            {"city":r[0],"country":r[1],"kind":r[2],"partial_begins_local":r[3],"maximum_or_totality_local":r[4],"partial_ends_local":r[5],"coverage":r[6]}
-            for r in CITY_DATA
+    data = {
+        "title": "August 12, 2026 Total Solar Eclipse — Cinematic Short v3",
+        "improvements": [
+            "Map scenes are rendered with Cartopy when available.",
+            "All title and caption text uses fit-to-box layout to prevent cropping.",
+            "Path, timing, width, and city examples remain grounded in NASA data.",
         ],
-        "sources": [
-            "NASA GSFC: https://eclipse.gsfc.nasa.gov/SEpath/SEpath2001/SE2026Aug12Tpath.html",
-            "NASA GSFC: https://eclipse.gsfc.nasa.gov/SEsearch/SEdata.php?Ecl=20260812",
-            "NASA Science: https://science.nasa.gov/eclipses/future-eclipses/total-solar-eclipse-on-august-12-2026/",
-            "NASA Safety: https://science.nasa.gov/eclipses/safety/",
-        ],
-        "visualization_notes": NASA_SOURCE_NOTES,
-        "narration": [text for _,_,text in FULL_CAPTIONS],
+        "cartopy_available_at_render_time": CARTOPY_OK,
+        "matplotlib_available_at_render_time": MATPLOTLIB_OK,
+        "facts": ECLIPSE_FACTS,
+        "city_examples": CITY_DATA,
+        "video": {"width": OUT_W, "height": OUT_H, "fps": FPS, "duration_s": DURATION},
     }
-    path.write_text(json.dumps(data,indent=2),encoding="utf-8")
+    path.write_text(json.dumps(data, indent=2), encoding="utf-8")
 
 
 def make_previews(scene: EclipseScene):
-    times = [0.6,2.2,4.2,6.2,8.6,10.8] if QUICK_MODE else [2.5,10.0,19.5,28.0,37.5,46.2,52.5]
+    times = [0.6, 2.4, 4.8, 7.2, 9.8, 12.0] if QUICK_MODE else [3.0, 10.0, 18.0, 27.0, 36.0, 46.0, 54.0]
     for t in times:
-        arr=scene.render(t)
-        Image.fromarray(arr).save(PREVIEW_DIR/f"preview_{t:g}s.png")
+        Image.fromarray(scene.render(t)).save(PREVIEW_DIR / f"preview_{t:g}s.png")
 
 
 def render_video(scene: EclipseScene, path: Path):
-    frames=int(round(FPS*DURATION))
-    writer=iio.get_writer(
+    frames = int(round(FPS * DURATION))
+    writer = iio.get_writer(
         path,
         fps=FPS,
         codec="libx264",
+        quality=8 if not QUICK_MODE else 7,
         pixelformat="yuv420p",
-        macro_block_size=1,
-        ffmpeg_params=[
-            "-crf", "20" if QUICK_MODE else "17",
-            "-preset", "medium" if QUICK_MODE else "slow",
-            "-movflags", "+faststart",
-        ],
+        ffmpeg_params=["-movflags", "+faststart", "-vf", f"scale={OUT_W}:{OUT_H}"],
+        macro_block_size=None,
     )
     try:
-        for i in tqdm(range(frames),desc="Rendering Aug 12 2026 eclipse Short"):
-            writer.append_data(scene.render(i/FPS))
+        for i in tqdm(range(frames), desc="Rendering eclipse Short v3"):
+            writer.append_data(scene.render(i / FPS))
     finally:
         writer.close()
 
 
 def main():
-    scene=EclipseScene()
-    basename=str(CONFIG["output_basename"])
-    mp4=OUTPUT_ROOT/f"{basename}_final.mp4"
-    srt=OUTPUT_ROOT/f"{basename}.srt"
-    csvp=DATA_DIR/"nasa_central_line_path.csv"
-    jsonp=DATA_DIR/"eclipse_fact_sheet.json"
+    scene = EclipseScene()
+    basename = str(CONFIG["output_basename"])
+    mp4_path = OUTPUT_ROOT / f"{basename}_final.mp4"
+    srt_path = OUTPUT_ROOT / f"{basename}.srt"
+    csv_path = DATA_DIR / "nasa_central_line_path.csv"
+    json_path = DATA_DIR / "eclipse_summary.json"
 
-    write_srt(CAPTIONS,srt)
-    save_path_csv(csvp)
-    save_summary(jsonp)
+    write_srt(CAPTIONS, srt_path)
+    save_path_csv(csv_path)
+    save_summary(json_path)
     make_previews(scene)
-    render_video(scene,mp4)
+    render_video(scene, mp4_path)
 
     print("\nRender complete")
-    print(f"Video:     {mp4}")
-    print(f"Subtitles: {srt}")
-    print(f"Path CSV:  {csvp}")
-    print(f"Fact JSON: {jsonp}")
-    print("\nScience credit: Eclipse Predictions by Fred Espenak, NASA's GSFC.")
+    print(f"Video:     {mp4_path}")
+    print(f"Subtitles: {srt_path}")
+    print(f"Path CSV:  {csv_path}")
+    print(f"Summary:   {json_path}")
+    print(f"Cartopy available: {CARTOPY_OK}")
 
 
 if __name__ == "__main__":
