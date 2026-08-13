@@ -4,6 +4,8 @@ from __future__ import annotations
 August 12, 2026 Total Solar Eclipse — Cinematic YouTube Short Renderer v3
 ============================================================================
 
+result : https://www.youtube.com/shorts/c28NbnbBAD4
+
 Purpose
 -------
 This is a third-pass rebuild focused on two user-requested fixes:
