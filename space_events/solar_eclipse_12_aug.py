@@ -968,4 +968,23 @@ def render_video(scene: EclipseScene, path: Path):
         writer.close()
 
 
+def main():
+    scene=EclipseScene()
+    basename=str(CONFIG["output_basename"])
+    mp4=OUTPUT_ROOT/f"{basename}_final.mp4"
+    srt=OUTPUT_ROOT/f"{basename}.srt"
+    csvp=DATA_DIR/"nasa_central_line_path.csv"
+    jsonp=DATA_DIR/"eclipse_fact_sheet.json"
 
+    write_srt(CAPTIONS,srt)
+    save_path_csv(csvp)
+    save_summary(jsonp)
+    make_previews(scene)
+    render_video(scene,mp4)
+
+    print("\nRender complete")
+    print(f"Video:     {mp4}")
+    print(f"Subtitles: {srt}")
+    print(f"Path CSV:  {csvp}")
+    print(f"Fact JSON: {jsonp}")
+    print("\nScience credit: Eclipse Predictions by Fred Espenak, NASA's GSFC.")
