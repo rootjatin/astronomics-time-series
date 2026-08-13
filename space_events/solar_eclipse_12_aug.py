@@ -86,6 +86,17 @@ for directory in (OUTPUT_ROOT, PREVIEW_DIR, DATA_DIR):
     directory.mkdir(parents=True, exist_ok=True)
 
 CONFIG: Dict[str, Any] = {
+    "video_width": 540 if QUICK_MODE else 1080,
+    "video_height": 960 if QUICK_MODE else 1920,
+    "fps": 8 if QUICK_MODE else 30,
+    "duration_s": 12.0 if QUICK_MODE else 56.0,
+    "output_basename": "august_12_2026_total_solar_eclipse_cinematic",
+    "title": "THE DAY EUROPE WENT DARK",
+    "subtitle": "12 AUGUST 2026 — TOTAL SOLAR ECLIPSE",
+    "background_stars": 260 if QUICK_MODE else 900,
+    "contrast": 1.14,
+    "saturation": 0.94,
+    "vignette": 0.34,
 }
 
 OUT_W = int(CONFIG["video_width"])
@@ -1013,6 +1024,7 @@ def main():
     print(f"Path CSV:  {csvp}")
     print(f"Fact JSON: {jsonp}")
     print("\nScience credit: Eclipse Predictions by Fred Espenak, NASA's GSFC.")
+
 
 if __name__ == "__main__":
     main()
