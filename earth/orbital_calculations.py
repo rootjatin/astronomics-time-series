@@ -911,5 +911,7 @@ def main():
     print(f"Orbit CSV:{csv_path}")
     print(f"Summary:  {json_path}")
 
+if __name__ == "__main__":
+    main()
 
 
