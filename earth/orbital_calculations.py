@@ -891,5 +891,25 @@ def render_video(scene: OrbitScene, path: Path):
     finally:
         writer.close()
 
+def main():
+    scene=OrbitScene()
+    basename=str(CONFIG["output_basename"])
+    mp4_path=OUTPUT_ROOT / f"{basename}_final.mp4"
+    srt_path=OUTPUT_ROOT / f"{basename}.srt"
+    csv_path=DATA_DIR / "earth_sun_velocity_verlet_orbit.csv"
+    json_path=DATA_DIR / "orbit_calculation_summary.json"
+
+    write_srt(CAPTIONS,srt_path)
+    save_orbit_csv(csv_path)
+    save_summary(json_path)
+    make_previews(scene)
+    render_video(scene,mp4_path)
+
+    print("\nRender complete")
+    print(f"Video:    {mp4_path}")
+    print(f"Subtitles:{srt_path}")
+    print(f"Orbit CSV:{csv_path}")
+    print(f"Summary:  {json_path}")
+
 
 
