@@ -6,6 +6,23 @@ Calculating & Simulating Earth's Orbit Around the Sun — YouTube Short renderer
 Creates a vertical 1080x1920 educational science Short that shows how to
 calculate and numerically simulate gravitational orbits.
 
+The video explains six ideas:
+
+1. Newton's law of gravitation provides the force between two masses.
+2. For a circular orbit, gravity supplies the centripetal acceleration, giving
+       v = sqrt(G (M + m) / r)
+   and
+       T = 2*pi*sqrt(r^3 / (G (M + m))).
+3. Earth's orbit is slightly elliptical, so the vis-viva equation
+       v^2 = G (M + m) * (2/r - 1/a)
+   gives the changing orbital speed.
+4. When BOTH bodies are massive, neither is truly fixed: both orbit their
+   shared center of mass (the barycenter).
+5. A numerical integrator can advance positions and velocities step by step
+   using Newtonian gravity. This renderer uses velocity-Verlet integration.
+6. The same framework applies to planets, moons, binary stars, and many other
+   two-body systems. Close to compact objects or at relativistic speeds,
+   general relativity is required instead of a purely Newtonian model.
 
 
 Recommended install
