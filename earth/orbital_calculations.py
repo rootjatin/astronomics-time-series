@@ -24,6 +24,9 @@ The video explains six ideas:
    two-body systems. Close to compact objects or at relativistic speeds,
    general relativity is required instead of a purely Newtonian model.
 
+All calculations are deterministic and require no internet connection.
+The Earth-Sun constants used here are standard approximate SI values.
+
 
 Recommended install
 -------------------
