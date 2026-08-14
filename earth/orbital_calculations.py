@@ -27,7 +27,6 @@ The video explains six ideas:
 All calculations are deterministic and require no internet connection.
 The Earth-Sun constants used here are standard approximate SI values.
 
-
 Recommended install
 -------------------
     pip install numpy pillow imageio imageio-ffmpeg tqdm
@@ -891,6 +890,7 @@ def render_video(scene: OrbitScene, path: Path):
     finally:
         writer.close()
 
+
 def main():
     scene=OrbitScene()
     basename=str(CONFIG["output_basename"])
@@ -911,7 +911,6 @@ def main():
     print(f"Orbit CSV:{csv_path}")
     print(f"Summary:  {json_path}")
 
+
 if __name__ == "__main__":
     main()
-
-
