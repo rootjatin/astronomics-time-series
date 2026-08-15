@@ -24,6 +24,22 @@ Real timeline used
 - 2018-07-23: more dust was falling than being raised; decay phase.
 - 2018-09-20: skies over Opportunity's location had substantially cleared.
 
+Primary sources
+---------------
+NASA SVS, Mars 2018 Global Dust Storm:
+https://svs.gsfc.nasa.gov/30983/
+
+NASA/JPL, Opportunity Hunkers Down During Dust Storm:
+https://www.jpl.nasa.gov/news/opportunity-hunkers-down-during-dust-storm/
+
+NASA/JPL, Martian Dust Storm Grows Global:
+https://www.jpl.nasa.gov/news/martian-dust-storm-grows-global-curiosity-captures-photos-of-thickening-haze/
+
+NASA Science, Mars Climate Sounder Studies 2018 Dust Storm:
+https://science.nasa.gov/photojournal/mars-climate-sounder-studies-2018-dust-storm/
+
+NASA Science, Opportunity mission:
+https://science.nasa.gov/mission/mer-opportunity/
 
 Modes
 -----
@@ -919,7 +935,5 @@ def main() -> None:
     print(json.dumps(manifest,indent=2))
 
 
-
 if __name__=="__main__":
     main()
-
