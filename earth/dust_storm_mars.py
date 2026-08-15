@@ -876,4 +876,46 @@ def contact_sheet(video:Path,path:Path) -> Path:
     return path
 
 
+def main() -> None:
+    csv_path,json_path=write_data_products()
+    srt_path=write_srt(OUTPUT/(BASENAME+".srt"))
+    silent=OUTPUT/(BASENAME+"_silent.mp4")
+    final=OUTPUT/(BASENAME+("_quick_preview.mp4" if QUICK else ".mp4"))
+    renderer=Renderer()
+    writer=iio.get_writer(
+        silent,
+        fps=FPS,
+        codec="libx264",
+        quality=8,
+        macro_block_size=None,
+        ffmpeg_params=["-pix_fmt","yuv420p","-movflags","+faststart"],
+    )
+    total=int(round(DURATION*FPS))
+    for frame_index in tqdm(range(total),desc="Rendering Mars dust-storm short"):
+        writer.append_data(renderer.render(frame_index/FPS))
+    writer.close()
+    if SOUND:
+        audio=OUTPUT/(BASENAME+"_soundtrack.wav")
+        make_soundtrack(audio)
+        mux_audio(silent,audio,final)
+    else:
+        silent.replace(final)
+    if silent.exists():
+        silent.unlink()
+    sheet=contact_sheet(final,PREVIEW_DIR/(BASENAME+"_contact_sheet.jpg"))
+    manifest={
+        "video":str(final),
+        "subtitles":str(srt_path),
+        "data_csv":str(csv_path),
+        "method":str(json_path),
+        "contact_sheet":str(sheet),
+        "resolution":[W,H],
+        "fps":FPS,
+        "duration_s":DURATION,
+        "sound":SOUND,
+        "caption_rule":"Every narrative caption is shown for no more than four seconds, followed by clean visual time.",
+    }
+    (OUTPUT/"render_manifest.json").write_text(json.dumps(manifest,indent=2),encoding="utf-8")
+    print(json.dumps(manifest,indent=2))
+
 
