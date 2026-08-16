@@ -14,6 +14,14 @@ Scientific framing
 - Ocean: covers about 71% of Earth and absorbs around 90% of the excess heat
   associated with planetary warming.
 
+Sources used for the narrative framing:
+- NASA: Weather vs. climate
+  https://science.nasa.gov/climate-change/faq/whats-the-difference-between-weather-and-climate/
+- NOAA: One global ocean covers about 71% of Earth
+  https://oceanservice.noaa.gov/news/june17/30days.html
+- NASA: Ocean and climate change / ocean heat uptake
+  https://science.nasa.gov/earth/explore/the-ocean-and-climate-change/
+
 Usage
 -----
 Full render:
