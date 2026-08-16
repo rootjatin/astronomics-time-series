@@ -7,7 +7,12 @@ Cinematic vertical YouTube Shorts renderer.
 Creates a 1080x1920 science short (optional 4K / quick preview) using only
 procedural visuals and sound. No external images or copyrighted music needed.
 
-
+Scientific framing
+------------------
+- Weather: local atmospheric conditions over short timescales.
+- Climate: expected patterns measured over much longer periods.
+- Ocean: covers about 71% of Earth and absorbs around 90% of the excess heat
+  associated with planetary warming.
 
 Usage
 -----
