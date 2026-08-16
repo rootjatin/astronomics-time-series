@@ -61,6 +61,18 @@ for directory in (OUTPUT_ROOT, PREVIEW_DIR):
     directory.mkdir(parents=True, exist_ok=True)
 
 CONFIG: Dict[str, Any] = {
+    "video_width": 540 if QUICK_MODE else (2160 if FOUR_K_MODE else 1080),
+    "video_height": 960 if QUICK_MODE else (3840 if FOUR_K_MODE else 1920),
+    "fps": 8 if QUICK_MODE else 24,
+    "duration_s": 13 if QUICK_MODE else 52,
+    "audio_rate": 44100,
+    "title": "EARTH, WEATHER, CLIMATE & OCEANS",
+    "subtitle": "one connected planetary system",
+    "output_basename": "earth_weather_climate_oceans_one_connected_system",
+    "stars": 180 if QUICK_MODE else 720,
+    "vignette": 0.24,
+    "contrast": 1.08,
+    "saturation": 1.06,
 }
 
 OUT_W = int(CONFIG["video_width"])
@@ -800,52 +812,6 @@ def save_contact_sheet(scene: EarthSystemScene, path: Path):
         sheet.paste(frame, ((i % 4) * 270, (i // 4) * 480))
     sheet.save(path, quality=92)
 
-def main():
-    scene = EarthSystemScene()
-    silent_video = OUTPUT_ROOT / f"{CONFIG['output_basename']}_silent.mp4"
-    audio_path = OUTPUT_ROOT / f"{CONFIG['output_basename']}_soundtrack.wav"
-    final_video = OUTPUT_ROOT / f"{CONFIG['output_basename']}.mp4"
-    subtitles = OUTPUT_ROOT / f"{CONFIG['output_basename']}.srt"
-    summary_path = OUTPUT_ROOT / f"{CONFIG['output_basename']}_summary.json"
-    contact_sheet = PREVIEW_DIR / f"{CONFIG['output_basename']}_contact_sheet.jpg"
-
-    print(f"Rendering {FRAME_COUNT} frames at {OUT_W}x{OUT_H} ...")
-    render_video(scene, silent_video)
-    print("Generating original stereo soundtrack ...")
-    make_audio(audio_path, DURATION)
-    print("Muxing audio ...")
-    audio_muxed = mux_audio(silent_video, audio_path, final_video)
-    write_srt(CAPTIONS, subtitles)
-    save_contact_sheet(scene, contact_sheet)
-
-    summary = {
-        "title": CONFIG["title"],
-        "subtitle": CONFIG["subtitle"],
-        "duration_seconds": DURATION,
-        "resolution": [OUT_W, OUT_H],
-        "fps": FPS,
-        "audio_muxed": audio_muxed,
-        "facts_used": {
-            "ocean_surface_share_percent": 71,
-            "ocean_excess_heat_share_approx_percent": 90,
-            "weather": "local atmospheric conditions on short timescales",
-            "climate": "long-term expected patterns",
-        },
-        "visualization_note": "All visuals are procedural cinematic illustrations, not satellite imagery or calibrated climate maps.",
-        "sources": [
-            "https://science.nasa.gov/climate-change/faq/whats-the-difference-between-weather-and-climate/",
-            "https://oceanservice.noaa.gov/news/june17/30days.html",
-            "https://science.nasa.gov/earth/explore/the-ocean-and-climate-change/",
-        ],
-    }
-    summary_path.write_text(json.dumps(summary, indent=2), encoding="utf-8")
-
-    print("Done.")
-    print(f"Final video : {final_video.resolve()}")
-    print(f"Subtitles   : {subtitles.resolve()}")
-    print(f"Contact sheet: {contact_sheet.resolve()}")
-    print(f"Summary     : {summary_path.resolve()}")
-
 
 def main():
     scene = EarthSystemScene()
@@ -896,4 +862,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
