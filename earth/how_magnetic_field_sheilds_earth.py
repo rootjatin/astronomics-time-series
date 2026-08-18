@@ -6,6 +6,19 @@ How Earth's Magnetic Field Shields Earth — cinematic YouTube Short renderer
 Creates a vertical 1080x1920 science short explaining how Earth's magnetic
 field interacts with the solar wind and forms the magnetosphere.
 
+The animation is deliberately diagrammatic rather than a numerical space-
+weather simulation. It visualizes these scientifically important ideas:
+
+- The Sun continuously releases the solar wind: a stream of charged particles.
+- Earth's internal dynamo produces a large-scale magnetic field.
+- Charged particles respond to magnetic fields, so the solar wind is diverted
+  around a cavity called the magnetosphere.
+- The dayside magnetosphere is compressed by the solar wind and the nightside
+  is stretched into a long magnetotail.
+- Some particles can enter the magnetosphere and are guided toward polar
+  regions, where collisions high in the atmosphere can produce auroras.
+- Earth's magnetic field is not an invisible wall and it does not block all
+  radiation. The atmosphere and magnetosphere protect Earth in different ways.
 
 No external data or internet connection is required. All particles, stars and
 field-line motion are deterministic so repeated renders look the same.
@@ -90,6 +103,7 @@ COLORS = {
     "land": (74, 174, 116),
     "night": (3, 20, 48),
 }
+
 FULL_CAPTIONS: List[Tuple[float, float, str]] = [
     (0.4, 7.3, "The Sun constantly blows charged particles through space. This stream is called the solar wind."),
     (7.4, 17.2, "Earth behaves like a giant magnet. Motion in its liquid outer core generates a magnetic field that reaches far into space."),
