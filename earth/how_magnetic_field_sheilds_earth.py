@@ -91,7 +91,12 @@ COLORS = {
     "night": (3, 20, 48),
 }
 FULL_CAPTIONS: List[Tuple[float, float, str]] = [
- 
+    (0.4, 7.3, "The Sun constantly blows charged particles through space. This stream is called the solar wind."),
+    (7.4, 17.2, "Earth behaves like a giant magnet. Motion in its liquid outer core generates a magnetic field that reaches far into space."),
+    (17.3, 28.3, "Charged solar-wind particles are pushed onto curved paths by the magnetic field, so much of the flow is diverted around Earth."),
+    (28.4, 39.2, "That interaction creates the magnetosphere: compressed on the Sun-facing side and stretched into a long magnetotail behind Earth."),
+    (39.3, 49.4, "The shield is not perfect. Some particles enter and can be guided toward the poles, where they help create auroras high in the atmosphere."),
+    (49.5, 57.5, "So Earth's magnetic field is not a force field. Together with the atmosphere, it reduces our direct exposure to the solar wind."),
 ]
 
 if QUICK_MODE:
