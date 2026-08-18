@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 """
+
+Result : https://www.youtube.com/shorts/-O7pDdKd_So
+
 How Earth's Magnetic Field Shields Earth — cinematic YouTube Short renderer
 
 Creates a vertical 1080x1920 science short explaining how Earth's magnetic
