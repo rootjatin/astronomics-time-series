@@ -55,7 +55,18 @@ for directory in (OUTPUT_ROOT, PREVIEW_DIR):
     directory.mkdir(parents=True, exist_ok=True)
 
 CONFIG: Dict[str, Any] = {
-   
+    "video_width": 540 if QUICK_MODE else 1080,
+    "video_height": 960 if QUICK_MODE else 1920,
+    "fps": 6 if QUICK_MODE else 24,
+    "duration_s": 12 if QUICK_MODE else 58,
+    "output_basename": "how_earths_magnetic_field_shields_earth",
+    "title": "HOW EARTH'S MAGNETIC FIELD SHIELDS EARTH",
+    "subtitle": "solar wind // magnetosphere // aurora",
+    "background_stars": 180 if QUICK_MODE else 420,
+    "solar_particles": 90 if QUICK_MODE else 240,
+    "contrast": 1.08,
+    "saturation": 1.08,
+    "vignette": 0.25,
 }
 
 OUT_W = int(CONFIG["video_width"])
