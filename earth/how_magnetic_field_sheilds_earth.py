@@ -75,9 +75,21 @@ OUT_SIZE = (OUT_W, OUT_H)
 SCALE = OUT_W / 1080.0
 
 COLORS = {
-   
+    "space": (2, 6, 18),
+    "white": (245, 250, 255),
+    "muted": (155, 203, 226),
+    "cyan": (74, 226, 255),
+    "blue": (76, 128, 255),
+    "violet": (178, 108, 255),
+    "gold": (255, 194, 90),
+    "orange": (255, 136, 67),
+    "red": (255, 83, 111),
+    "green": (94, 243, 174),
+    "earth_blue": (26, 104, 196),
+    "ocean": (15, 69, 149),
+    "land": (74, 174, 116),
+    "night": (3, 20, 48),
 }
-
 FULL_CAPTIONS: List[Tuple[float, float, str]] = [
  
 ]
