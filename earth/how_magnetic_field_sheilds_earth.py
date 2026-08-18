@@ -826,4 +826,33 @@ def render_video(scene: EarthMagneticFieldScene) -> Path:
     return final_video
 
 
+def main():
+    print("Preparing Earth magnetic-field YouTube Short ...")
+    print("Mode:", "QUICK" if QUICK_MODE else "FULL")
+    print("Canvas:", f"{OUT_W}x{OUT_H}")
+    print("FPS:", CONFIG["fps"])
+    print("Duration:", CONFIG["duration_s"], "seconds")
+
+    scene = EarthMagneticFieldScene()
+    summary_path = save_summary()
+
+    preview_times = [
+        1.0,
+        min(10.5, float(CONFIG["duration_s"]) * 0.20),
+        min(22.5, float(CONFIG["duration_s"]) * 0.39),
+        min(34.0, float(CONFIG["duration_s"]) * 0.60),
+        min(45.0, float(CONFIG["duration_s"]) * 0.79),
+        float(CONFIG["duration_s"]) - 1.0,
+    ]
+    for preview_time in tqdm(preview_times, desc="Preview frames"):
+        Image.fromarray(scene.render_frame(float(preview_time))).save(
+            PREVIEW_DIR / f"preview_{int(preview_time):02d}s.png"
+        )
+
+    print("Summary:", summary_path.resolve())
+    render_video(scene)
+    print("Output directory:", OUTPUT_ROOT.resolve())
+    for path in sorted(OUTPUT_ROOT.glob("*")):
+        print("-", path.name)
+
 
