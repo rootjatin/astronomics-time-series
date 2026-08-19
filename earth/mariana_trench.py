@@ -8,6 +8,7 @@ into the Mariana Trench. The animation is atmospheric and diagrammatic rather
 than a bathymetric survey. It focuses on mood, scale, darkness, pressure, and
 key facts about the trench.
 
+output : https://www.youtube.com/shorts/EvhhOxfMYkw 
 Features
 --------
 - Vertical 1080x1920 render (optional quick preview or 4K vertical)
@@ -24,7 +25,7 @@ Install
 
 Quick preview
 -------------
-    MARIANA_SHORT_QUICK=1 python mariana_trench_cinematic_short.py
+    MARIANA_SHORT_QUICK=1 python3 mariana_trench_cinematic_short.py
 
 Full render
 -----------
@@ -32,7 +33,7 @@ Full render
 
 4K vertical
 -----------
-    MARIANA_SHORT_4K=1 python mariana_trench_cinematic_short.py
+    MARIANA_SHORT_4K=1 python mariana_trench.py
 """
 
 import json
