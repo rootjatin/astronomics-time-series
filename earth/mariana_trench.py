@@ -3,10 +3,14 @@ from __future__ import annotations
 """
 Mariana Trench — cinematic underwater YouTube Short renderer
 
+
+
 Creates a vertical 1080x1920 science/cinematic short showing a stylized descent
 into the Mariana Trench. The animation is atmospheric and diagrammatic rather
 than a bathymetric survey. It focuses on mood, scale, darkness, pressure, and
 key facts about the trench.
+
+Output :  https://www.youtube.com/shorts/EvhhOxfMYkw
 
 Features
 --------
