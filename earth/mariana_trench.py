@@ -69,7 +69,17 @@ for directory in (OUTPUT_ROOT, PREVIEW_DIR):
     directory.mkdir(parents=True, exist_ok=True)
 
 CONFIG: Dict[str, Any] = {
-    
+    "title": "MARIANA TRENCH",
+    "subtitle": "descent // darkness // pressure // challenger deep",
+    "output_basename": "mariana_trench_cinematic_short",
+    "contrast": 1.08,
+    "saturation": 1.10,
+    "vignette": 0.27,
+    "facts": {
+        "location": "western Pacific Ocean",
+        "deepest_label": "Challenger Deep",
+        "depth_text": "about 11 km deep",
+        "pressure_text": "pressure rises to over 1,000 times sea level",
     },
 }
 
