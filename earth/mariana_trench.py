@@ -3,14 +3,10 @@ from __future__ import annotations
 """
 Mariana Trench — cinematic underwater YouTube Short renderer
 
-
-
 Creates a vertical 1080x1920 science/cinematic short showing a stylized descent
 into the Mariana Trench. The animation is atmospheric and diagrammatic rather
 than a bathymetric survey. It focuses on mood, scale, darkness, pressure, and
 key facts about the trench.
-
-Output :  https://www.youtube.com/shorts/EvhhOxfMYkw
 
 Features
 --------
@@ -28,7 +24,7 @@ Install
 
 Quick preview
 -------------
-    MARIANA_SHORT_QUICK=1 python3 mariana_trench.py
+    MARIANA_SHORT_QUICK=1 python mariana_trench_cinematic_short.py
 
 Full render
 -----------
@@ -739,4 +735,35 @@ def render_video(scene: MarianaTrenchScene) -> Path:
     return final_video
 
 
+def main():
+    print("Preparing Mariana Trench YouTube Short ...")
+    print("Mode:", "QUICK" if QUICK_MODE else ("4K" if FOUR_K else "FULL"))
+    print("Canvas:", f"{OUT_W}x{OUT_H}")
+    print("FPS:", FPS)
+    print("Duration:", DURATION, "seconds")
 
+    scene = MarianaTrenchScene()
+    summary_path = save_summary()
+
+    preview_times = [
+        min(1.2, DURATION * 0.08),
+        min(10.0, DURATION * 0.22),
+        min(20.5, DURATION * 0.40),
+        min(31.5, DURATION * 0.58),
+        min(42.5, DURATION * 0.76),
+        DURATION - (1.0 if not QUICK_MODE else 0.8),
+    ]
+    for preview_time in tqdm(preview_times, desc="Preview frames"):
+        Image.fromarray(scene.render_frame(float(preview_time))).save(
+            PREVIEW_DIR / f"preview_{int(preview_time * 10):03d}.png"
+        )
+
+    print("Summary:", summary_path.resolve())
+    render_video(scene)
+    print("Output directory:", OUTPUT_ROOT.resolve())
+    for path in sorted(OUTPUT_ROOT.glob("*")):
+        print("-", path.name)
+
+
+if __name__ == "__main__":
+    main()
