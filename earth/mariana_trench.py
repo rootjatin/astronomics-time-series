@@ -8,7 +8,15 @@ into the Mariana Trench. The animation is atmospheric and diagrammatic rather
 than a bathymetric survey. It focuses on mood, scale, darkness, pressure, and
 key facts about the trench.
 
-
+Features
+--------
+- Vertical 1080x1920 render (optional quick preview or 4K vertical)
+- Cinematic underwater lighting, haze, particles, bioluminescence, terrain
+- Multiple scenes: surface to deep descent, twilight zone, abyss, trench walls,
+  Challenger Deep, and finale
+- SRT subtitles
+- Preview frames
+- JSON manifest
 
 Install
 -------
