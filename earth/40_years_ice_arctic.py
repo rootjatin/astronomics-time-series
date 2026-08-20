@@ -684,4 +684,43 @@ def render_video(scene: ArcticSeaIceScene) -> Path:
         writer.close()
     return output
 
+def render_previews(scene: ArcticSeaIceScene) -> List[Path]:
+    times=[
+        3.2 if not QUICK_MODE else .72,
+        12.5 if not QUICK_MODE else 2.80,
+        22.5 if not QUICK_MODE else 5.05,
+        33.5 if not QUICK_MODE else 7.50,
+        44.2 if not QUICK_MODE else 9.90,
+        53.8 if not QUICK_MODE else 12.05,
+    ]
+    paths=[]
+    for i,t in enumerate(times,1):
+        path=PREVIEW_DIR/f"preview_{i:02d}_{t:.2f}s.png"
+        Image.fromarray(scene.render_frame(t)).save(path)
+        paths.append(path)
+    return paths
+
+
+def main():
+    scene=ArcticSeaIceScene()
+    preview_paths=render_previews(scene)
+    srt_path=write_srt(CAPTIONS,OUTPUT_ROOT/f"{CONFIG['output_basename']}.srt")
+    summary_path=save_summary()
+    output_path=render_video(scene)
+
+    print("\nRender complete")
+    print(f"Video:   {output_path.resolve()}")
+    print(f"SRT:     {srt_path.resolve()}")
+    print(f"Summary: {summary_path.resolve()}")
+    print("Previews:")
+    for path in preview_paths:
+        print(f"  - {path.resolve()}")
+
+    ffmpeg=shutil.which("ffmpeg")
+    if ffmpeg:
+        print(f"ffmpeg:  {ffmpeg}")
+
+
+if __name__ == "__main__":
+    main()
 
