@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 """
+Result : https://www.youtube.com/shorts/21aq_QV2Lnw
+
 40 Years of Arctic Sea Ice — cinematic YouTube Short renderer
 
 Creates a vertical 1080x1920 science short showing four decades of change in
