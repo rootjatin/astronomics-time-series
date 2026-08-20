@@ -152,3 +152,38 @@ def get_shot(t: float) -> Dict[str, Any]:
         if shot["start"] <= t < shot["end"]:
             return shot
     return SHOT_PLAN[-1]
+
+
+def get_font(size: int, bold: bool = False):
+    candidates = [
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf" if bold else "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+        "/usr/share/fonts/truetype/liberation2/LiberationSans-Bold.ttf" if bold else "/usr/share/fonts/truetype/liberation2/LiberationSans-Regular.ttf",
+        "DejaVuSans-Bold.ttf" if bold else "DejaVuSans.ttf",
+    ]
+    for candidate in candidates:
+        try:
+            return ImageFont.truetype(candidate, size=max(7, int(size * SCALE)))
+        except Exception:
+            continue
+    return ImageFont.load_default()
+
+
+def draw_text(
+    image: Image.Image,
+    value: str,
+    xy: Tuple[int, int],
+    size: int,
+    fill=(255, 255, 255, 255),
+    bold: bool = False,
+    anchor: str = "la",
+    stroke: int = 2,
+):
+    ImageDraw.Draw(image).text(
+        xy,
+        value,
+        font=get_font(size, bold),
+        fill=fill,
+        anchor=anchor,
+        stroke_width=max(1, int(stroke * SCALE)),
+        stroke_fill=(0, 0, 0, 220),
+    )
