@@ -187,3 +187,28 @@ def draw_text(
         stroke_width=max(1, int(stroke * SCALE)),
         stroke_fill=(0, 0, 0, 220),
     )
+
+def make_vignette(width: int, height: int, strength: float) -> np.ndarray:
+    yy, xx = np.mgrid[0:height, 0:width]
+    nx = (xx - width / 2.0) / (width / 2.0)
+    ny = (yy - height / 2.0) / (height / 2.0)
+    rr = np.sqrt(nx * nx + ny * ny)
+    return np.clip(1.0 - strength * rr**1.8, 0.0, 1.0).astype(np.float32)
+
+
+def apply_grade(array: np.ndarray) -> np.ndarray:
+    image = Image.fromarray(array)
+    image = ImageEnhance.Contrast(image).enhance(float(CONFIG["contrast"]))
+    image = ImageEnhance.Color(image).enhance(float(CONFIG["saturation"]))
+    return np.asarray(image)
+
+
+def format_srt_time(seconds: float) -> str:
+    ms = int(round(seconds * 1000.0))
+    h = ms // 3_600_000
+    ms %= 3_600_000
+    m = ms // 60_000
+    ms %= 60_000
+    s = ms // 1000
+    ms %= 1000
+    return f"{h:02d}:{m:02d}:{s:02d},{ms:03d}"
