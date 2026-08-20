@@ -1,3 +1,46 @@
+from __future__ import annotations
+
+"""
+40 Years of Arctic Sea Ice — cinematic YouTube Short renderer
+
+Creates a vertical 1080x1920 science short showing four decades of change in
+Arctic sea ice, centered on the 1985 -> 2025 span. The polar maps are stylized,
+not geospatial reconstructions; numerical callouts are based on NASA/NSIDC
+satellite-record summaries cited in the source notes written beside the output.
+
+Scientific framing used in the narration
+-----------------------------------------
+- Continuous satellite observations of Arctic sea ice extend back to 1979.
+- NSIDC reports the long-term downward trend in annual minimum Arctic sea ice
+  extent from 1979 through 2025 as about 12.1% per decade relative to the
+  1981-2010 average.
+- The satellite-era record minimum was 3.39 million km^2 on 17 September 2012.
+- The 2025 minimum was 4.60 million km^2 on 10 September 2025, tied for the
+  tenth-lowest minimum in the record at the time.
+- The last 19 annual minimums, 2007-2025, were the 19 lowest minimum extents in
+  the satellite record.
+- The 2025 winter maximum was 14.33 million km^2, the lowest maximum in the
+  47-year satellite record at the time.
+- Sea ice varies strongly from year to year because winds, weather, ocean heat,
+  and other conditions affect each melt season. The long-term trend is the key.
+
+Install
+-------
+    pip install numpy pillow imageio imageio-ffmpeg tqdm
+
+Quick preview
+-------------
+    ARCTIC_ICE_SHORT_QUICK=1 python 40_years_of_arctic_sea_ice.py
+
+Full render
+-----------
+    python 40_years_of_arctic_sea_ice.py
+
+4K vertical
+-----------
+    ARCTIC_ICE_SHORT_4K=1 python 40_years_of_arctic_sea_ice.py
+"""
+
 import json
 import math
 import os
@@ -70,3 +113,42 @@ FULL_CAPTIONS: List[Tuple[float, float, str]] = [
     (38.2, 49.0, "Sea ice also grows back every winter. But in 2025, even the winter maximum was the lowest in the 47-year satellite record — about 14.33 million square kilometers."),
     (49.1, 57.5, "Sea ice is more than a white cap. It changes how much sunlight the Arctic reflects and how heat and moisture move between the ocean and atmosphere. Four decades reveal a system being reshaped."),
 ]
+
+if QUICK_MODE:
+    factor = DURATION / 58.0
+    CAPTIONS = [(a * factor, b * factor, text) for a, b, text in FULL_CAPTIONS]
+else:
+    CAPTIONS = FULL_CAPTIONS
+
+SHOT_PLAN = [
+    {"name": "forty_years", "start": 0.0, "end": 8.0 if not QUICK_MODE else 1.8},
+    {"name": "trend", "start": 8.0 if not QUICK_MODE else 1.8, "end": 18.0 if not QUICK_MODE else 4.0},
+    {"name": "record_2012", "start": 18.0 if not QUICK_MODE else 4.0, "end": 28.0 if not QUICK_MODE else 6.25},
+    {"name": "variability_2025", "start": 28.0 if not QUICK_MODE else 6.25, "end": 39.0 if not QUICK_MODE else 8.7},
+    {"name": "seasonal_cycle", "start": 39.0 if not QUICK_MODE else 8.7, "end": 50.0 if not QUICK_MODE else 11.15},
+    {"name": "why_it_matters", "start": 50.0 if not QUICK_MODE else 11.15, "end": DURATION},
+]
+
+
+# -----------------------------------------------------------------------------
+# Helpers
+# -----------------------------------------------------------------------------
+
+def clamp(value: float, lo: float = 0.0, hi: float = 1.0) -> float:
+    return max(lo, min(hi, float(value)))
+
+
+def smoothstep(value: float) -> float:
+    x = clamp(value)
+    return x * x * (3.0 - 2.0 * x)
+
+
+def lerp(a: float, b: float, t: float) -> float:
+    return a + (b - a) * t
+
+
+def get_shot(t: float) -> Dict[str, Any]:
+    for shot in SHOT_PLAN:
+        if shot["start"] <= t < shot["end"]:
+            return shot
+    return SHOT_PLAN[-1]
