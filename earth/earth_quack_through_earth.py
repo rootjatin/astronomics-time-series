@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 """
-Watch Earthquakes Travel Across the Planet — cinematic YouTube Short renderer
+output : https://www.youtube.com/shorts/rFOogD8S_ys
 
+Watch Earthquakes Travel Across the Planet — cinematic YouTube Short renderer
 Creates a vertical 1080x1920 science short showing how seismic energy spreads
 from an earthquake through and around Earth.
 
