@@ -6,6 +6,13 @@ Watch Earthquakes Travel Across the Planet — cinematic YouTube Short renderer
 Creates a vertical 1080x1920 science short showing how seismic energy spreads
 from an earthquake through and around Earth.
 
+This is a diagrammatic educational animation, NOT a numerical seismology model
+and NOT a live earthquake feed. It visualizes these scientifically important
+ideas:
+
+- Earthquakes begin when a fault ruptures and releases stored elastic energy.
+- P waves are compressional body waves and travel fastest through Earth.
+- S waves are shear body waves and are slower than P waves.
 
 
 No external data or internet connection is required. All stars, particles,
