@@ -13,7 +13,11 @@ ideas:
 - Earthquakes begin when a fault ruptures and releases stored elastic energy.
 - P waves are compressional body waves and travel fastest through Earth.
 - S waves are shear body waves and are slower than P waves.
-
+- S waves do not propagate through Earth's liquid outer core.
+- Surface waves travel along Earth's exterior and often produce strong,
+  long-duration shaking near the surface.
+- Seismometers can distinguish arrivals because P, S, and surface waves reach
+  stations at different times.
 
 No external data or internet connection is required. All stars, particles,
 wave paths, and terrain marks are deterministic so repeated renders match.
