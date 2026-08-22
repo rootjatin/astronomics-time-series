@@ -803,4 +803,35 @@ def render_video(scene: EarthquakeScene) -> Path:
     return final_video
 
 
+def main():
+    print("Preparing 'Watch Earthquakes Travel Across the Planet' YouTube Short ...")
+    print("Mode:","QUICK" if QUICK_MODE else ("4K" if FOUR_K else "FULL"))
+    print("Canvas:",f"{OUT_W}x{OUT_H}")
+    print("FPS:",CONFIG["fps"])
+    print("Duration:",CONFIG["duration_s"],"seconds")
 
+    scene=EarthquakeScene()
+    summary_path=save_summary()
+
+    preview_times=[
+        min(1.0,float(CONFIG["duration_s"])*.08),
+        float(CONFIG["duration_s"])*.20,
+        float(CONFIG["duration_s"])*.39,
+        float(CONFIG["duration_s"])*.59,
+        float(CONFIG["duration_s"])*.79,
+        max(0.0,float(CONFIG["duration_s"])-1.0),
+    ]
+    for index,preview_time in enumerate(preview_times,1):
+        Image.fromarray(scene.render_frame(float(preview_time))).save(
+            PREVIEW_DIR/f"preview_{index:02d}_{preview_time:05.2f}s.png"
+        )
+
+    print("Summary:",summary_path.resolve())
+    render_video(scene)
+    print("Output directory:",OUTPUT_ROOT.resolve())
+    for path in sorted(OUTPUT_ROOT.glob("*")):
+        print("-",path.name)
+
+
+if __name__=="__main__":
+    main()
