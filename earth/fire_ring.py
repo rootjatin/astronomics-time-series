@@ -98,8 +98,19 @@ OUT_H = int(CONFIG["video_height"])
 OUT_SIZE = (OUT_W, OUT_H)
 SCALE = OUT_W / 1080.0
 
-COLORS = {
-
+CONFIG: Dict[str, Any] = {
+    "video_width": 540 if QUICK_MODE else 1080,
+    "video_height": 960 if QUICK_MODE else 1920,
+    "fps": 6 if QUICK_MODE else 24,
+    "duration_s": 12 if QUICK_MODE else 58,
+    "output_basename": "the_ring_of_fire_is_always_moving",
+    "title": "THE RING OF FIRE IS ALWAYS MOVING",
+    "subtitle": "Pacific margins // plate motion // subduction // earthquakes",
+    "background_stars": 80 if QUICK_MODE else 190,
+    "embers": 40 if QUICK_MODE else 120,
+    "contrast": 1.08,
+    "saturation": 1.10,
+    "vignette": 0.23,
 }
 
 FULL_CAPTIONS: List[Tuple[float, float, str]] = [
