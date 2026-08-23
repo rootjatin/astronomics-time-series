@@ -72,8 +72,25 @@ PREVIEW_DIR = OUTPUT_ROOT / "previews"
 for directory in (OUTPUT_ROOT, PREVIEW_DIR):
     directory.mkdir(parents=True, exist_ok=True)
 
-CONFIG: Dict[str, Any] = {
-
+COLORS = {
+    "space": (4, 7, 16),
+    "white": (247, 250, 255),
+    "muted": (158, 197, 214),
+    "cyan": (74, 226, 255),
+    "blue": (71, 126, 255),
+    "violet": (181, 108, 255),
+    "gold": (255, 194, 82),
+    "orange": (255, 132, 55),
+    "lava": (255, 76, 30),
+    "red": (255, 71, 95),
+    "green": (101, 230, 156),
+    "ocean": (9, 34, 62),
+    "ocean_light": (14, 54, 87),
+    "land": (45, 70, 73),
+    "land_light": (74, 105, 101),
+    "crust": (69, 88, 92),
+    "mantle": (109, 45, 33),
+    "magma": (255, 111, 30),
 }
 
 OUT_W = int(CONFIG["video_width"])
