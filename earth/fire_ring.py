@@ -933,4 +933,28 @@ def save_summary() -> Path:
     }, indent=2), encoding="utf-8")
     return path
 
+def main():
+    print(f"Rendering: {CONFIG['title']}")
+    print(f"Mode: {'QUICK' if QUICK_MODE else 'FULL'} // {OUT_W}x{OUT_H} @ {CONFIG['fps']} fps")
+
+    scene = RingOfFireScene()
+    srt_path = write_srt(CAPTIONS, OUTPUT_ROOT / f"{CONFIG['output_basename']}.srt")
+    summary_path = save_summary()
+
+    if QUICK_MODE:
+        preview_times = [0.7, 2.3, 4.5, 6.7, 8.9, 11.0]
+    else:
+        preview_times = [3.0, 12.0, 23.0, 34.0, 45.0, 54.0]
+
+    for preview_time in tqdm(preview_times, desc="Preview frames"):
+        Image.fromarray(scene.render_frame(float(preview_time))).save(
+            PREVIEW_DIR / f"preview_{int(preview_time):02d}s.png"
+        )
+
+    video_path = render_video(scene)
+    print(f"Video: {video_path}")
+    print(f"Subtitles: {srt_path}")
+    print(f"Summary: {summary_path}")
+    print(f"Previews: {PREVIEW_DIR}")
+
 
