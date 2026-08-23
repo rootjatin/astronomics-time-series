@@ -7,7 +7,18 @@ Creates a vertical 1080x1920 science Short explaining that the Pacific Ring
 of Fire is not a fixed glowing ring. It is the surface expression of tectonic
 plates moving relative to one another around the Pacific basin.
 
+The animation focuses on six ideas:
 
+- The Ring of Fire is a broad horseshoe-shaped zone around much of the Pacific.
+- Pacific-margin plates move relative to one another continuously on geologic
+  timescales; the arrows in this video are schematic, not live GPS vectors.
+- Many margins are subduction zones where oceanic lithosphere descends beneath
+  another plate, producing trenches, earthquake zones, and volcanic arcs.
+- Other Pacific margins include transform motion, where plates slide past one
+  another and can generate earthquakes without feeding a volcanic arc.
+- Motion is slow on a human timescale but persistent, so stress, deformation,
+  earthquakes, and volcanism keep reshaping the system.
+- The Ring of Fire is therefore a moving tectonic system, not a stationary line.
 
 The volcano markers are a curated illustrative subset of well-known volcanoes
 around the Pacific margin. Plate boundaries and motion vectors are deliberately
