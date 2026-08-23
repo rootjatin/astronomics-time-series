@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 """
+Output : https://www.youtube.com/shorts/2IDu4wEFka0
 The Ring of Fire Is Always Moving — cinematic YouTube Short renderer
 
 Creates a vertical 1080x1920 science Short explaining that the Pacific Ring
