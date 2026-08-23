@@ -103,6 +103,12 @@ COLORS = {
 }
 
 FULL_CAPTIONS: List[Tuple[float, float, str]] = [
+    (0.4, 7.3, "The Ring of Fire looks like a giant horseshoe around the Pacific. But it is not a fixed ring drawn on Earth's surface."),
+    (7.4, 17.2, "It exists because tectonic plates around the Pacific are moving relative to one another. The motion is usually centimeters per year, but it never truly stops."),
+    (17.3, 28.0, "Along many margins, oceanic lithosphere bends into deep trenches and sinks beneath another plate. That subduction drives earthquake zones and feeds volcanic arcs."),
+    (28.1, 38.6, "Other edges slide sideways. Transform boundaries can lock, build stress, and then slip suddenly as earthquakes — motion without a chain of volcanoes."),
+    (38.7, 49.4, "So the Ring of Fire is constantly being deformed: trenches migrate, plates are consumed, crust is built, and stress shifts from one segment to another."),
+    (49.5, 57.5, "The Ring of Fire is always moving — slowly enough to miss day to day, but relentlessly enough to reshape the Pacific over geologic time."),
 ]
 
 if QUICK_MODE:
