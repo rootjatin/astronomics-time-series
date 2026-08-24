@@ -1837,3 +1837,8 @@ def main():
     print("Output directory:", OUTPUT_ROOT.resolve())
     for path in sorted(OUTPUT_ROOT.glob("*")):
         print("-", path.name)
+
+
+
+if __name__ == "__main__":
+    main()
