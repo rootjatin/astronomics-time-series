@@ -141,7 +141,28 @@ for directory in [OUTPUT_ROOT, DATA_ROOT, CACHE_ROOT, PREVIEW_DIR]:
     directory.mkdir(parents=True, exist_ok=True)
 
 CONFIG: Dict[str, Any] = {
-
+    "video_width": 540 if QUICK_MODE else 1080,
+    "video_height": 960 if QUICK_MODE else 1920,
+    "fps": 6 if QUICK_MODE else 24,
+    "duration_s": 12.0 if QUICK_MODE else 58.0,
+    "output_basename": f"every_earthquake_{MONTH_KEY}",
+    "title": "EVERY EARTHQUAKE THIS MONTH",
+    "subtitle": f"{MONTH_LABEL} // USGS COMCAT // UTC",
+    "map_lon_center": 0.0,
+    "map_lat_min": -66.0,
+    "map_lat_max": 82.0,
+    "map_margin_x": 22 if QUICK_MODE else 44,
+    "map_top": 112 if QUICK_MODE else 222,
+    "map_bottom": 806 if QUICK_MODE else 1610,
+    "timeline_buckets": 12 if QUICK_MODE else 18,
+    "background_particles": 150 if QUICK_MODE else 360,
+    "dust_particles": 90 if QUICK_MODE else 220,
+    "contrast": 1.10,
+    "saturation": 1.04,
+    "vignette": 0.35,
+    "grain_strength": 4.3,
+    "soundtrack_sample_rate": 22050 if QUICK_MODE else 44100,
+    "api_query_limit": 19000,
 }
 
 OUT_W = int(CONFIG["video_width"])
