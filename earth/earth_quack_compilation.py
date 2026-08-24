@@ -170,7 +170,18 @@ OUT_H = int(CONFIG["video_height"])
 OUT_SIZE = (OUT_W, OUT_H)
 
 COLORS = {
-
+    "ocean_top": (3, 8, 17),
+    "ocean_bottom": (0, 2, 8),
+    "land": (17, 27, 35),
+    "land_edge": (92, 130, 139),
+    "grid": (80, 124, 136),
+    "shallow": (79, 225, 255),
+    "intermediate": (255, 190, 81),
+    "deep": (239, 91, 255),
+    "red": (255, 83, 76),
+    "white": (246, 249, 252),
+    "muted": (160, 194, 203),
+    "dark": (2, 6, 13),
 }
 
 FULL_SHOT_PLAN = [
