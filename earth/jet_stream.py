@@ -8,6 +8,17 @@ fast-moving ribbons of air near the top of the troposphere. The visuals are
 cinematic and diagrammatic, not a numerical weather-model simulation.
 
 
+Key ideas visualized
+--------------------
+- Jet streams are narrow bands of very strong winds high in the atmosphere.
+- They form near strong horizontal temperature contrasts and are shaped by
+  Earth's rotation.
+- The flow often meanders in large waves rather than tracing a straight path.
+- Those bends help steer weather systems and can influence where warm and cold
+  air masses move.
+- There is not one single permanent jet stream; several major jets exist and
+  their position and strength change.
+
 Install
 -------
     pip install numpy pillow imageio imageio-ffmpeg tqdm
