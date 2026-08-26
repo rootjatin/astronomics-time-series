@@ -14,7 +14,6 @@ Scientific framing used in the narration:
 - A 2021 study reported aftershocks near ~750 km, but a 2025 reanalysis
   challenged the deepest-event interpretation. The short labels this as debated.
 
-
 Install:
     pip install numpy pillow imageio imageio-ffmpeg tqdm
 
@@ -439,3 +438,17 @@ def render_video(scene:DeepQuakeScene) -> Path:
     shutil.copyfile(raw,final)
     return final
 
+
+def main():
+    print("Preparing deepest-earthquakes YouTube Short ...")
+    print("Mode:","QUICK" if QUICK_MODE else ("4K" if FOUR_K else "FULL"))
+    print("Canvas:",f"{OUT_W}x{OUT_H}","FPS:",FPS,"Duration:",DURATION)
+    scene=DeepQuakeScene(); summary=save_summary(); print("Summary:",summary.resolve())
+    preview_times=[min(1.1,DURATION*.08),min(10,DURATION*.22),min(21,DURATION*.40),min(33,DURATION*.58),min(44,DURATION*.77),DURATION-(1 if not QUICK_MODE else .8)]
+    for pt in tqdm(preview_times,desc="Preview frames"):
+        Image.fromarray(scene.render_frame(float(pt))).save(PREVIEW_DIR/f"preview_{int(pt*10):03d}.png")
+    final=render_video(scene); print("Final video:",final.resolve())
+
+
+if __name__=="__main__":
+    main()
