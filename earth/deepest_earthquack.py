@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 """
+Result : https://youtube.com/shorts/BiiL20rgyM0
+
 The Deepest Earthquakes Ever Recorded — cinematic YouTube Short renderer
 
 Creates a vertical 1080x1920 science short about deep-focus earthquakes inside
