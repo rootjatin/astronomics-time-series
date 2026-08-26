@@ -6,6 +6,14 @@ The Deepest Earthquakes Ever Recorded — cinematic YouTube Short renderer
 Creates a vertical 1080x1920 science short about deep-focus earthquakes inside
 subducting slabs. The visualizations are diagrammatic and not to scale.
 
+Scientific framing used in the narration:
+- USGS classifies shallow earthquakes as 0–70 km, intermediate as 70–300 km,
+  and deep earthquakes as 300–700 km.
+- The 24 May 2013 Sea of Okhotsk Mw 8.3 earthquake occurred at 609 km depth.
+- The 30 May 2015 Bonin / Ogasawara deep earthquake was about 680 km deep.
+- A 2021 study reported aftershocks near ~750 km, but a 2025 reanalysis
+  challenged the deepest-event interpretation. The short labels this as debated.
+
 
 Install:
     pip install numpy pillow imageio imageio-ffmpeg tqdm
