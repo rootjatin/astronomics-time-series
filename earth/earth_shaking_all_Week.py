@@ -616,4 +616,25 @@ def render_previews(scene: EarthquakeWeekScene):
         paths.append(path)
     return paths
 
+def main():
+    frame,source,notes=load_data()
+    frame,summary=prepare(frame,source)
+    save_data(frame,summary,notes)
+    srt=write_srt(CAPTIONS,OUTPUT_ROOT/(CONFIG["output_basename"]+".srt"))
+    scene=EarthquakeWeekScene(frame,summary)
+    previews=render_previews(scene)
+    video=render_video(scene)
+    manifest={
+        "video":str(video),"srt":str(srt),"previews":[str(p) for p in previews],
+        "summary":summary,"notes":notes,"quick_mode":QUICK_MODE,
+        "science_notes":[
+            "The USGS feed is a rolling seven-day catalogue snapshot.",
+            "Magnitude is earthquake size; shaking intensity varies by place.",
+            "Plate-boundary guides are schematic and explanatory only.",
+            "This visualization is not an earthquake forecast.",
+        ]
+    }
+    (OUTPUT_ROOT/"render_manifest.json").write_text(json.dumps(manifest,indent=2),encoding="utf-8")
+    print(json.dumps(manifest,indent=2))
+
 
