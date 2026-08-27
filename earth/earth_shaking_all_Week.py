@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 """
@@ -7,10 +6,28 @@ The Earth Has Been Shaking All Week — cinematic YouTube Short renderer
 Creates a vertical 1080x1920 science short from the USGS Earthquake Hazards
 Program's rolling 7-day GeoJSON feed.
 
+Live source
+-----------
+USGS all-earthquakes, past 7 days:
+    https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson
 
+Each dot is one earthquake event in the feed. Dot size is based on magnitude;
+colour is based on depth. The map is a stylized equirectangular world view,
+with schematic plate-boundary guides used only as explanatory context.
 
+Important science notes
+-----------------------
+- "All week" means the rolling 7 days at render time, not a calendar week.
+- Earthquake catalogues include many small events that people never feel.
+- Magnitude measures earthquake size; shaking intensity varies by location.
+- Event counts change as the USGS catalogue is updated/reviewed.
+- Plate-boundary lines here are schematic, not a tectonic GIS dataset.
+- This video is an educational visualization, not an earthquake forecast.
 
-
+Offline behaviour
+-----------------
+If the USGS feed is unavailable, a deterministic synthetic fixture is used and
+clearly labelled in the rendered HUD and summary metadata.
 
 Install
 -------
@@ -615,6 +632,7 @@ def render_previews(scene: EarthquakeWeekScene):
         Image.fromarray(scene.render(t)).save(path)
         paths.append(path)
     return paths
+
 
 def main():
     frame,source,notes=load_data()
