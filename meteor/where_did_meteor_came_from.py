@@ -3,6 +3,7 @@ from __future__ import annotations
 """
 Where Did This Meteor Come From?
 ================================
+output : https://www.youtube.com/shorts/gqOm-lAyq8w
 
 A cinematic vertical YouTube Short renderer that selects one real meteor
 trajectory from the Global Meteor Network (GMN) and traces it backward from the
