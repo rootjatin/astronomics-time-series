@@ -8,20 +8,32 @@ A cinematic vertical YouTube Short renderer that selects one real meteor
 trajectory from the Global Meteor Network (GMN) and traces it backward from the
 atmosphere to its apparent radiant and pre-atmospheric heliocentric orbit.
 
+What the video shows
+--------------------
+- A real multi-station meteor trajectory from the latest complete UTC date in
+  the GMN public database, or a date/trajectory selected with environment
+  variables.
+- The measured atmospheric beginning/end coordinates and heights.
+- The geocentric radiant: the direction in the sky from which the meteor appears
+  to arrive.
+- A two-body reconstruction of the published heliocentric orbit using GMN's
+  orbital elements.
+- The meteor-shower association and a known parent body when a conservative,
+  established mapping is available.
+- A cautious comet-like/asteroid-like orbital interpretation using the
+  published Tisserand parameter with respect to Jupiter.
 
-Selection controls
-------------------
-Choose a UTC date:
-    METEOR_ORIGIN_DATE=2025-12-14
-
-Choose an exact GMN trajectory identifier:
-    METEOR_ORIGIN_ID=YYYYMMDDhhmmss_hash
+Primary data source
+-------------------
+Global Meteor Network REST API / Data Explorer:
+    https://explore.globalmeteornetwork.org/gmn_rest_api
+    https://explore.globalmeteornetwork.org/gmn_rest_api/meteor_summary
 
 Schema and licensing:
     https://gmn-python-api.readthedocs.io/en/latest/data_schemas.html
     https://globalmeteornetwork.org/data/
 
-interpretation rules
+Honesty / interpretation rules
 ------------------------------
 - The ground track, radiant, velocity, and orbital elements are reconstructed
   from multi-station camera measurements; they are not direct samples of the
@@ -35,6 +47,13 @@ interpretation rules
   composition or a unique source object.
 - If no parent is securely mapped, the video says so rather than inventing one.
 
+Selection controls
+------------------
+Choose a UTC date:
+    METEOR_ORIGIN_DATE=2025-12-14
+
+Choose an exact GMN trajectory identifier:
+    METEOR_ORIGIN_ID=YYYYMMDDhhmmss_hash
 
 Install
 -------
@@ -972,3 +991,13 @@ def make_contact_sheet(paths:Sequence[Path],out_path:Path):
     sheet.save(out_path,quality=92)
 
 
+def main():
+    print("Collecting meteor origin data ...")
+    event,summary=collect_data();csv_path,json_path=save_data(event,summary);print("Data:",csv_path.resolve());print("Summary:",json_path.resolve())
+    scene=MeteorOriginScene(event,summary);preview_times=[1.0,min(10.0,CONFIG["duration_s"]*.22),min(22.0,CONFIG["duration_s"]*.42),min(34.0,CONFIG["duration_s"]*.64),min(47.0,CONFIG["duration_s"]*.83),CONFIG["duration_s"]-1];preview_paths=[]
+    for t in tqdm(preview_times,desc="Preview frames"):
+        path=PREVIEW_ROOT/f"preview_{int(t):02d}s.png";Image.fromarray(scene.render_frame(float(t))).save(path);preview_paths.append(path)
+    make_contact_sheet(preview_paths,PREVIEW_ROOT/"where_did_this_meteor_come_from_contact_sheet.jpg");video_path=render_video(scene);print("Video:",video_path.resolve());print("Source status:",summary)
+
+
+if __name__=="__main__":main()
