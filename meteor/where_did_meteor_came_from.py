@@ -94,7 +94,19 @@ for directory in (OUTPUT_ROOT, DATA_ROOT, PREVIEW_ROOT, CACHE_ROOT):
     directory.mkdir(parents=True, exist_ok=True)
 
 CONFIG = {
-    
+    "width": 540 if QUICK_MODE else 1080,
+    "height": 960 if QUICK_MODE else 1920,
+    "fps": 6 if QUICK_MODE else 24,
+    "duration_s": 12 if QUICK_MODE else 58,
+    "basename": "where_did_this_meteor_come_from",
+    "title": "WHERE DID THIS METEOR COME FROM?",
+    "subtitle": "Tracing one measured meteor backward through space",
+    "timeout_s": 40,
+    "stars": 640 if QUICK_MODE else 1100,
+    "api_base": "https://explore.globalmeteornetwork.org/gmn_rest_api",
+    "summary_endpoint": "https://explore.globalmeteornetwork.org/gmn_rest_api/meteor_summary",
+    "source_page": "https://globalmeteornetwork.org/data/",
+    "cache_hours": 6,
 }
 
 W = CONFIG["width"]
