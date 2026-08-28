@@ -17,6 +17,21 @@ Choose a UTC date:
 Choose an exact GMN trajectory identifier:
     METEOR_ORIGIN_ID=YYYYMMDDhhmmss_hash
 
+interpretation rules
+------------------------------
+- The ground track, radiant, velocity, and orbital elements are reconstructed
+  from multi-station camera measurements; they are not direct samples of the
+  meteoroid before it reached Earth.
+- The heliocentric curve is an osculating two-body conic drawn from GMN's
+  published elements. It is not a long-term n-body integration.
+- A radiant is an apparent incoming direction, not a physical birthplace.
+- Shower membership links a meteor to a stream. A named parent body is shown
+  only for a small set of widely established shower-parent associations.
+- Tisserand-parameter labels are broad dynamical hints, not proof of physical
+  composition or a unique source object.
+- If no parent is securely mapped, the video says so rather than inventing one.
+
+
 Install
 -------
     pip install numpy pandas pillow imageio imageio-ffmpeg requests tqdm
