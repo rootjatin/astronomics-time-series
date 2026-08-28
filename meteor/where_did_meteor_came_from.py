@@ -94,7 +94,7 @@ for directory in (OUTPUT_ROOT, DATA_ROOT, PREVIEW_ROOT, CACHE_ROOT):
     directory.mkdir(parents=True, exist_ok=True)
 
 CONFIG = {
-
+    
 }
 
 W = CONFIG["width"]
@@ -103,7 +103,18 @@ SIZE = (W, H)
 SCALE = W / 1080.0
 
 COLORS = {
-  
+    "bg": (4, 8, 16),
+    "white": (246, 249, 255),
+    "muted": (150, 198, 222),
+    "cyan": (92, 223, 255),
+    "blue": (85, 145, 255),
+    "gold": (255, 205, 92),
+    "violet": (201, 116, 255),
+    "green": (104, 255, 181),
+    "red": (255, 115, 125),
+    "orange": (255, 160, 84),
+    "sun": (255, 205, 79),
+    "earth": (93, 174, 255),
 }
 
 SHOT_PLAN = [
