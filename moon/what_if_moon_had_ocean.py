@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 """
+output : https://www.youtube.com/shorts/W79WSUYVkTg
 What If the Moon Had Oceans Like Earth? — cinematic YouTube Short renderer
 
 Creates a vertical 1080x1920 science short imagining a Moon covered with large
