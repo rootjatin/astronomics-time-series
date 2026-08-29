@@ -71,7 +71,12 @@ for directory in (OUTPUT_ROOT, PREVIEW_DIR):
     directory.mkdir(parents=True, exist_ok=True)
 
 CONFIG: Dict[str, Any] = {
-
+    "title": "WHAT IF THE MOON HAD OCEANS LIKE EARTH?",
+    "subtitle": "low gravity // Earth-raised tides // very long days",
+    "output_basename": "what_if_moon_had_oceans_like_earth",
+    "contrast": 1.09,
+    "saturation": 1.10,
+    "vignette": 0.26,
 }
 
 COLORS = {
