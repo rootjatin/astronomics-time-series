@@ -104,6 +104,12 @@ COLORS = {
 }
 
 FULL_CAPTIONS: List[Tuple[float, float, str]] = [
+    (0.4, 7.4, "Imagine looking up and seeing a blue Moon — not gray dust, but enormous oceans covering its lowlands."),
+    (7.5, 17.2, "There is one catch: the real Moon has almost no atmosphere. Earth-like liquid oceans would need enough air and the right temperatures to stay stable."),
+    (17.3, 27.2, "With only about one-sixth of Earth's surface gravity, this ocean world would feel very different. Water, waves and weather would all operate in weaker gravity."),
+    (27.3, 38.0, "And Earth would loom in the lunar sky, raising tides in those oceans. Coastlines could repeatedly flood and retreat as the ocean responds to Earth's pull."),
+    (38.1, 48.5, "A lunar day lasts about 29 and a half Earth days. That means roughly two weeks of sunlight followed by roughly two weeks of darkness at many locations."),
+    (48.6, 57.4, "Give that Moon a thick enough atmosphere and a water cycle could emerge — evaporation, clouds, rain and rivers beneath a giant Earth in the sky."),
 ]
 
 if QUICK_MODE:
