@@ -750,32 +750,6 @@ def render_video(scene:MoonOceanScene) -> Path:
     print("Final video:",final_video.resolve())
     return final_video
 
-def main():
-    print("Preparing Moon-oceans YouTube Short ...")
-    print("Mode:","QUICK" if QUICK_MODE else ("4K" if FOUR_K else "FULL"))
-    print("Canvas:",f"{OUT_W}x{OUT_H}")
-    print("FPS:",FPS)
-    print("Duration:",DURATION,"seconds")
-
-    scene=MoonOceanScene()
-    summary_path=save_summary()
-
-    preview_times=[
-        min(1.0,DURATION*.08),
-        min(10.5,DURATION*.22),
-        min(21.5,DURATION*.40),
-        min(33.0,DURATION*.58),
-        min(44.0,DURATION*.77),
-        DURATION-(1.0 if not QUICK_MODE else .8),
-    ]
-    for preview_time in tqdm(preview_times,desc="Preview frames"):
-        Image.fromarray(scene.render_frame(float(preview_time))).save(PREVIEW_DIR/f"preview_{int(preview_time*10):03d}.png")
-
-    print("Summary:",summary_path.resolve())
-    render_video(scene)
-    print("Output directory:",OUTPUT_ROOT.resolve())
-    for path in sorted(OUTPUT_ROOT.glob("*")):
-        print("-",path.name)
 
 def main():
     print("Preparing Moon-oceans YouTube Short ...")
@@ -807,4 +781,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
