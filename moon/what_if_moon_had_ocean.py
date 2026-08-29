@@ -80,7 +80,27 @@ CONFIG: Dict[str, Any] = {
 }
 
 COLORS = {
-
+    "space": (2, 5, 15),
+    "space2": (7, 15, 34),
+    "white": (246, 250, 255),
+    "muted": (174, 193, 214),
+    "cyan": (79, 225, 255),
+    "blue": (48, 131, 238),
+    "deep_blue": (8, 57, 126),
+    "ocean": (16, 103, 184),
+    "ocean_light": (67, 187, 240),
+    "moon": (164, 167, 173),
+    "moon_dark": (75, 79, 88),
+    "highland": (190, 187, 174),
+    "rock": (111, 105, 98),
+    "gold": (255, 205, 91),
+    "orange": (255, 143, 73),
+    "red": (255, 85, 105),
+    "violet": (176, 127, 255),
+    "green": (103, 237, 170),
+    "cloud": (235, 246, 255),
+    "earth_ocean": (41, 115, 199),
+    "earth_land": (86, 158, 104),
 }
 
 FULL_CAPTIONS: List[Tuple[float, float, str]] = [
