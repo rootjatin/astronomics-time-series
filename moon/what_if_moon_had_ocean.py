@@ -7,6 +7,18 @@ Creates a vertical 1080x1920 science short imagining a Moon covered with large
 liquid-water oceans. The scenario is intentionally hypothetical and the visuals
 are cinematic/diagrammatic rather than a physical climate simulation.
 
+Scientific framing used in the narration
+-----------------------------------------
+- The real Moon has essentially no substantial atmosphere, so stable Earth-like
+  surface oceans require changing the premise: enough atmosphere and suitable
+  temperatures must also be present.
+- Lunar surface gravity is about one-sixth of Earth's, so an ocean world there
+  would operate under very different gravity.
+- Earth would be an important external tide-raising body for lunar oceans.
+- A lunar solar day lasts about 29.5 Earth days, creating very long periods of
+  daylight and darkness unless a thick atmosphere/ocean redistributed heat.
+- With an atmosphere, evaporation, clouds, rain/snow and runoff could create a
+  water cycle, but it would not simply copy Earth's climate.
 
 Install
 -------
