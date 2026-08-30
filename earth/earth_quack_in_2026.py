@@ -9,7 +9,18 @@ map-first and cinematic: no conventional chart panels, only chronological
 accumulation, depth-coded light, a Pacific-margin sequence, selected-event
 closeups, captions, film texture, and a generated ambient soundtrack.
 
+Preferred live source
+---------------------
+USGS Earthquake Hazards Program / ANSS Comprehensive Earthquake Catalog
+(ComCat), queried through the official FDSN Event Web Service. The script asks
+for every event whose event type is "earthquake" between the first instant of
+the target UTC month and the current instant (or the end of a completed month).
+If the result would exceed the service's normal single-query limit, the month is
+requested one UTC day at a time and deduplicated by event ID.
 
+The default target is the current UTC month. To render a completed month:
+
+    EARTHQUAKE_MONTH=2026-07 python every_earthquake_this_month_short.py
 
 
 Offline behavior
