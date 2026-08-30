@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 """
+output : https://youtube.com/shorts/crvXWSAnA8U
 Every Earthquake This Month — cinematic YouTube Short renderer
 
 Creates a vertical 1080x1920 data-driven short that plots every earthquake in a
