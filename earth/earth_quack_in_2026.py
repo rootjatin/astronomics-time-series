@@ -22,13 +22,6 @@ The default target is the current UTC month. To render a completed month:
 
     EARTHQUAKE_MONTH=2026-07 python every_earthquake_this_month_short.py
 
-
-Offline behavior
-----------------
-If USGS or Natural Earth cannot be reached, deterministic procedural earthquake
-fixtures and coarse built-in land polygons are used. The result remains useful
-for timing and layout previews, but is prominently labeled as synthetic.
-
 Scientific framing
 ------------------
 - Each point is one catalogued earthquake epicenter.
@@ -43,6 +36,12 @@ Scientific framing
   physical rupture that occurred on Earth.
 - Event information can be revised by contributing seismic networks after the
   first publication. Re-running the script refreshes the month.
+
+Offline behavior
+----------------
+If USGS or Natural Earth cannot be reached, deterministic procedural earthquake
+fixtures and coarse built-in land polygons are used. The result remains useful
+for timing and layout previews, but is prominently labeled as synthetic.
 
 Recommended install
 -------------------
@@ -1845,3 +1844,43 @@ def render_video(scene: EarthquakeScene) -> Path:
     return final_video
 
 
+def main():
+    print("Target month:", MONTH_LABEL)
+    print("UTC query window:", MONTH_START.isoformat(), "to", MONTH_END.isoformat())
+    print("Loading USGS earthquakes ...")
+    events, source, data_notes, query_metadata, cache_path = load_earthquakes()
+    print("Loading world land geometry ...")
+    land_polygons, land_source, land_notes = load_land_polygons()
+    notes = data_notes + land_notes
+
+    summary = earthquake_summary(events, source, land_source, query_metadata)
+    csv_path, summary_path = save_data_products(events, summary, notes)
+
+    print("Data source:", source)
+    print("Earthquakes:", f"{len(events):,}")
+    if summary["maximum_reported_magnitude"] is not None:
+        print("Largest magnitude:", f"M {summary['maximum_reported_magnitude']:.1f}")
+    print("CSV:", csv_path.resolve())
+    print("Summary:", summary_path.resolve())
+    if cache_path:
+        print("Cache:", cache_path.resolve())
+    for note in notes:
+        print("Data note:", note)
+
+    scene = EarthquakeScene(events, land_polygons, summary)
+    preview_times = [
+        1.0,
+        min(12.0, float(CONFIG["duration_s"]) * 0.22),
+        min(31.0, float(CONFIG["duration_s"]) * 0.54),
+        min(42.0, float(CONFIG["duration_s"]) * 0.72),
+        min(50.0, float(CONFIG["duration_s"]) * 0.86),
+        float(CONFIG["duration_s"]) - 0.7,
+    ]
+    for preview_time in tqdm(preview_times, desc="Preview frames"):
+        frame = scene.render_frame(float(preview_time))
+        Image.fromarray(frame).save(PREVIEW_DIR / f"preview_{int(preview_time):02d}s.png")
+
+    render_video(scene)
+    print("Output directory:", OUTPUT_ROOT.resolve())
+    for path in sorted(OUTPUT_ROOT.glob("*")):
+        print("-", path.name)
