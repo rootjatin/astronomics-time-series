@@ -29,6 +29,21 @@ If USGS or Natural Earth cannot be reached, deterministic procedural earthquake
 fixtures and coarse built-in land polygons are used. The result remains useful
 for timing and layout previews, but is prominently labeled as synthetic.
 
+Scientific framing
+------------------
+- Each point is one catalogued earthquake epicenter.
+- Marker size responds to magnitude, but is intentionally compressed so one
+  large event does not hide an entire region.
+- Marker color represents hypocentral depth using common USGS depth zones:
+  shallow 0-70 km, intermediate 70-300 km, and deep 300-700 km.
+- Magnitude is logarithmic; the animation does not imply that marker area is a
+  literal measure of released energy.
+- Catalog completeness varies geographically and with network sensitivity.
+  "Every" means every earthquake returned by the selected USGS query, not every
+  physical rupture that occurred on Earth.
+- Event information can be revised by contributing seismic networks after the
+  first publication. Re-running the script refreshes the month.
+
 Recommended install
 -------------------
     pip install numpy pandas pillow imageio imageio-ffmpeg tqdm pyshp
