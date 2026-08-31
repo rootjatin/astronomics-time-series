@@ -1609,4 +1609,45 @@ def render_video(scene: LightningScene) -> Path:
 # Main
 # -----------------------------------------------------------------------------
 
+def main():
+    print("Title:", CONFIG["title"], CONFIG["title_2"])
+    print("Represented window:", WINDOW_START.isoformat(), "to", WINDOW_END.isoformat())
+    print("Represented duration:", f"{REPRESENT_SECONDS / 3600.0:.2f} hours")
+    print("Configured global flash rate:", f"{GLOBAL_FLASH_RATE:.1f} flashes/s")
+    print("Estimated flashes in window:", f"{estimate_total_flashes():,}")
+
+    flashes, source, data_notes, metadata = load_flashes()
+    print("Loading world land geometry ...")
+    land_polygons, land_source, land_notes = load_land_polygons()
+    notes = data_notes + land_notes
+
+    summary = flash_summary(flashes, source, land_source, metadata)
+    csv_path, summary_path = save_data_products(flashes, summary, notes)
+
+    print("Data source:", source)
+    print("Rendered sample points:", f"{len(flashes):,}")
+    print("Weighted flash count:", f"{summary['weighted_flash_count']:,}")
+    print("CSV:", csv_path.resolve())
+    print("Summary:", summary_path.resolve())
+    for note in notes:
+        print("Data note:", note)
+
+    scene = LightningScene(flashes, land_polygons, summary)
+    preview_times = [
+        1.2,
+        min(12.0, float(CONFIG["duration_s"]) * 0.22),
+        min(31.0, float(CONFIG["duration_s"]) * 0.54),
+        min(42.0, float(CONFIG["duration_s"]) * 0.72),
+        min(50.0, float(CONFIG["duration_s"]) * 0.86),
+        float(CONFIG["duration_s"]) - 0.7,
+    ]
+    for preview_time in tqdm(preview_times, desc="Preview frames"):
+        frame = scene.render_frame(float(preview_time))
+        Image.fromarray(frame).save(PREVIEW_DIR / f"preview_{int(preview_time):02d}s.png")
+
+    render_video(scene)
+    print("Output directory:", OUTPUT_ROOT.resolve())
+    for path in sorted(OUTPUT_ROOT.glob("*")):
+        print("-", path.name)
+
 
