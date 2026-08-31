@@ -132,7 +132,19 @@ OUT_H = int(CONFIG["video_height"])
 OUT_SIZE = (OUT_W, OUT_H)
 
 COLORS = {
-
+    "sky_top": (2, 6, 16),
+    "sky_bottom": (0, 1, 8),
+    "land": (12, 20, 33),
+    "land_edge": (87, 121, 150),
+    "grid": (66, 99, 132),
+    "electric": (80, 225, 255),
+    "white": (248, 251, 255),
+    "violet": (181, 101, 255),
+    "gold": (255, 205, 91),
+    "storm": (115, 161, 255),
+    "muted": (159, 190, 218),
+    "dark": (1, 4, 12),
+    "red": (255, 90, 88),
 }
 
 FULL_SHOT_PLAN = [
