@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 """
+output : https://youtube.com/shorts/cjx40glZukM
 Millions of Lightning Strikes in Seconds — cinematic YouTube Short renderer
 
 Creates a vertical 1080x1920 data-driven / climatology-driven YouTube Short that
