@@ -103,7 +103,28 @@ for directory in [OUTPUT_ROOT, DATA_ROOT, CACHE_ROOT, PREVIEW_DIR]:
     directory.mkdir(parents=True, exist_ok=True)
 
 CONFIG: Dict[str, Any] = {
-
+    "video_width": 540 if QUICK_MODE else 1080,
+    "video_height": 960 if QUICK_MODE else 1920,
+    "fps": 6 if QUICK_MODE else 24,
+    "duration_s": 12.0 if QUICK_MODE else 58.0,
+    "output_basename": "millions_of_lightning_strikes_in_seconds",
+    "title": "MILLIONS OF LIGHTNING STRIKES",
+    "title_2": "IN SECONDS",
+    "subtitle": "ONE GLOBAL DAY // COMPRESSED",
+    "map_lon_center": 0.0,
+    "map_lat_min": -62.0,
+    "map_lat_max": 78.0,
+    "map_margin_x": 22 if QUICK_MODE else 44,
+    "map_top": 118 if QUICK_MODE else 235,
+    "map_bottom": 785 if QUICK_MODE else 1570,
+    "timeline_buckets": 12 if QUICK_MODE else 22,
+    "background_particles": 160 if QUICK_MODE else 420,
+    "dust_particles": 90 if QUICK_MODE else 220,
+    "contrast": 1.12,
+    "saturation": 1.08,
+    "vignette": 0.38,
+    "grain_strength": 4.0,
+    "soundtrack_sample_rate": 22050 if QUICK_MODE else 44100,
 }
 
 OUT_W = int(CONFIG["video_width"])
