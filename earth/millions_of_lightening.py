@@ -148,10 +148,21 @@ COLORS = {
 }
 
 FULL_SHOT_PLAN = [
-
+    {"name": "ignition", "start": 0.0, "end": 7.0},
+    {"name": "global_sweep", "start": 7.0, "end": 28.0},
+    {"name": "hotspots", "start": 28.0, "end": 39.5},
+    {"name": "land_ocean", "start": 39.5, "end": 47.0},
+    {"name": "maracaibo", "start": 47.0, "end": 54.5},
+    {"name": "all_flashes", "start": 54.5, "end": 58.0},
 ]
 
 FULL_CAPTIONS = [
+    (0.4, 6.7, "Lightning never stops. Satellites and ground networks detect flashes around the planet day and night."),
+    (7.2, 27.6, "This animation compresses one represented global day into seconds. Each visible spark can stand for many real flashes."),
+    (28.1, 39.1, "Lightning clusters over tropical land, mountains, lakes, and major storm corridors rather than spreading evenly around Earth."),
+    (39.8, 46.7, "Classic satellite studies found most global lightning over land, even though oceans cover most of the planet."),
+    (47.2, 54.2, "Lake Maracaibo in Venezuela is one of Earth's most intense lightning hotspots in satellite climatology."),
+    (54.7, 57.8, "Millions of flashes in a day—compressed into less than a minute. The title says strikes; the science here represents total lightning flashes."),
 ]
 
 if QUICK_MODE:
