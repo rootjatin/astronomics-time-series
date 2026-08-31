@@ -24,7 +24,31 @@ tropical maxima, Lake Maracaibo / Congo / East African Rift / South & Southeast 
 Central America, Florida, etc.). Each rendered sample point represents many flashes.
 The count HUD scales to the estimated total flashes in the represented time window.
 
+Optional real-data mode
+-----------------------
+Set LIGHTNING_CSV to a CSV file containing at least latitude and longitude columns.
+If a time column is available, the script sorts chronologically; otherwise it assigns
+an evenly spaced sequence. Accepted aliases include:
 
+    latitude / lat
+    longitude / lon / lng
+    time / timestamp / datetime / date
+    energy / power / intensity (optional)
+
+Example:
+    LIGHTNING_CSV=/path/to/detections.csv python millions_of_lightning_strikes_in_seconds_short.py
+
+The real-data input can be GLM, ground-network, or other lightning detections you have
+already exported to CSV. The script intentionally avoids hard-coding a fragile or
+restricted live lightning API.
+
+Tuning
+------
+    LIGHTNING_SHORT_QUICK=1        fast 540x960 preview, 6 fps, 12 seconds
+    LIGHTNING_SHORT_OFFLINE=1      skip Natural Earth download
+    LIGHTNING_REPRESENT_SECONDS=86400   represented real-world duration (default 1 day)
+    LIGHTNING_GLOBAL_FLASH_RATE=44      assumed global flashes per second in model mode
+    LIGHTNING_SAMPLE_COUNT=90000        representative flashes rendered in full mode
 
 Recommended install
 -------------------
@@ -40,7 +64,18 @@ Outputs
 - JSON summary and source notes
 - cached Natural Earth land geometry
 
-
+Primary scientific references
+-----------------------------
+- NASA NTRS, Christian et al. global OTD analysis: ~44 +/- 5 flashes/s and ~1.4B/year
+  https://ntrs.nasa.gov/search.jsp?R=20020051098
+- NASA Earthdata / LIS-OTD lightning climatology collections
+  https://www.earthdata.nasa.gov/data/catalog/ghrc-daac-lisvhrdc-1
+- NASA: Earth's New Lightning Capital Revealed (Lake Maracaibo)
+  https://www.nasa.gov/missions/trmm/earths-new-lightning-capital-revealed/
+- NASA Earth Observatory: A New Look at Earth's Lightning
+  https://science.nasa.gov/earth/earth-observatory/a-new-look-at-earths-lightning-149301/
+- Natural Earth land polygons
+  https://www.naturalearthdata.com/
 """
 
 import json
