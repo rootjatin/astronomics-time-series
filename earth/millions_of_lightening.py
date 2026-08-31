@@ -1686,3 +1686,5 @@ def main():
         print("-", path.name)
 
 
+if __name__ == "__main__":
+    main()
