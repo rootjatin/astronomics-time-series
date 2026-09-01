@@ -12,6 +12,17 @@ automatically searches the sequence for a region with strong cloud-field change,
 and turns that crop into a cinematic storm-growth time lapse.
 
 
+SCIENTIFIC FRAMING
+------------------
+- Band 13 senses emitted infrared radiation and can observe clouds day and night.
+- Colder cloud tops generally correspond to higher cloud tops, but this script uses
+  NOAA's rendered JPEG imagery, not calibrated radiances / brightness temperatures.
+- Therefore the on-screen metric is deliberately called a "cold-top proxy" rather
+  than a temperature in degrees Celsius.
+- Rapid cloud-top cooling and expanding cold cloud shields can accompany vigorous
+  convection, but the animation is not an operational severe-weather diagnosis.
+- Automatic crop selection finds the most visually changing cold-cloud region in the
+  available sequence. It is a storytelling aid, not a meteorological storm tracker.
 
 LIVE SOURCE
 -----------
@@ -22,6 +33,9 @@ NOAA Band 13 information / loop page:
     https://www.goes.noaa.gov/fulldisk_band.php?band=13&length=12&sat=G19
 
 As of 2026, GOES-19 is NOAA's operational GOES-East satellite.
+
+
+
 
 LOCAL IMAGE MODE
 ----------------
