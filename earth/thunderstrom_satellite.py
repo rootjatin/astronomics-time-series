@@ -164,7 +164,7 @@ OUT_H = int(CONFIG["video_height"])
 OUT_SIZE = (OUT_W, OUT_H)
 
 COLORS = {
- 
+ black,
 }
 
 FULL_SHOT_PLAN = [
