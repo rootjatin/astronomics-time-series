@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 """
-Output : https://www.youtube.com/shorts/dFzpC98UTD0
+output : https://www.youtube.com/shorts/dFzpC98UTD0
+
 A Thunderstorm Growing From Satellite Data — cinematic YouTube Short renderer
 
 Creates a vertical 1080x1920 YouTube Short from a short sequence of geostationary
