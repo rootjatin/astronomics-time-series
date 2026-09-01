@@ -1491,4 +1491,44 @@ def render_video(scene: ThunderstormScene, metrics: Dict[str, Any]) -> Path:
 # Main
 # -----------------------------------------------------------------------------
 
+def main() -> None:
+    print("Title:", CONFIG["title"], CONFIG["title_2"])
+    print("Preferred live source:", NOAA_CDN_DIR)
+    print("Loading satellite sequence ...")
+    frames, source, notes = load_frames()
+    print("Source:", source)
+    print("Frames:", len(frames))
+    print("Frame window:", frames[0].time_utc.isoformat(), "to", frames[-1].time_utc.isoformat())
+
+    print("Selecting storm-growth crop ...")
+    crop, crop_info = detect_growth_crop(frames)
+    print("Crop:", crop)
+    print("Crop method:", crop_info.get("method"))
+
+    metrics = compute_frame_metrics(frames, crop)
+    csv_path, summary_path = save_data_products(frames, crop, crop_info, metrics, source, notes)
+    print("Metrics CSV:", csv_path.resolve())
+    print("Summary JSON:", summary_path.resolve())
+    for note in notes:
+        print("Data note:", note)
+
+    scene = ThunderstormScene(frames, crop, metrics, source)
+    preview_times = [
+        1.0,
+        min(10.0, float(CONFIG["duration_s"]) * 0.20),
+        min(24.0, float(CONFIG["duration_s"]) * 0.43),
+        min(34.0, float(CONFIG["duration_s"]) * 0.60),
+        min(44.0, float(CONFIG["duration_s"]) * 0.78),
+        float(CONFIG["duration_s"]) - 0.7,
+    ]
+    for preview_time in tqdm(preview_times, desc="Preview frames"):
+        frame = scene.render_frame(float(preview_time))
+        Image.fromarray(frame).save(PREVIEW_DIR / f"preview_{int(preview_time):02d}s.png")
+
+    final = render_video(scene, metrics)
+    print("Final:", final.resolve())
+    print("Output directory:", OUTPUT_ROOT.resolve())
+    for path in sorted(OUTPUT_ROOT.glob("*")):
+        print("-", path.name)
+
 
