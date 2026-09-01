@@ -11,7 +11,6 @@ The script downloads the latest full-disk JPEG sequence published by NOAA/NESDIS
 automatically searches the sequence for a region with strong cloud-field change,
 and turns that crop into a cinematic storm-growth time lapse.
 
-
 SCIENTIFIC FRAMING
 ------------------
 - Band 13 senses emitted infrared radiation and can observe clouds day and night.
@@ -33,9 +32,6 @@ NOAA Band 13 information / loop page:
     https://www.goes.noaa.gov/fulldisk_band.php?band=13&length=12&sat=G19
 
 As of 2026, GOES-19 is NOAA's operational GOES-East satellite.
-
-
-
 
 LOCAL IMAGE MODE
 ----------------
@@ -164,14 +160,36 @@ OUT_H = int(CONFIG["video_height"])
 OUT_SIZE = (OUT_W, OUT_H)
 
 COLORS = {
- black,
+    "black": (1, 3, 8),
+    "navy": (4, 10, 22),
+    "panel": (5, 12, 25),
+    "grid": (89, 132, 170),
+    "white": (246, 250, 255),
+    "muted": (159, 191, 218),
+    "cyan": (92, 231, 255),
+    "blue": (91, 152, 255),
+    "violet": (187, 116, 255),
+    "gold": (255, 206, 99),
+    "red": (255, 91, 91),
+    "green": (118, 247, 191),
 }
 
 FULL_SHOT_PLAN = [
-
+    {"name": "acquisition", "start": 0.0, "end": 7.0},
+    {"name": "growth_loop", "start": 7.0, "end": 27.5},
+    {"name": "cold_tops", "start": 27.5, "end": 39.5},
+    {"name": "anvil", "start": 39.5, "end": 47.5},
+    {"name": "rapid_timelapse", "start": 47.5, "end": 55.0},
+    {"name": "before_after", "start": 55.0, "end": 58.0},
 ]
 
 FULL_CAPTIONS = [
+    (0.4, 6.7, "A geostationary weather satellite watches the same part of Earth again and again, turning cloud growth into a time sequence."),
+    (7.2, 27.1, "These infrared frames are compressed in time. The selected cloud region changes rapidly as a convective storm develops."),
+    (27.8, 39.1, "Infrared imagery senses emitted heat. Colder cloud tops usually indicate clouds reaching higher into the atmosphere."),
+    (39.8, 47.1, "As the updraft deepens, the cold cloud shield expands outward and the storm's anvil becomes easier to see from space."),
+    (47.8, 54.7, "Minutes of satellite observations become seconds on screen, revealing growth that is difficult to notice in a single image."),
+    (55.1, 57.8, "One storm. A sequence of infrared satellite frames. A cloud tower building upward and spreading outward."),
 ]
 
 if QUICK_MODE:
