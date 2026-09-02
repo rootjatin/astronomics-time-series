@@ -8,7 +8,20 @@ cyclone represented in the selected calendar year one by one, while its track
 appears on a global map. A running counter, basin label, storm name, peak wind,
 and year-to-date cutoff turn the global archive into a fast cinematic roll call.
 
+Preferred live source
+---------------------
+NOAA/NCEI International Best Track Archive for Climate Stewardship (IBTrACS)
+Version 4r01, using the last-3-years CSV subset. IBTrACS merges tropical-cyclone
+best-track data from WMO Regional Specialized Meteorological Centres and other
+agencies into a unified global archive.
 
+Default year
+------------
+The current UTC calendar year is used by default. For a completed year:
+
+CYCLONE_YEAR=2025 python every_tropical_cyclone_on_earth_this_year.py
+
+For an in-progress year, the animation ends at the current UTC instant.
 
 Default year
 ------------
