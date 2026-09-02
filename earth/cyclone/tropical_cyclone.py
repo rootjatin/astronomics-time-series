@@ -197,7 +197,12 @@ COLORS = {
 }
 
 FULL_SHOT_PLAN = [
-
+    {"name": "opening", "start": 0.0, "end": 6.0},
+    {"name": "storm_rollcall", "start": 6.0, "end": 35.0},
+    {"name": "basin_totals", "start": 35.0, "end": 43.0},
+    {"name": "strongest", "start": 43.0, "end": 50.0},
+    {"name": "all_storms", "start": 50.0, "end": 56.0},
+    {"name": "finale", "start": 56.0, "end": 58.0},
 ]
 
 FULL_CAPTIONS = [
