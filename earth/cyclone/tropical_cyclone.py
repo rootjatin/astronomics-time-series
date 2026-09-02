@@ -153,8 +153,26 @@ for directory in [OUTPUT_ROOT, DATA_ROOT, CACHE_ROOT, PREVIEW_DIR]:
     directory.mkdir(parents=True, exist_ok=True)
 
 CONFIG: Dict[str, Any] = {
-
+    "video_width": 540 if QUICK_MODE else 1080,
+    "video_height": 960 if QUICK_MODE else 1920,
+    "fps": 6 if QUICK_MODE else 24,
+    "duration_s": 12.0 if QUICK_MODE else 58.0,
+    "output_basename": f"every_tropical_cyclone_on_earth_this_year_{YEAR_KEY}",
+    "title": "EVERY TROPICAL CYCLONE ON EARTH THIS YEAR",
+    "subtitle": f"{YEAR_LABEL} YEAR TO DATE // NOAA IBTRACS V4R01",
+    "map_margin_x": 20 if QUICK_MODE else 40,
+    "map_top": 142 if QUICK_MODE else 284,
+    "map_bottom": 720 if QUICK_MODE else 1440,
+    "timeline_buckets": 14 if QUICK_MODE else 30,
+    "background_particles": 110 if QUICK_MODE else 280,
+    "dust_particles": 70 if QUICK_MODE else 180,
+    "grain_strength": 3.5,
+    "contrast": 1.09,
+    "saturation": 1.06,
+    "vignette": 0.33,
+    "soundtrack_sample_rate": 22050 if QUICK_MODE else 44100,
 }
+
 
 OUT_W = int(CONFIG["video_width"])
 OUT_H = int(CONFIG["video_height"])
