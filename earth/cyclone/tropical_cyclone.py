@@ -206,7 +206,12 @@ FULL_SHOT_PLAN = [
 ]
 
 FULL_CAPTIONS = [
-
+    (0.5, 5.6, "This is every tropical cyclone in the global archive for the year so far."),
+    (6.2, 34.6, "Each storm gets one turn: its track, basin, dates, and strongest selected wind in the archive."),
+    (35.2, 42.6, "The storms are spread across seven tropical-cyclone basins, each with a different seasonal rhythm."),
+    (43.2, 49.6, "A few storms reach the highest intensity bands, but every line belongs to the same global year."),
+    (50.2, 55.6, "Put them together and the planet fills with the complete year-to-date track pattern."),
+    (56.1, 57.8, "Every cyclone currently represented in IBTrACS. One year. One Earth."),
 ]
 
 if QUICK_MODE:
