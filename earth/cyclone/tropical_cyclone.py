@@ -1258,4 +1258,46 @@ def render_video(scene: StormTrackScene) -> Path:
     return final_video
 
 
+def main():
+    print("Target year:", TARGET_YEAR)
+    print("UTC window:", YEAR_START.isoformat(), "to", YEAR_END.isoformat())
+    print("Loading global tropical-cyclone tracks ...")
+    storms, source, data_notes, cache_path = load_storms()
+    print("Loading world land geometry ...")
+    land_polygons, land_source, land_notes = load_land_polygons()
+    notes = data_notes + land_notes
+
+    summary = storm_summary(storms, source, land_source)
+    csv_path, summary_path = save_data_products(storms, summary, notes)
+
+    print("Data source:", source)
+    print("Storms:", f"{len(storms):,}")
+    print("Track points:", f"{sum(len(s.points) for s in storms):,}")
+    if summary["maximum_selected_wind_kt"] is not None:
+        print("Strongest selected wind:", f"{summary['maximum_selected_wind_kt']:.0f} kt")
+    print("CSV:", csv_path.resolve())
+    print("Summary:", summary_path.resolve())
+    if cache_path:
+        print("Cache:", cache_path.resolve())
+    for note in notes:
+        print("Data note:", note)
+
+    scene = StormTrackScene(storms, land_polygons, summary)
+    preview_times = [
+        1.2,
+        min(12.0, float(CONFIG["duration_s"]) * 0.24),
+        min(31.0, float(CONFIG["duration_s"]) * 0.54),
+        min(43.0, float(CONFIG["duration_s"]) * 0.74),
+        min(51.0, float(CONFIG["duration_s"]) * 0.88),
+        float(CONFIG["duration_s"]) - 0.7,
+    ]
+    for preview_time in tqdm(preview_times, desc="Preview frames"):
+        frame = scene.render_frame(float(preview_time))
+        Image.fromarray(frame).save(PREVIEW_DIR / f"preview_{int(preview_time):02d}s.png")
+
+    render_video(scene)
+    print("Output directory:", OUTPUT_ROOT.resolve())
+    for path in sorted(OUTPUT_ROOT.glob("*")):
+        print("-", path.name)
+
 
