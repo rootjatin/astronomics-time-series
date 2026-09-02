@@ -19,14 +19,6 @@ Default year
 ------------
 The current UTC calendar year is used by default. For a completed year:
 
-CYCLONE_YEAR=2025 python every_tropical_cyclone_on_earth_this_year.py
-
-For an in-progress year, the animation ends at the current UTC instant.
-
-Default year
-------------
-The current UTC calendar year is used by default. For a completed year:
-
     CYCLONE_YEAR=2025 python every_tropical_cyclone_on_earth_this_year.py
 
 For an in-progress year, the animation ends at the current UTC instant.
@@ -173,7 +165,6 @@ CONFIG: Dict[str, Any] = {
     "soundtrack_sample_rate": 22050 if QUICK_MODE else 44100,
 }
 
-
 OUT_W = int(CONFIG["video_width"])
 OUT_H = int(CONFIG["video_height"])
 OUT_SIZE = (OUT_W, OUT_H)
@@ -226,12 +217,19 @@ else:
     CAPTIONS = FULL_CAPTIONS
 
 IBTRACS_URL = (
-
+    "https://www.ncei.noaa.gov/data/international-best-track-archive-for-climate-stewardship-ibtracs/"
+    "v04r01/access/csv/ibtracs.last3years.list.v04r01.csv"
 )
 NATURAL_EARTH_LAND_URL = "https://naturalearth.s3.amazonaws.com/110m_physical/ne_110m_land.zip"
 
 BASIN_NAMES = {
-
+    "NA": "NORTH ATLANTIC",
+    "EP": "EASTERN PACIFIC",
+    "WP": "WESTERN PACIFIC",
+    "NI": "NORTH INDIAN",
+    "SI": "SOUTH INDIAN",
+    "SP": "SOUTH PACIFIC",
+    "SA": "SOUTH ATLANTIC",
 }
 BASIN_ORDER = ["NA", "EP", "WP", "NI", "SI", "SP", "SA"]
 
@@ -1355,3 +1353,5 @@ def main():
         print("-", path.name)
 
 
+if __name__ == "__main__":
+    main()
