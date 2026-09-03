@@ -196,7 +196,12 @@ FULL_SHOT_PLAN = [
 ]
 
 FULL_CAPTIONS = [
-
+    (0.5, 6.6, "A year of tropical cyclones begins as an almost empty map."),
+    (7.2, 28.6, "Tracks appear in time order, turning months of motion into seconds."),
+    (29.2, 39.6, "Each ocean basin has its own season, rhythm, and preferred paths."),
+    (40.2, 48.6, "The strongest storms are only a few lines inside a much larger global pattern."),
+    (49.2, 54.6, "By the end, the tracks form a fingerprint of where tropical cyclones traveled that year."),
+    (55.1, 57.7, "One planet. One year. Every track in the selected global archive."),
 ]
 
 if QUICK_MODE:
