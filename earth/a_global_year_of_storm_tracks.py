@@ -170,7 +170,20 @@ OUT_SIZE = (OUT_W, OUT_H)
 SCALE = OUT_W / 1080.0
 
 COLORS = {
-   
+    "ocean_top": (2, 9, 20),
+    "ocean_bottom": (0, 2, 8),
+    "land": (17, 27, 34),
+    "land_edge": (74, 106, 119),
+    "grid": (70, 116, 133),
+    "white": (245, 249, 252),
+    "muted": (154, 188, 201),
+    "weak": (111, 150, 162),
+    "ts": (63, 224, 255),
+    "hurr": (255, 215, 92),
+    "strong": (255, 139, 74),
+    "major": (255, 78, 92),
+    "extreme": (232, 96, 255),
+    "dark": (1, 4, 11),
 }
 
 FULL_SHOT_PLAN = [
