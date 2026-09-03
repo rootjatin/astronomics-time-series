@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 """
+Output : https://youtube.com/shorts/vKia2iHHCso
+
 A Global Year of Storm Tracks — cinematic YouTube Short renderer
 
 Creates a vertical 1080x1920 data-driven short showing tropical-cyclone tracks
