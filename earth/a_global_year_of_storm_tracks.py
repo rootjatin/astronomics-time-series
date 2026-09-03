@@ -53,6 +53,12 @@ Outputs
 - JSON summary and source notes
 - cached IBTrACS CSV and Natural Earth land geometry
 
+Primary sources
+---------------
+- NOAA/NCEI IBTrACS: https://www.ncei.noaa.gov/products/international-best-track-archive
+- IBTrACS v04r01 CSV directory:
+  https://www.ncei.noaa.gov/data/international-best-track-archive-for-climate-stewardship-ibtracs/v04r01/access/csv/
+- Natural Earth land polygons: https://www.naturalearthdata.com/
 
 """
 
