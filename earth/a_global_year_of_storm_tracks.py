@@ -23,7 +23,19 @@ The current UTC calendar year is used by default. For a completed year:
 
 For an in-progress year, the animation ends at the current UTC instant.
 
-
+Scientific framing
+------------------
+- Each polyline is the portion of an IBTrACS tropical-cyclone track that falls
+  inside the selected calendar year.
+- Track position and intensity come from IBTrACS when live/cached data load.
+- The renderer prefers WMO wind when available, then USA wind and other agency
+  fields as fallbacks. Different agencies use different wind-averaging periods,
+  so cross-basin intensity comparisons should be interpreted cautiously.
+- Color bands are visualization bands in knots, not a claim that one regional
+  cyclone category scale applies globally.
+- Provisional recent tracks can be revised after operational analysis.
+- "Global year" means all tropical-cyclone tracks represented in the selected
+  IBTrACS subset during the calendar-year window, subject to dataset updates.
 
 Offline behavior
 ----------------
