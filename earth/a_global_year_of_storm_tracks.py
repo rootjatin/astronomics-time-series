@@ -187,7 +187,12 @@ COLORS = {
 }
 
 FULL_SHOT_PLAN = [
-
+    {"name": "opening", "start": 0.0, "end": 7.0},
+    {"name": "year_sweep", "start": 7.0, "end": 29.0},
+    {"name": "basin_relay", "start": 29.0, "end": 40.0},
+    {"name": "strongest", "start": 40.0, "end": 49.0},
+    {"name": "global_pattern", "start": 49.0, "end": 55.0},
+    {"name": "finale", "start": 55.0, "end": 58.0},
 ]
 
 FULL_CAPTIONS = [
