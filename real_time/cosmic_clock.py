@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 """
+Output : https://youtube.com/shorts/agKYIMPjO3k
 Radio Waves — Time Analysis of a Pulsar
 =======================================
 Cinematic vertical YouTube Short renderer showing how astronomers turn noisy
