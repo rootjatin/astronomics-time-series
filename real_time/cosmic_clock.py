@@ -16,7 +16,15 @@ The synthetic observation is parameterized after the bright pulsar PSR B0329+54:
 The dynamic spectrum, noise, individual pulse amplitudes, timing residuals, and
 soundtrack are SIMULATED for explanation. They are not raw telescope data.
 
-
+Optional real/processed dynamic-spectrum CSV
+--------------------------------------------
+Set PULSAR_RADIO_CSV to a CSV containing:
+    time_s, frequency_mhz, intensity
+The script pivots those rows into a dynamic spectrum. For best results use a
+regular time/frequency grid. The educational overlays still use the configured
+period/DM unless you override them with:
+    PULSAR_PERIOD_S=...
+    PULSAR_DM=...
 
 Quick preview
 -------------
