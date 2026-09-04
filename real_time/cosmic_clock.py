@@ -894,5 +894,24 @@ def render_video(scene: RadioPulsarScene) -> Path:
     if mux_audio(raw,audio,final): return final
     shutil.copyfile(raw,final); return final
 
+def main() -> None:
+    print("Loading / simulating pulsar radio data ...")
+    times,freqs,raw,source,notes=load_radio_data()
+    print("Source:",source)
+    print("Shape:",raw.shape,"(frequency channels x time samples)")
+    scene=RadioPulsarScene(times,freqs,raw,source)
+    print("Configured period:",PERIOD_S,"s")
+    print("Recovered demo period:",scene.best_period,"s")
+    print("Dispersion measure:",DM,"pc cm^-3")
+    csv_path,summary_path=save_data_products(scene,notes)
+    print("CSV:",csv_path.resolve())
+    print("Summary:",summary_path.resolve())
+    preview_times=[1.0,min(9.0,float(CONFIG["duration_s"])*.18),min(20.0,float(CONFIG["duration_s"])*.36),min(33.0,float(CONFIG["duration_s"])*.58),min(44.0,float(CONFIG["duration_s"])*.78),float(CONFIG["duration_s"])-.7]
+    for pt in tqdm(preview_times,desc="Preview frames"):
+        frame=scene.render_frame(float(pt)); Image.fromarray(frame).save(PREVIEW_DIR/f"preview_{int(pt):02d}s.png")
+    final=render_video(scene)
+    print("Final video:",final.resolve())
+    print("Output directory:",OUTPUT_ROOT.resolve())
+
 
 
