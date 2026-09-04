@@ -913,5 +913,7 @@ def main() -> None:
     print("Final video:",final.resolve())
     print("Output directory:",OUTPUT_ROOT.resolve())
 
+if __name__=="__main__":
+    main()
 
 
