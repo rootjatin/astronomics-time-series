@@ -36,11 +36,11 @@ period/DM unless you override them with:
 
 Quick preview
 -------------
-    PULSAR_RADIO_SHORT_QUICK=1 python radio_waves_time_analysis_of_a_pulsar.py
+    PULSAR_RADIO_SHORT_QUICK=1 python cosmic_clock.py
 
 Full render
 -----------
-    python radio_waves_time_analysis_of_a_pulsar.py
+    python cosmic_clock.py
 
 Recommended install
 -------------------
