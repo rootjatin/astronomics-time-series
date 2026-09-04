@@ -6,6 +6,14 @@ Radio Waves — Time Analysis of a Pulsar
 Cinematic vertical YouTube Short renderer showing how astronomers turn noisy
 radio-telescope data into a pulsar timing measurement.
 
+Story arc
+---------
+1) A radio telescope receives what looks like noise.
+2) A pulsar pulse is delayed at low radio frequencies by interstellar plasma.
+3) Dedispersion removes that frequency-dependent sweep.
+4) A period search reveals a repeating clock.
+5) Folding many rotations builds a clean average pulse profile.
+6) Pulse arrival times become a precision timing observable.
 
 Default numerical demonstration
 -------------------------------
@@ -46,7 +54,6 @@ Primary references
   https://www.atnf.csiro.au/research/pulsar/psrcat/psrcat_help.html
 - CSIRO Parkes Pulsar Timing Array data products:
   https://data.csiro.au/collection/csiro:41824
-
 """
 
 import json
@@ -894,6 +901,7 @@ def render_video(scene: RadioPulsarScene) -> Path:
     if mux_audio(raw,audio,final): return final
     shutil.copyfile(raw,final); return final
 
+
 def main() -> None:
     print("Loading / simulating pulsar radio data ...")
     times,freqs,raw,source,notes=load_radio_data()
@@ -913,7 +921,6 @@ def main() -> None:
     print("Final video:",final.resolve())
     print("Output directory:",OUTPUT_ROOT.resolve())
 
+
 if __name__=="__main__":
     main()
-
-
