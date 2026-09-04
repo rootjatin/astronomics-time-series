@@ -30,6 +30,15 @@ Recommended install
 -------------------
     pip install numpy pandas pillow imageio imageio-ffmpeg tqdm
 
+Primary references
+------------------
+- NASA Science — Pulsars:
+  https://science.nasa.gov/mission/hubble/science/science-behind-the-discoveries/hubble-pulsars/
+- CSIRO / ATNF Pulsar Catalogue documentation:
+  https://www.atnf.csiro.au/research/pulsar/psrcat/psrcat_help.html
+- CSIRO Parkes Pulsar Timing Array data products:
+  https://data.csiro.au/collection/csiro:41824
+
 """
 
 import json
