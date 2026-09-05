@@ -1,9 +1,7 @@
-
 from __future__ import annotations
 
 """
-output : https://youtube.com/shorts/rN_NSJY67FY?feature=share
-
+ouput : https://youtube.com/shorts/rN_NSJY67FY?feature=share
 The Planet's Active Volcanoes Are Not Random — cinematic YouTube Short renderer
 
 Creates a vertical 1080x1920 science Short explaining why Earth's volcanoes
@@ -954,6 +952,7 @@ def save_summary() -> Path:
     )
     return path
 
+
 def main():
     print(f"Rendering: {CONFIG['title']}")
     print(f"Mode: {'QUICK' if QUICK_MODE else 'FULL'} // {OUT_W}x{OUT_H} @ {CONFIG['fps']} fps")
@@ -979,4 +978,5 @@ def main():
     print(f"Previews: {PREVIEW_DIR}")
 
 
-
+if __name__ == "__main__":
+    main()
