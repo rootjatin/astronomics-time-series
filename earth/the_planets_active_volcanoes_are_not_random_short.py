@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 """
+output : https://youtube.com/shorts/rN_NSJY67FY?feature=share
+
 The Planet's Active Volcanoes Are Not Random — cinematic YouTube Short renderer
 
 Creates a vertical 1080x1920 science Short explaining why Earth's volcanoes
