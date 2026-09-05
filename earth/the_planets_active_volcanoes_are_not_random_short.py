@@ -9,7 +9,15 @@ The Planet's Active Volcanoes Are Not Random — cinematic YouTube Short rendere
 Creates a vertical 1080x1920 science Short explaining why Earth's volcanoes
 cluster in recognizable global patterns rather than appearing randomly.
 
+The animation focuses on four big ideas:
 
+- Most volcanic belts track tectonic plate boundaries.
+- At subduction zones, one plate sinks beneath another; water and other
+  volatiles help generate magma in the mantle above the descending slab.
+- At divergent boundaries and continental rifts, plates pull apart and hot
+  mantle rises, promoting decompression melting.
+- A smaller but important group of volcanoes forms above intraplate hotspots,
+  producing chains such as Hawaii as a plate moves over a long-lived source.
 
 The plotted volcanoes are a curated, illustrative subset of well-known
 historically or recently active volcanic systems. They are used to communicate
