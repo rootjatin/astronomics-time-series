@@ -28,7 +28,19 @@ What the video shows
   available.
 
 
-
+Honesty / interpretation rules
+------------------------------
+- TESS records brightness measurements, not a resolved movie of the stellar
+  surface. The expanding star graphic is a visual metaphor synchronized to the
+  light curve.
+- The dominant period is estimated from the downloaded data. It is not
+  substituted from a catalog value, and real Delta Scuti stars can contain
+  several simultaneous pulsation modes.
+- A phase-folded curve combines measurements from many cycles and emphasizes
+  the dominant repeating timescale; it does not show one uninterrupted cycle.
+- Pixel colors are contrast-stretched for visibility and are not true color.
+- Different TESS products, sectors, detrending choices, and data gaps can shift
+  the measured amplitude or period slightly.
 
 
 Offline fallback
