@@ -1340,3 +1340,6 @@ def main():
     print("Source status:", summary)
 
 
+if __name__ == "__main__":
+    main()
+
