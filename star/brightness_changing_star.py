@@ -169,7 +169,12 @@ COLORS = {
 }
 
 SHOT_PLAN = [
-  
+    {"name": "intro", "start": 0.0, "end": 7.0 if not QUICK_MODE else 1.8},
+    {"name": "curve", "start": 7.0 if not QUICK_MODE else 1.8, "end": 20.0 if not QUICK_MODE else 4.4},
+    {"name": "events", "start": 20.0 if not QUICK_MODE else 4.4, "end": 32.0 if not QUICK_MODE else 6.8},
+    {"name": "period", "start": 32.0 if not QUICK_MODE else 6.8, "end": 44.0 if not QUICK_MODE else 9.1},
+    {"name": "stats", "start": 44.0 if not QUICK_MODE else 9.1, "end": 53.0 if not QUICK_MODE else 10.9},
+    {"name": "outro", "start": 53.0 if not QUICK_MODE else 10.9, "end": CONFIG["duration_s"]},
 ]
 
 CAPTION_TEXTS = [
