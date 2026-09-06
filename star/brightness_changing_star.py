@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 """
+output : https://youtube.com/shorts/QGxSl_1aH-8
 This Star Changes Brightness Every Few Hours
 ============================================
 
