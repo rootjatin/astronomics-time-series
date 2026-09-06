@@ -178,7 +178,12 @@ SHOT_PLAN = [
 ]
 
 CAPTION_TEXTS = [
-  
+    "This star becomes brighter and fainter again on a cycle lasting only a few hours.",
+    "TESS measured the star point by point. The rapid waves in this curve are real changes in recorded brightness.",
+    "A closer view reveals repeated peaks and troughs, while several pulsation modes can subtly reshape each cycle.",
+    "Folding the observations on the strongest measured period stacks many cycles into one dominant repeating pattern.",
+    "The period in hours, brightness range, cadence, observation span, and number of cycles are all measured from this light curve.",
+    "The star animation is illustrative. TESS measured unresolved brightness, not a resolved movie of the stellar surface.",
 ]
 
 if QUICK_MODE:
