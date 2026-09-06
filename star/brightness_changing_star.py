@@ -27,6 +27,14 @@ What the video shows
 - A target-pixel stamp and pipeline aperture when a TESS Target Pixel File is
   available.
 
+Official sources and tools
+--------------------------
+TESS data at MAST:
+    https://archive.stsci.edu/missions-and-data/tess
+NASA TESS data-product guide:
+    https://heasarc.gsfc.nasa.gov/docs/tess/data-products.html
+Lightkurve:
+    https://lightkurve.github.io/lightkurve/
 
 Honesty / interpretation rules
 ------------------------------
@@ -41,15 +49,6 @@ Honesty / interpretation rules
 - Pixel colors are contrast-stretched for visibility and are not true color.
 - Different TESS products, sectors, detrending choices, and data gaps can shift
   the measured amplitude or period slightly.
-
-Official sources and tools
---------------------------
-TESS data at MAST:
-    https://archive.stsci.edu/missions-and-data/tess
-NASA TESS data-product guide:
-    https://heasarc.gsfc.nasa.gov/docs/tess/data-products.html
-Lightkurve:
-    https://lightkurve.github.io/lightkurve/
 
 Offline fallback
 ----------------
@@ -1319,5 +1318,25 @@ def make_contact_sheet(paths: Sequence[Path], out_path: Path):
         row, col = divmod(index, 2)
         sheet.paste(thumb, (20 + col * 290, 20 + row * 500))
     sheet.save(out_path, quality=92)
+
+
+def main():
+    print("Collecting few-hours variable-star light-curve data ...")
+    metadata, analysis, summary = collect_data()
+    csv_path, json_path = save_data(metadata, analysis, summary)
+    print("Data:", csv_path.resolve())
+    print("Summary:", json_path.resolve())
+
+    scene = PulsatingStarScene(metadata, analysis, summary)
+    preview_times = [1.0, min(11.0, CONFIG["duration_s"] * 0.22), min(25.0, CONFIG["duration_s"] * 0.43), min(37.0, CONFIG["duration_s"] * 0.65), min(47.0, CONFIG["duration_s"] * 0.83), CONFIG["duration_s"] - 1]
+    preview_paths = []
+    for t in tqdm(preview_times, desc="Preview frames"):
+        path = PREVIEW_ROOT / f"preview_{int(t):02d}s.png"
+        Image.fromarray(scene.render_frame(float(t))).save(path)
+        preview_paths.append(path)
+    make_contact_sheet(preview_paths, PREVIEW_ROOT / "this_star_changes_brightness_every_few_hours_contact_sheet.jpg")
+    video_path = render_video(scene)
+    print("Video:", video_path.resolve())
+    print("Source status:", summary)
 
 
