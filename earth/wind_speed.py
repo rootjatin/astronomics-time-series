@@ -17,7 +17,12 @@ The production pattern mirrors the supplied Shorts renderers:
 - generated ambient soundtrack
 - final MP4 when ffmpeg is available
 
-
+REAL DATA
+---------
+Primary source: NOAA Physical Sciences Laboratory, NCEP/NCAR Reanalysis 1 daily
+pressure-level wind. The visualization uses U and V wind at 850 hPa, a lower-
+tropospheric pressure surface often around ~1–1.5 km altitude away from high
+terrain. The altitude is only a guide: pressure surfaces rise and fall.
 
 Default year: 2025, chosen as a complete archived calendar year in the source
 used by the supplied jet-stream renderer.
