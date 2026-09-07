@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 """
+Output : https://youtube.com/shorts/PrPtuGiVsT0?feature=share
 A YEAR OF GLOBAL WIND IN 60 SECONDS — cinematic YouTube Shorts renderer
 
 Creates a vertical 1080x1920 data-driven short that compresses one complete
