@@ -126,7 +126,26 @@ for directory in (OUTPUT_ROOT, DATA_ROOT, CACHE_ROOT, PREVIEW_DIR):
     directory.mkdir(parents=True, exist_ok=True)
 
 CONFIG: Dict[str, Any] = {
-
+    "video_width": 540 if QUICK_MODE else 1080,
+    "video_height": 960 if QUICK_MODE else 1920,
+    "fps": 6 if QUICK_MODE else 24,
+    "duration_s": 12.0 if QUICK_MODE else 58.0,
+    "title": "A YEAR OF GLOBAL WIND IN 60 SECONDS",
+    "subtitle": "365 DAILY MEANS // 850 HPA // NOAA NCEP-NCAR REANALYSIS",
+    "output_basename": "a_year_of_global_wind_in_60_seconds",
+    "map_margin_x": 20 if QUICK_MODE else 40,
+    "map_top": 140 if QUICK_MODE else 280,
+    "map_bottom": 665 if QUICK_MODE else 1330,
+    "stream_seed_spacing_lon": 42 if QUICK_MODE else 24,
+    "stream_step_count": 10 if QUICK_MODE else 18,
+    "layer_cache_size": 4 if QUICK_MODE else 6,
+    "star_count": 70 if QUICK_MODE else 180,
+    "dust_count": 38 if QUICK_MODE else 105,
+    "grain_strength": 3.1,
+    "contrast": 1.09,
+    "saturation": 1.08,
+    "vignette": 0.34,
+    "sample_rate": 22050 if QUICK_MODE else 44100,
 }
 
 OUT_W = int(CONFIG["video_width"])
@@ -135,7 +154,23 @@ OUT_SIZE = (OUT_W, OUT_H)
 SCALE = OUT_W / 1080.0
 
 COLORS = {
-
+    "bg_top": (2, 10, 21),
+    "bg_bottom": (0, 2, 8),
+    "land": (14, 28, 34),
+    "land_edge": (74, 107, 119),
+    "grid": (70, 118, 131),
+    "white": (246, 250, 252),
+    "muted": (154, 187, 198),
+    "calm": (30, 84, 113),
+    "moderate": (50, 203, 208),
+    "fast": (246, 211, 91),
+    "very_fast": (255, 127, 75),
+    "extreme": (237, 91, 207),
+    "spring": (112, 225, 164),
+    "summer": (250, 211, 91),
+    "autumn": (255, 139, 78),
+    "winter": (89, 196, 243),
+    "dark": (1, 4, 11),
 }
 
 FULL_SHOT_PLAN = [
@@ -148,7 +183,12 @@ FULL_SHOT_PLAN = [
 ]
 
 FULL_CAPTIONS = [
-
+    (0.4, 5.2, "This is one year of global wind, compressed into sixty seconds."),
+    (5.8, 41.1, "Each moment advances through daily-mean wind near eight hundred fifty hectopascals. Watch the trade winds, storm tracks, and broad circulation patterns shift through the year."),
+    (41.8, 47.7, "The circulation changes with the seasons. The strongest belts migrate, strengthen, weaken, and reorganize."),
+    (48.2, 52.5, "One day contains the strongest daily-mean wind loaded anywhere on this pressure surface during the year."),
+    (53.0, 55.7, "Average every day together and the planet's persistent wind corridors emerge."),
+    (56.1, 57.8, "Three hundred sixty-five days. One atmosphere. Never still."),
 ]
 
 if QUICK_MODE:
@@ -1201,5 +1241,42 @@ def render_video(scene: GlobalWindYearScene) -> Path:
 # -----------------------------------------------------------------------------
 # Main
 # -----------------------------------------------------------------------------
+
+def main():
+    print("Title:", CONFIG["title"])
+    print("Year:", TARGET_YEAR)
+    print("Pressure level:", f"{PRESSURE_HPA:.0f} hPa")
+    print("Loading global daily U/V wind ...")
+    data = load_winds()
+    stats = compute_day_stats(data)
+    csv_path, summary_path = save_data_products(data, stats)
+    strongest = max(stats, key=lambda s: s.global_max_ms)
+    print("Data source:", data.source)
+    print("Actual window:", data.dates[0].isoformat(), "to", data.dates[-1].isoformat())
+    print("Daily fields:", len(data.dates))
+    print("Grid:", len(data.lat), "lat x", len(data.lon), "lon")
+    print("Strongest loaded day:", strongest.when.isoformat(), f"{strongest.global_max_ms:.1f} m/s")
+    print("CSV:", csv_path.resolve())
+    print("Summary:", summary_path.resolve())
+    for note in data.notes:
+        print("Data note:", note)
+
+    scene = GlobalWindYearScene(data, stats)
+    preview_times = [
+        1.3,
+        min(10.0, float(CONFIG["duration_s"]) * 0.22),
+        min(27.0, float(CONFIG["duration_s"]) * 0.48),
+        min(43.5, float(CONFIG["duration_s"]) * 0.73),
+        min(50.0, float(CONFIG["duration_s"]) * 0.86),
+        float(CONFIG["duration_s"]) - 0.7,
+    ]
+    for preview_time in tqdm(preview_times, desc="Preview frames"):
+        frame = scene.render_frame(float(preview_time))
+        Image.fromarray(frame).save(PREVIEW_DIR / f"preview_{int(preview_time):02d}s.png")
+
+    render_video(scene)
+    print("Output directory:", OUTPUT_ROOT.resolve())
+    for path in sorted(OUTPUT_ROOT.glob("*")):
+        print("-", path.name)
 
 
