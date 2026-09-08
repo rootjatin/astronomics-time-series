@@ -42,7 +42,21 @@ Choose ending year
 ------------------
     TEMP_ANOMALY_END_YEAR=2024 python earths_temperature_anomaly_since_1880.py
 
+Outputs
+-------
+- final vertical MP4 with generated ambient audio when ffmpeg is available
+- silent MP4 fallback
+- SRT subtitle sidecar
+- preview PNG frames
+- CSV with annual global / hemispheric anomaly statistics
+- JSON summary and source notes
+- cached NASA GISTEMP NetCDF
 
+Sources
+-------
+- NASA GISTEMP v4: https://data.giss.nasa.gov/gistemp/
+- Data downloads: https://data.giss.nasa.gov/gistemp/data_v4.html
+- Gridded NetCDF: https://data.giss.nasa.gov/pub/gistemp/gistemp1200_GHCNv4_ERSSTv5.nc.gz
 """
 
 import gzip
@@ -849,5 +863,18 @@ def render_video(scene:TemperatureAnomalyScene)->Path:
 # -----------------------------------------------------------------------------
 # Main
 # -----------------------------------------------------------------------------
+
+def main():
+    print("Title:",CONFIG["title"]); print("Loading NASA GISTEMP temperature-anomaly record ...")
+    data=load_temperature_data(); stats=compute_stats(data); csv_path,json_path=save_data_products(data,stats)
+    print("Data source:",data.source); print("Years:",int(data.years[0]),"to",int(data.years[-1])); print("Grid:",len(data.lat),"lat x",len(data.lon),"lon")
+    print("Latest global anomaly:",f"{stats[-1].global_mean_c:+.2f}°C"); print("CSV:",csv_path.resolve()); print("Summary:",json_path.resolve())
+    for note in data.notes: print("Data note:",note)
+    scene=TemperatureAnomalyScene(data,stats)
+    preview_times=[1.4,min(14.0,float(CONFIG["duration_s"])*0.27),min(38.0,float(CONFIG["duration_s"])*0.66),min(47.0,float(CONFIG["duration_s"])*0.81),min(53.5,float(CONFIG["duration_s"])*0.92),float(CONFIG["duration_s"])-0.7]
+    for pt in tqdm(preview_times,desc="Preview frames"):
+        Image.fromarray(scene.render_frame(float(pt))).save(PREVIEW_DIR/f"preview_{int(pt):02d}s.png")
+    render_video(scene)
+    print("Output directory:",OUTPUT_ROOT.resolve())
 
 
