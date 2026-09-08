@@ -131,11 +131,21 @@ COLORS = {
 }
 
 FULL_SHOT_PLAN = [
-
+    {"name": "opening", "start": 0.0, "end": 5.5},
+    {"name": "history", "start": 5.5, "end": 35.5},
+    {"name": "landmarks", "start": 35.5, "end": 43.5},
+    {"name": "curve", "start": 43.5, "end": 51.5},
+    {"name": "recent", "start": 51.5, "end": 56.0},
+    {"name": "finale", "start": 56.0, "end": 58.0},
 ]
 
 FULL_CAPTIONS = [
-
+    (0.4, 5.2, "This is Earth's temperature anomaly record, beginning in 1880."),
+    (5.8, 35.1, "Each year is compared with NASA GISTEMP's 1951 to 1980 average. The map and the global mean move forward together."),
+    (35.8, 43.1, "Pause at a few points in the record and the long-term shift becomes easier to see."),
+    (43.8, 51.1, "The year-to-year line rises and falls, but the long-term direction is clear."),
+    (51.8, 55.7, "Recent years sit near the warmest end of the modern instrumental record."),
+    (56.1, 57.8, "From 1880 to now, Earth's temperature anomaly has moved decisively upward."),
 ]
 
 if QUICK_MODE:
