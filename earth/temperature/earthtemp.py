@@ -92,7 +92,21 @@ for directory in (OUTPUT_ROOT, DATA_ROOT, CACHE_ROOT, PREVIEW_DIR):
     directory.mkdir(parents=True, exist_ok=True)
 
 CONFIG: Dict[str, Any] = {
-   
+    "video_width": 540 if QUICK_MODE else 1080,
+    "video_height": 960 if QUICK_MODE else 1920,
+    "fps": 6 if QUICK_MODE else 24,
+    "duration_s": 12.0 if QUICK_MODE else 58.0,
+    "title": "EARTH'S TEMPERATURE ANOMALY SINCE 1880",
+    "subtitle": "NASA GISTEMP V4 // GLOBAL SURFACE ANOMALY VS 1951-1980",
+    "output_basename": "earths_temperature_anomaly_since_1880",
+    "map_margin_x": 22 if QUICK_MODE else 44,
+    "map_top": 150 if QUICK_MODE else 300,
+    "map_bottom": 660 if QUICK_MODE else 1320,
+    "grain_strength": 3.0,
+    "contrast": 1.08,
+    "saturation": 1.07,
+    "vignette": 0.34,
+    "sample_rate": 22050 if QUICK_MODE else 44100,
 }
 
 OUT_W = int(CONFIG["video_width"])
@@ -101,7 +115,19 @@ OUT_SIZE = (OUT_W, OUT_H)
 SCALE = OUT_W / 1080.0
 
 COLORS = {
-
+    "bg_top": (4, 7, 15),
+    "bg_bottom": (1, 2, 7),
+    "white": (247, 249, 250),
+    "muted": (161, 181, 190),
+    "grid": (96, 118, 128),
+    "cold2": (34, 69, 145),
+    "cold1": (61, 147, 207),
+    "near": (104, 178, 190),
+    "neutral": (38, 43, 48),
+    "warm1": (240, 196, 91),
+    "warm2": (244, 126, 71),
+    "hot": (219, 62, 68),
+    "extreme": (190, 70, 148),
 }
 
 FULL_SHOT_PLAN = [
