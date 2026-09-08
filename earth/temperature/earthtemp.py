@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 """
+output : https://youtube.com/shorts/lEf6FDGkdxM?feature=share
 EARTH'S TEMPERATURE ANOMALY SINCE 1880 — cinematic YouTube Shorts renderer
 
 Creates a vertical 1080x1920 data-driven short following Earth's global surface-
