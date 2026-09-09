@@ -146,7 +146,13 @@ FULL_SHOT_PLAN = [
 ]
 
 FULL_CAPTIONS = [
-
+    (0.4, 5.7, "Some neutron stars keep time with extraordinary regularity."),
+    (6.2, 15.7, "A pulsar is a rotating neutron star. Its beam sweeps through space like a lighthouse."),
+    (16.2, 26.7, "Every time the beam crosses Earth, a radio telescope can record another pulse: another tick."),
+    (27.2, 37.7, "Astronomers predict when each pulse should arrive, then measure whether it appears early or late."),
+    (38.2, 47.7, "A HackRF One can simulate that received pulse train in a closed, attenuated RF bench test."),
+    (48.2, 55.7, "Those tiny timing differences are called residuals. They are where the interesting physics appears."),
+    (56.1, 57.8, "A star, turning in darkness, becomes a clock across the galaxy."),
 ]
 
 if QUICK_MODE:
