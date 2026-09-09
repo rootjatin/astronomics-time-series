@@ -136,7 +136,13 @@ COLORS = {
 }
 
 FULL_SHOT_PLAN = [
-
+    {"name": "opening", "start": 0.0, "end": 6.0},
+    {"name": "lighthouse", "start": 6.0, "end": 16.0},
+    {"name": "pulse_train", "start": 16.0, "end": 27.0},
+    {"name": "arrival_times", "start": 27.0, "end": 38.0},
+    {"name": "hackrf", "start": 38.0, "end": 48.0},
+    {"name": "residuals", "start": 48.0, "end": 56.0},
+    {"name": "finale", "start": 56.0, "end": 58.0},
 ]
 
 FULL_CAPTIONS = [
