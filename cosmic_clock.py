@@ -102,7 +102,18 @@ for d in (OUTPUT_ROOT, DATA_ROOT, PREVIEW_DIR):
     d.mkdir(parents=True, exist_ok=True)
 
 CONFIG: Dict[str, Any] = {
-
+    "video_width": 540 if QUICK_MODE else 1080,
+    "video_height": 960 if QUICK_MODE else 1920,
+    "fps": 6 if QUICK_MODE else 24,
+    "duration_s": 12.0 if QUICK_MODE else 58.0,
+    "title": "HOW DOES A COSMIC CLOCK WORK?",
+    "subtitle": "PULSAR TIMING // HACKRF ONE LAB SIMULATION",
+    "output_basename": "how_cosmic_clock_works",
+    "sample_rate_audio": 22050 if QUICK_MODE else 44100,
+    "grain_strength": 3.0,
+    "contrast": 1.10,
+    "saturation": 1.06,
+    "vignette": 0.34,
 }
 
 OUT_W = int(CONFIG["video_width"])
