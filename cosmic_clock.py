@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 """
+output : https://youtube.com/shorts/RB2DhhnLaMg
 HOW DOES A COSMIC CLOCK WORK? — cinematic YouTube Shorts renderer + HackRF One pulsar demo
 
 Concept
