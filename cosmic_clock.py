@@ -700,4 +700,37 @@ def render_video(scene: CosmicClockScene) -> Path:
 # Main
 # -----------------------------------------------------------------------------
 
+def main():
+    csv_path,json_path=save_timing_products()
+    iq_path=generate_hackrf_iq()
+
+    print("Title:",CONFIG["title"])
+    print("Timing CSV:",csv_path.resolve())
+    print("Summary:",json_path.resolve())
+    print("HackRF IQ:",iq_path.resolve())
+    print("IQ format: interleaved signed int8 I,Q (.cs8)")
+    print("LAB ONLY: use coax + external attenuation; do not attach a TX antenna.")
+
+    if IQ_ONLY:
+        print("IQ-only mode requested; skipping video render.")
+        return
+
+    scene=CosmicClockScene()
+    preview_times=[
+        1.4,
+        min(9.0,float(CONFIG["duration_s"])*0.20),
+        min(20.0,float(CONFIG["duration_s"])*0.38),
+        min(32.0,float(CONFIG["duration_s"])*0.57),
+        min(43.0,float(CONFIG["duration_s"])*0.76),
+        float(CONFIG["duration_s"])-0.7,
+    ]
+    for pt in tqdm(preview_times,desc="Preview frames"):
+        Image.fromarray(scene.render_frame(float(pt))).save(PREVIEW_DIR/f"preview_{int(pt):02d}s.png")
+
+    srt=write_srt(CAPTIONS,OUTPUT_ROOT/(CONFIG["output_basename"]+".srt"))
+    final=render_video(scene)
+    print("SRT:",srt.resolve())
+    print("Final video:",final.resolve())
+    print("Output directory:",OUTPUT_ROOT.resolve())
+
 
