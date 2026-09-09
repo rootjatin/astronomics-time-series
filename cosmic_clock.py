@@ -734,3 +734,5 @@ def main():
     print("Output directory:",OUTPUT_ROOT.resolve())
 
 
+if __name__=="__main__":
+    main()
