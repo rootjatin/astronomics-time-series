@@ -29,7 +29,21 @@ Force offline fixture
 ---------------------
     SPACE_DEBRIS_OFFLINE=1 python space_debris_youtube_short.py
 
+REAL DATA
+---------
+Primary live source: CelesTrak SATCAT CSV.
+The script filters current on-orbit records whose OBJECT_TYPE is DEBRIS, then uses
+real catalog metadata such as NORAD catalog number, launch date, inclination,
+perigee and apogee. The particles shown are a cinematic geocentric projection of
+those real orbital parameters; they are NOT precise propagated sky positions.
 
+Reference context shown in the video comes from ESA Space Debris Environment
+Statistics, last updated 31 July 2026:
+- ~46,590 regularly tracked space objects
+- 54,000 modeled objects >10 cm
+- 1.2 million debris objects 1–10 cm
+- 140 million debris objects 1 mm–1 cm
+Those modeled totals include objects too small to appear in SATCAT.
 
 Outputs
 -------
