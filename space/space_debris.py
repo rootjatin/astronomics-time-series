@@ -930,5 +930,30 @@ def render_video(scene: DebrisScene) -> Path:
     print("Audio mux unavailable; copied silent video to:",final.resolve())
     return final
 
+def main():
+    print("SPACE DEBRIS YouTube Short")
+    print("Loading CelesTrak SATCAT debris records ...")
+    records,source,notes,cache=load_debris()
+    summary=summarize(records,source)
+    csv_path,json_path=save_data(records,summary,notes)
+    print("Data source:",source)
+    print("Catalogued debris loaded:",f"{len(records):,}")
+    print("Regimes:",summary["regime_counts"])
+    print("CSV:",csv_path.resolve())
+    print("Summary:",json_path.resolve())
+    if cache:
+        print("Cache:",cache.resolve())
+    for n in notes:
+        print("Data note:",n)
+
+    scene=DebrisScene(records,summary)
+    preview_times=[1.2,min(10.0,float(CONFIG["duration_s"])*0.23),min(28.0,float(CONFIG["duration_s"])*0.49),min(38.0,float(CONFIG["duration_s"])*0.67),min(47.0,float(CONFIG["duration_s"])*0.82),float(CONFIG["duration_s"])-0.6]
+    for t in tqdm(preview_times,desc="Preview frames"):
+        Image.fromarray(scene.render_frame(float(t))).save(PREVIEW_DIR/f"preview_{int(t):02d}s.png")
+    render_video(scene)
+    print("Output directory:",OUTPUT_ROOT.resolve())
+
+
+
 
 
