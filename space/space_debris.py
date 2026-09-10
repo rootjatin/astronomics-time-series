@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 """
+output : https://youtube.com/shorts/ZnfC6CTckAk?feature=share
 SPACE DEBRIS — cinematic YouTube Shorts renderer
 
 Creates a vertical 1080x1920 data-driven short about catalogued orbital debris.
