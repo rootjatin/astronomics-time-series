@@ -145,7 +145,13 @@ COLORS = {
 }
 
 FULL_SHOT_PLAN = [
-
+    {"name": "opening", "start": 0.0, "end": 6.0},
+    {"name": "catalog_cloud", "start": 6.0, "end": 24.0},
+    {"name": "altitude_bands", "start": 24.0, "end": 34.0},
+    {"name": "families", "start": 34.0, "end": 43.0},
+    {"name": "scale_gap", "start": 43.0, "end": 51.0},
+    {"name": "all_debris", "start": 51.0, "end": 56.0},
+    {"name": "finale", "start": 56.0, "end": 58.0},
 ]
 
 FULL_CAPTIONS = [
