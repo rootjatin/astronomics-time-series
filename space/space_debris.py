@@ -178,7 +178,13 @@ SATCAT_QUERY_FALLBACKS = [
     "https://www.celestrak.org/pub/satcat.csv",
 ]
 ESA_STATS = {
-
+    "as_of": "2026-07-31",
+    "tracked_space_objects_about": 46590,
+    "modeled_gt_10cm": 54000,
+    "modeled_1cm_to_10cm": 1_200_000,
+    "modeled_1mm_to_1cm": 140_000_000,
+    "fragmentation_events_more_than": 660,
+    "mass_tonnes_more_than": 17000,
 }
 
 
