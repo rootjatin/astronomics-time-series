@@ -155,7 +155,13 @@ FULL_SHOT_PLAN = [
 ]
 
 FULL_CAPTIONS = [
-
+    (0.4, 5.7, "Space around Earth is filled with human-made debris."),
+    (6.2, 23.7, "These points come from catalogued debris records, using real orbital altitude and inclination data."),
+    (24.2, 33.7, "Most tracked debris is concentrated in low Earth orbit, but fragments also occupy higher orbital bands."),
+    (34.2, 42.7, "Some breakup and collision events created large families of fragments that remain in orbit for years."),
+    (43.2, 50.7, "The tracked catalogue is only the visible part of the problem. Smaller debris is far more numerous."),
+    (51.2, 55.7, "Every dot here represents a catalogued debris object loaded by this render."),
+    (56.1, 57.8, "Space debris. Thousands tracked. Millions more estimated."),
 ]
 
 if QUICK_MODE:
