@@ -173,8 +173,13 @@ if QUICK_MODE:
 else:
     CAPTIONS = FULL_CAPTIONS
 
-SHOT_PLAN = [
-
+FULL_CAPTIONS = [
+    (0.5, 7.2, "James Webb does not scan the whole sky. It turns toward carefully selected targets, one programme at a time."),
+    (7.3, 17.2, "Every dot here is a public JWST science observation record from MAST, placed at its real sky coordinates."),
+    (17.3, 27.2, "The pattern is deliberately uneven. Bright knots are places Webb revisited for deep fields, mosaics, spectra, or monitoring."),
+    (27.3, 38.8, "Play the archive in time and Webb's footprint grows: target after target, visit after visit, across the infrared sky."),
+    (38.9, 49.6, "Colour separates the instruments: NIRCam, NIRSpec, MIRI, NIRISS, and the fine-guidance system's science records."),
+    (49.7, 57.4, "This is where the James Webb Space Telescope looked: not a finished atlas, but a living map that keeps growing."),
 ]
 
 
