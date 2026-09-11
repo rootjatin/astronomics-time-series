@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 """
+output : https://www.youtube.com/shorts/q13tLOl4b4c
 Where the James Webb Telescope Looked — cinematic YouTube Short renderer
 
 Creates a vertical 1080x1920 astronomy short from public James Webb Space
