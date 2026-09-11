@@ -113,7 +113,26 @@ for directory in (OUTPUT_ROOT, DATA_ROOT, PREVIEW_DIR):
 MAST_INVOKE_URL = "https://mast.stsci.edu/api/v0/invoke"
 
 CONFIG: Dict[str, Any] = {
-
+    "video_width": 540 if QUICK_MODE else 1080,
+    "video_height": 960 if QUICK_MODE else 1920,
+    "fps": 6 if QUICK_MODE else 24,
+    "duration_s": 12 if QUICK_MODE else 58,
+    "output_basename": "where_the_james_webb_telescope_looked",
+    "title": "WHERE THE JAMES WEBB TELESCOPE LOOKED",
+    "subtitle": "public JWST observations // MAST archive // real sky coordinates",
+    "data_timeout_s": 45,
+    "mast_page_size": 1500 if QUICK_MODE else 5000,
+    "mast_max_pages": 4 if QUICK_MODE else 30,
+    "max_archive_rows": 6000 if QUICK_MODE else 50000,
+    "max_render_points": 2200 if QUICK_MODE else 9000,
+    "fixture_rows": 3200 if QUICK_MODE else 15000,
+    "background_stars": 280 if QUICK_MODE else 520,
+    "hud_noise": 32 if QUICK_MODE else 66,
+    "contrast": 1.08,
+    "saturation": 1.06,
+    "vignette": 0.25,
+    "density_cell_lon_deg": 6.0,
+    "density_cell_lat_deg": 6.0,
 }
 
 OUT_W = int(CONFIG["video_width"])
