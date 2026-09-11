@@ -142,6 +142,18 @@ SQRT2 = math.sqrt(2.0)
 MJD_EPOCH = datetime(1858, 11, 17, tzinfo=timezone.utc)
 
 COLORS = {
+    "ice": (146, 224, 255),
+    "cyan": (76, 229, 255),
+    "blue": (72, 131, 255),
+    "violet": (185, 110, 255),
+    "gold": (255, 193, 89),
+    "rose": (255, 99, 157),
+    "green": (105, 242, 179),
+    "orange": (255, 145, 77),
+    "white": (245, 250, 255),
+    "muted": (157, 203, 226),
+    "dark": (3, 7, 17),
+}
 
 
 INSTRUMENT_COLORS: Dict[str, Tuple[int, int, int]] = {
