@@ -14,8 +14,6 @@ Preferred live source
 MAST observation service:
     https://mast.stsci.edu/api/v0/invoke
 
-
-
 The renderer queries Mast.Caom.Filtered for public JWST science observations
 and uses archive-level metadata including:
 
@@ -155,7 +153,6 @@ COLORS = {
     "dark": (3, 7, 17),
 }
 
-
 INSTRUMENT_COLORS: Dict[str, Tuple[int, int, int]] = {
     "NIRCAM": COLORS["cyan"],
     "NIRSPEC": COLORS["violet"],
@@ -166,20 +163,26 @@ INSTRUMENT_COLORS: Dict[str, Tuple[int, int, int]] = {
 }
 
 FULL_CAPTIONS = [
-       ]
-if QUICK_MODE:
-    _caption_scale = float(CONFIG["duration_s"]) / 58.0
-    CAPTIONS = [(a * _caption_scale, b * _caption_scale, text) for a, b, text in FULL_CAPTIONS]
-else:
-    CAPTIONS = FULL_CAPTIONS
-
-FULL_CAPTIONS = [
     (0.5, 7.2, "James Webb does not scan the whole sky. It turns toward carefully selected targets, one programme at a time."),
     (7.3, 17.2, "Every dot here is a public JWST science observation record from MAST, placed at its real sky coordinates."),
     (17.3, 27.2, "The pattern is deliberately uneven. Bright knots are places Webb revisited for deep fields, mosaics, spectra, or monitoring."),
     (27.3, 38.8, "Play the archive in time and Webb's footprint grows: target after target, visit after visit, across the infrared sky."),
     (38.9, 49.6, "Colour separates the instruments: NIRCam, NIRSpec, MIRI, NIRISS, and the fine-guidance system's science records."),
     (49.7, 57.4, "This is where the James Webb Space Telescope looked: not a finished atlas, but a living map that keeps growing."),
+]
+if QUICK_MODE:
+    _caption_scale = float(CONFIG["duration_s"]) / 58.0
+    CAPTIONS = [(a * _caption_scale, b * _caption_scale, text) for a, b, text in FULL_CAPTIONS]
+else:
+    CAPTIONS = FULL_CAPTIONS
+
+SHOT_PLAN = [
+    {"name": "intro", "start": 0.0, "end": 7.8 if not QUICK_MODE else 1.65},
+    {"name": "all_sky", "start": 7.8 if not QUICK_MODE else 1.65, "end": 18.5 if not QUICK_MODE else 3.85},
+    {"name": "density", "start": 18.5 if not QUICK_MODE else 3.85, "end": 29.0 if not QUICK_MODE else 6.05},
+    {"name": "timeline", "start": 29.0 if not QUICK_MODE else 6.05, "end": 40.5 if not QUICK_MODE else 8.4},
+    {"name": "instruments", "start": 40.5 if not QUICK_MODE else 8.4, "end": 50.5 if not QUICK_MODE else 10.45},
+    {"name": "finale", "start": 50.5 if not QUICK_MODE else 10.45, "end": float(CONFIG["duration_s"])},
 ]
 
 
@@ -1586,4 +1589,44 @@ def render_video(scene: JWSTLookedScene) -> Path:
     return final_video
 
 
+def main():
+    print("Loading public JWST observation metadata ...")
+    frame, source, notes, requests_used = load_all_data()
+    print("Transforming coordinates and analysing archive density ...")
+    frame, density, targets, summary = prepare_observations(frame)
+    catalogue_path, summary_path = save_data_products(frame, density, targets, summary, notes, requests_used)
+    create_scientific_plots(frame, density, summary)
 
+    print("Data source:", source)
+    print("Observation records:", f"{summary['observation_records']:,}")
+    print("Unique target names:", f"{summary['unique_targets']:,}")
+    print("Unique programmes:", f"{summary['unique_programmes']:,}")
+    print("Observation span:", summary["date_start"], "to", summary["date_end"])
+    for instrument, count in summary["instrument_counts"].items():
+        print(f"Instrument {instrument}: {count:,}")
+    for note in notes:
+        print("Data note:", note)
+    print("Data:", catalogue_path.resolve())
+    print("Summary:", summary_path.resolve())
+
+    scene = JWSTLookedScene(frame, density, targets, summary)
+    preview_times = [
+        1.0,
+        min(10.0, float(CONFIG["duration_s"]) * 0.20),
+        min(22.0, float(CONFIG["duration_s"]) * 0.39),
+        min(34.0, float(CONFIG["duration_s"]) * 0.60),
+        min(45.0, float(CONFIG["duration_s"]) * 0.79),
+        float(CONFIG["duration_s"]) - 1.0,
+    ]
+    for preview_time in tqdm(preview_times, desc="Preview frames"):
+        Image.fromarray(scene.render_frame(float(preview_time))).save(
+            PREVIEW_DIR / f"preview_{int(preview_time):02d}s.png"
+        )
+    render_video(scene)
+    print("Output directory:", OUTPUT_ROOT.resolve())
+    for path in sorted(OUTPUT_ROOT.glob("*")):
+        print("-", path.name)
+
+
+if __name__ == "__main__":
+    main()
