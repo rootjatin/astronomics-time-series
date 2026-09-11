@@ -157,7 +157,12 @@ COLORS = {
 
 
 INSTRUMENT_COLORS: Dict[str, Tuple[int, int, int]] = {
-
+    "NIRCAM": COLORS["cyan"],
+    "NIRSPEC": COLORS["violet"],
+    "MIRI": COLORS["rose"],
+    "NIRISS": COLORS["gold"],
+    "FGS": COLORS["green"],
+    "OTHER": COLORS["ice"],
 }
 
 FULL_CAPTIONS = [
