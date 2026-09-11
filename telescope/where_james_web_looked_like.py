@@ -9,6 +9,11 @@ Telescope observation metadata in the Mikulski Archive for Space Telescopes
 where Webb returned repeatedly, plays the observations in time, and colours the
 pointings by science instrument.
 
+Preferred live source
+---------------------
+MAST observation service:
+    https://mast.stsci.edu/api/v0/invoke
+
 
 
 The renderer queries Mast.Caom.Filtered for public JWST science observations
