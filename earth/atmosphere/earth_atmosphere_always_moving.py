@@ -206,7 +206,14 @@ FULL_SHOT_PLAN = [
 ]
 
 FULL_CAPTIONS = [
-
+    (0.4, 5.5, "The atmosphere is never still."),
+    (6.0, 15.2, "Near the surface, wind bends around pressure systems, terrain, friction, and coastlines."),
+    (15.8, 24.7, "Higher up, the flow changes. At seven hundred hectopascals, broad weather systems become easier to see."),
+    (25.3, 34.2, "Near five hundred hectopascals, huge waves steer much of the weather below."),
+    (34.8, 43.7, "Around two hundred fifty hectopascals, the fastest currents form the upper-level jet-stream corridors."),
+    (44.3, 51.2, "These layers are moving at the same time, at different speeds and in different directions."),
+    (51.8, 55.7, "Stack them together and the atmosphere becomes a deep, moving fluid instead of a flat weather map."),
+    (56.1, 57.8, "One planet. Many layers. Always moving."),
 ]
 
 if QUICK_MODE:
