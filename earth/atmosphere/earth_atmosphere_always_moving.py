@@ -179,7 +179,19 @@ OUT_SIZE = (OUT_W, OUT_H)
 SCALE = OUT_W / 1080.0
 
 COLORS = {
-
+    "bg_top": (2, 10, 22),
+    "bg_bottom": (0, 2, 8),
+    "land": (14, 27, 35),
+    "land_edge": (74, 105, 119),
+    "grid": (72, 119, 137),
+    "white": (246, 250, 252),
+    "muted": (155, 187, 201),
+    "cyan": (61, 215, 239),
+    "green": (66, 224, 183),
+    "yellow": (249, 209, 89),
+    "orange": (255, 125, 75),
+    "magenta": (235, 92, 207),
+    "dark": (1, 4, 11),
 }
 
 FULL_SHOT_PLAN = [
