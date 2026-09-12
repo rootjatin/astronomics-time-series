@@ -151,7 +151,26 @@ for directory in (OUTPUT_ROOT, DATA_ROOT, CACHE_ROOT, PREVIEW_DIR):
     directory.mkdir(parents=True, exist_ok=True)
 
 CONFIG: Dict[str, Any] = {
-
+    "video_width": 540 if QUICK_MODE else 1080,
+    "video_height": 960 if QUICK_MODE else 1920,
+    "fps": 6 if QUICK_MODE else 24,
+    "duration_s": 12.0 if QUICK_MODE else 58.0,
+    "title": "THE ATMOSPHERE IS ALWAYS MOVING",
+    "subtitle": "GLOBAL DAILY-MEAN WIND // 1000 · 700 · 500 · 250 HPA",
+    "output_basename": "the_atmosphere_is_always_moving",
+    "map_margin_x": 20 if QUICK_MODE else 40,
+    "map_top": 140 if QUICK_MODE else 280,
+    "map_bottom": 675 if QUICK_MODE else 1350,
+    "stream_seed_spacing_lon": 36 if QUICK_MODE else 22,
+    "stream_step_count": 10 if QUICK_MODE else 18,
+    "tracer_count_per_level": 26 if QUICK_MODE else 72,
+    "star_count": 80 if QUICK_MODE else 190,
+    "dust_count": 40 if QUICK_MODE else 110,
+    "grain_strength": 3.0,
+    "contrast": 1.10,
+    "saturation": 1.08,
+    "vignette": 0.34,
+    "sample_rate": 22050 if QUICK_MODE else 44100,
 }
 
 OUT_W = int(CONFIG["video_width"])
