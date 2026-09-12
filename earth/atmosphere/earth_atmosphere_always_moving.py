@@ -195,7 +195,14 @@ COLORS = {
 }
 
 FULL_SHOT_PLAN = [
-
+    {"name": "opening", "start": 0.0, "end": 5.8},
+    {"name": "surface", "start": 5.8, "end": 15.5},
+    {"name": "lower_mid", "start": 15.5, "end": 25.0},
+    {"name": "mid", "start": 25.0, "end": 34.5},
+    {"name": "upper", "start": 34.5, "end": 44.0},
+    {"name": "stack", "start": 44.0, "end": 51.5},
+    {"name": "all_layers", "start": 51.5, "end": 56.0},
+    {"name": "finale", "start": 56.0, "end": 58.0},
 ]
 
 FULL_CAPTIONS = [
