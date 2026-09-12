@@ -8,6 +8,16 @@ four pressure levels: 1000, 700, 500, and 250 hPa. The intent is to show that
 "the wind" is not one layer: the atmosphere is moving differently from near the
 surface through the mid-troposphere and into the upper-level jet-stream region.
 
+The production pattern mirrors the supplied Shorts renderers:
+- archived public data first
+- cached data second
+- deterministic synthetic fixture third
+- quick-preview mode
+- preview PNGs
+- CSV / JSON data products
+- SRT captions
+- generated ambient soundtrack
+- final MP4 when ffmpeg is available
 
 Pressure levels shown:
 - 1000 hPa : near-surface / lower troposphere
