@@ -56,7 +56,12 @@ Outputs
 - JSON summary and source notes
 - cached NOAA U/V NetCDF subsets
 
-
+Sources
+-------
+- NOAA PSL NCEP/NCAR Reanalysis:
+  https://psl.noaa.gov/data/reanalysis/reanalysis.shtml
+- NOAA PSL THREDDS daily pressure-level files:
+  https://psl.noaa.gov/thredds/catalog/Datasets/ncep.reanalysis/Dailies/pressure/catalog.html
 """
 
 import json
