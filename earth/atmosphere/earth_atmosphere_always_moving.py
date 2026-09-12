@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 """
+output : https://youtube.com/shorts/U1LfxVHtS5o?feature=share
+
 THE ATMOSPHERE IS ALWAYS MOVING — cinematic YouTube Shorts renderer
 
 Creates a vertical 1080x1920 data-driven short that reveals horizontal wind at
