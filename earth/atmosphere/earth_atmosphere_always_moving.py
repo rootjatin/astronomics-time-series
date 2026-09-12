@@ -19,6 +19,13 @@ The production pattern mirrors the supplied Shorts renderers:
 - generated ambient soundtrack
 - final MP4 when ffmpeg is available
 
+REAL DATA
+---------
+Primary source: NOAA Physical Sciences Laboratory, NCEP/NCAR Reanalysis 1 daily
+pressure-level U/V wind. The default date is 17 March 2026, the final date noted
+by NOAA PSL for NCEP/NCAR Reanalysis 1 production in the supplied jet-stream
+renderer. This script therefore labels the data as ARCHIVED, not live/current.
+
 Pressure levels shown:
 - 1000 hPa : near-surface / lower troposphere
 - 700 hPa  : lower-mid troposphere (~3 km guide)
@@ -1269,4 +1276,44 @@ def render_video(scene: AtmosphereScene) -> Path:
 # -----------------------------------------------------------------------------
 # Main
 # -----------------------------------------------------------------------------
+
+def main():
+    print("Title:", CONFIG["title"])
+    print("Requested archived date:", TARGET_DATE.isoformat())
+    print("Pressure levels:", ", ".join(f"{x} hPa" for x in PRESSURE_LEVELS))
+    print("Loading global pressure-level U/V wind ...")
+    data = load_atmosphere()
+    stats = compute_level_stats(data)
+    csv_path, summary_path = save_data_products(data, stats)
+
+    print("Data source:", data.source)
+    print("Actual date:", data.when.isoformat())
+    print("Grid:", len(data.lat), "lat x", len(data.lon), "lon")
+    for s in stats:
+        print(f"{s.level_hpa:4d} hPa: max {s.max_ms:5.1f} m/s, mean {s.mean_ms:4.1f} m/s")
+    print("CSV:", csv_path.resolve())
+    print("Summary:", summary_path.resolve())
+    for note in data.notes:
+        print("Data note:", note)
+
+    scene = AtmosphereScene(data, stats)
+    preview_times = [
+        1.5,
+        min(9.0, float(CONFIG["duration_s"]) * 0.17),
+        min(20.0, float(CONFIG["duration_s"]) * 0.35),
+        min(31.0, float(CONFIG["duration_s"]) * 0.53),
+        min(40.0, float(CONFIG["duration_s"]) * 0.69),
+        min(47.0, float(CONFIG["duration_s"]) * 0.81),
+        min(54.0, float(CONFIG["duration_s"]) * 0.93),
+        float(CONFIG["duration_s"]) - 0.7,
+    ]
+    for preview_time in tqdm(preview_times, desc="Preview frames"):
+        frame = scene.render_frame(float(preview_time))
+        Image.fromarray(frame).save(PREVIEW_DIR / f"preview_{int(preview_time):02d}s.png")
+
+    render_video(scene)
+    print("Output directory:", OUTPUT_ROOT.resolve())
+    for path in sorted(OUTPUT_ROOT.glob("*")):
+        print("-", path.name)
+
 
