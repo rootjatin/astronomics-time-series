@@ -1074,5 +1074,24 @@ def render_video(scene: EyeScene) -> Path:
     print("Final video (silent fallback):",final.resolve())
     return final
 
+def main():
+    print("Building Hurricane Milton eye-formation sequence ...")
+    frames, source, notes = build_frames()
+    print("Data mode:",source)
+    print("Satellite frames:",len(frames))
+    for note in notes: print("Data note:",note)
+    csv_path, summary_path = save_data_products(frames,source,notes)
+    print("CSV:",csv_path.resolve())
+    print("Summary:",summary_path.resolve())
+    scene=EyeScene(frames,source)
+    preview_times=[1.0,min(8.0,float(CONFIG["duration_s"])*0.23),min(23.0,float(CONFIG["duration_s"])*0.43),min(38.0,float(CONFIG["duration_s"])*0.68),float(CONFIG["duration_s"])-0.7]
+    for pt in tqdm(preview_times,desc="Preview frames"):
+        Image.fromarray(scene.render_frame(float(pt))).save(PREVIEW_DIR/f"preview_{int(pt):02d}s.png")
+    render_video(scene)
+    print("Output directory:",OUTPUT_ROOT.resolve())
+    for path in sorted(OUTPUT_ROOT.glob("*")): print("-",path.name)
 
+
+if __name__ == "__main__":
+    main()
 
