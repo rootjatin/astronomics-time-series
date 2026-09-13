@@ -40,6 +40,13 @@ very cold central cloud cover and that the eye was becoming better defined;
 Mexican radar showed a small closed eye and intense eyewall.
 NHC Discussion 11 (2100 UTC) said the small eye had become even more distinct.
 
+TUNING
+------
+    EYE_SHORT_QUICK=1          540x960, 6 fps, 12-second preview
+    EYE_SHORT_OFFLINE=1        skip NOAA download and use deterministic fallback
+    EYE_SHORT_NO_AUDIO=1       skip generated soundtrack mux
+    EYE_MAX_FRAMES=6           maximum historical GOES frames to fetch
+    EYE_SATELLITE_DIR=/path    optional local chronological images instead
 
 Recommended install
 -------------------
@@ -55,6 +62,15 @@ Outputs
 - JSON summary/source notes
 - cached NOAA GOES-16 Band 13 NetCDF files when live retrieval succeeds
 
+Primary references
+------------------
+- NHC Milton archive: https://www.nhc.noaa.gov/archive/2024/MILTON.shtml
+- NHC Discussion 8: https://www.nhc.noaa.gov/archive/2024/al14/al142024.discus.008.shtml
+- NHC Discussion 10: https://www.nhc.noaa.gov/archive/2024/al14/al142024.discus.010.shtml
+- NHC Discussion 11: https://www.nhc.noaa.gov/archive/2024/al14/al142024.discus.011.shtml
+- NOAA GOES-16 public archive: https://noaa-goes16.s3.amazonaws.com/
+- NOAA/NESDIS Milton satellite feature:
+  https://www.nesdis.noaa.gov/news/hurricane-milton-eyes-florida
 """
 
 import json
@@ -134,7 +150,40 @@ OUT_W = int(CONFIG["video_width"])
 OUT_H = int(CONFIG["video_height"])
 OUT_SIZE = (OUT_W, OUT_H)
 
+COLORS = {
+    "black": (1, 3, 7),
+    "navy": (4, 9, 18),
+    "panel": (5, 12, 23),
+    "grid": (80, 126, 158),
+    "white": (246, 249, 253),
+    "muted": (157, 190, 211),
+    "cyan": (71, 230, 255),
+    "blue": (77, 135, 255),
+    "violet": (176, 93, 255),
+    "magenta": (247, 89, 220),
+    "yellow": (255, 225, 92),
+    "orange": (255, 153, 67),
+    "red": (255, 74, 70),
+    "green": (102, 233, 174),
+}
 
+FULL_SHOT_PLAN = [
+    {"name": "opening", "start": 0.0, "end": 7.0},
+    {"name": "ragged", "start": 7.0, "end": 18.0},
+    {"name": "eyewall", "start": 18.0, "end": 31.0},
+    {"name": "eye_opens", "start": 31.0, "end": 44.0},
+    {"name": "defined", "start": 44.0, "end": 54.5},
+    {"name": "compare", "start": 54.5, "end": 58.0},
+]
+
+FULL_CAPTIONS = [
+    (0.4, 6.7, "These are infrared satellite observations of Hurricane Milton on October 7, 2024, centered using National Hurricane Center positions."),
+    (7.2, 17.6, "Early that morning, NHC described a small ragged eye inside a central dense overcast with cloud tops colder than minus eighty Celsius."),
+    (18.2, 30.6, "As the inner core organizes, very cold cloud tops wrap more completely around a warmer center. That ring is the eyewall."),
+    (31.2, 43.6, "The warm opening becomes cleaner and more circular. Our simple thermal contrast compares the eye with the colder surrounding eyewall."),
+    (44.2, 54.1, "By 1500 UTC, NHC said the small eye was becoming better defined. Later that day it became even more distinct as Milton reached Category 5 intensity."),
+    (54.7, 57.8, "A ragged warm spot becomes a sharply bounded eye — visible directly in the infrared temperature field."),
+]
 
 if QUICK_MODE:
     scale = float(CONFIG["duration_s"]) / 58.0
@@ -1024,4 +1073,6 @@ def render_video(scene: EyeScene) -> Path:
     shutil.copyfile(raw,final)
     print("Final video (silent fallback):",final.resolve())
     return final
+
+
 
