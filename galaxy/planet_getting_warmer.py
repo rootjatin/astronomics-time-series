@@ -740,3 +740,16 @@ def render_video(scene:WarmingPixelsScene)->Path:
     if mux_audio(raw,audio,final): print("Final video with audio:",final.resolve()); return final
     shutil.copyfile(raw,final); print("ffmpeg audio mux unavailable; copied silent video to:",final.resolve()); return final
 
+def main():
+    print("Title:",CONFIG["title"]); print("Loading NASA GISTEMP annual grid ...")
+    data=load_temperature_data(); stats=compute_stats(data); csv_path,json_path=save_data_products(data,stats)
+    print("Data source:",data.source); print("Years:",int(data.years[0]),"to",int(data.years[-1])); print("Grid:",len(data.lat),"lat x",len(data.lon),"lon")
+    print("Latest global anomaly:",f"{stats[-1].global_mean_c:+.2f}°C"); print("CSV:",csv_path.resolve()); print("Summary:",json_path.resolve())
+    for note in data.notes: print("Data note:",note)
+    scene=WarmingPixelsScene(data,stats)
+    preview_times=[1.3,min(12.0,float(CONFIG["duration_s"])*0.25),min(36.0,float(CONFIG["duration_s"])*0.62),min(45.0,float(CONFIG["duration_s"])*0.77),min(52.0,float(CONFIG["duration_s"])*0.89),float(CONFIG["duration_s"])-0.7]
+    for pt in tqdm(preview_times,desc="Preview frames"):
+        Image.fromarray(scene.render_frame(float(pt))).save(PREVIEW_DIR/f"preview_{int(pt):02d}s.png")
+    render_video(scene)
+    print("Output directory:",OUTPUT_ROOT.resolve())
+
