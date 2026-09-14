@@ -50,7 +50,11 @@ Outputs
 - JSON summary and source notes
 - cached NASA GISTEMP NetCDF
 
-
+Sources
+-------
+- NASA GISTEMP v4: https://data.giss.nasa.gov/gistemp/
+- Data downloads: https://data.giss.nasa.gov/gistemp/data_v4.html
+- Gridded NetCDF: https://data.giss.nasa.gov/pub/gistemp/gistemp1200_GHCNv4_ERSSTv5.nc.gz
 """
 
 import gzip
