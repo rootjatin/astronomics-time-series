@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 """
+output : https://youtube.com/shorts/3dvlEtT3AQU
+
 THE PLANET IS GETTING WARMER PIXEL BY PIXEL — cinematic YouTube Shorts renderer
 
 Creates a vertical 1080x1920 data-driven short showing global surface-temperature
