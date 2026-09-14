@@ -143,7 +143,12 @@ COLORS = {
 }
 
 FULL_SHOT_PLAN = [
-
+    {"name": "opening", "start": 0.0, "end": 5.5},
+    {"name": "timeline", "start": 5.5, "end": 34.5},
+    {"name": "decades", "start": 34.5, "end": 42.5},
+    {"name": "difference", "start": 42.5, "end": 49.0},
+    {"name": "latitude", "start": 49.0, "end": 55.5},
+    {"name": "finale", "start": 55.5, "end": 58.0},
 ]
 
 FULL_CAPTIONS = [
