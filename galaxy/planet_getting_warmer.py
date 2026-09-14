@@ -104,7 +104,21 @@ for directory in (OUTPUT_ROOT, DATA_ROOT, CACHE_ROOT, PREVIEW_DIR):
     directory.mkdir(parents=True, exist_ok=True)
 
 CONFIG: Dict[str, Any] = {
-
+    "video_width": 540 if QUICK_MODE else 1080,
+    "video_height": 960 if QUICK_MODE else 1920,
+    "fps": 6 if QUICK_MODE else 24,
+    "duration_s": 12.0 if QUICK_MODE else 58.0,
+    "title": "THE PLANET IS GETTING WARMER PIXEL BY PIXEL",
+    "subtitle": "NASA GISTEMP V4 // 2 DEGREE GRID // ANOMALY VS 1951-1980",
+    "output_basename": "the_planet_is_getting_warmer_pixel_by_pixel",
+    "map_margin_x": 22 if QUICK_MODE else 44,
+    "map_top": 150 if QUICK_MODE else 300,
+    "map_bottom": 660 if QUICK_MODE else 1320,
+    "grain_strength": 3.0,
+    "contrast": 1.08,
+    "saturation": 1.07,
+    "vignette": 0.34,
+    "sample_rate": 22050 if QUICK_MODE else 44100,
 }
 
 OUT_W = int(CONFIG["video_width"])
