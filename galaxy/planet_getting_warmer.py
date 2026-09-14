@@ -152,7 +152,12 @@ FULL_SHOT_PLAN = [
 ]
 
 FULL_CAPTIONS = [
-
+    (0.4, 5.2, "Every square is one part of the planet's temperature record."),
+    (5.8, 34.1, "These are annual surface-temperature anomalies on NASA GISTEMP's global grid, measured against the 1951 to 1980 average."),
+    (34.8, 42.1, "Move decade by decade and the balance of cool and warm pixels changes across the map."),
+    (42.8, 48.7, "Subtract the early climate from the recent climate and the long-term spatial pattern becomes unmistakable."),
+    (49.2, 55.2, "The warming is not uniform. High northern latitudes have changed especially strongly."),
+    (55.7, 57.8, "One planet. Thousands of pixels. A warming signal written across the map."),
 ]
 
 if QUICK_MODE:
