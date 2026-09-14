@@ -753,3 +753,5 @@ def main():
     render_video(scene)
     print("Output directory:",OUTPUT_ROOT.resolve())
 
+if __name__=="__main__":
+    main()
