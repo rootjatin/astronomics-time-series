@@ -168,6 +168,7 @@ else:
     SHOT_PLAN = FULL_SHOT_PLAN
     CAPTIONS = FULL_CAPTIONS
 
+GISTEMP_GZ_URL = "https://data.giss.nasa.gov/pub/gistemp/gistemp1200_GHCNv4_ERSSTv5.nc.gz"
 
 
 # -----------------------------------------------------------------------------
@@ -780,6 +781,11 @@ def render_video(scene:WarmingPixelsScene)->Path:
     if mux_audio(raw,audio,final): print("Final video with audio:",final.resolve()); return final
     shutil.copyfile(raw,final); print("ffmpeg audio mux unavailable; copied silent video to:",final.resolve()); return final
 
+
+# -----------------------------------------------------------------------------
+# Main
+# -----------------------------------------------------------------------------
+
 def main():
     print("Title:",CONFIG["title"]); print("Loading NASA GISTEMP annual grid ...")
     data=load_temperature_data(); stats=compute_stats(data); csv_path,json_path=save_data_products(data,stats)
@@ -792,6 +798,7 @@ def main():
         Image.fromarray(scene.render_frame(float(pt))).save(PREVIEW_DIR/f"preview_{int(pt):02d}s.png")
     render_video(scene)
     print("Output directory:",OUTPUT_ROOT.resolve())
+
 
 if __name__=="__main__":
     main()
