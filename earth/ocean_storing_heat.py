@@ -26,6 +26,13 @@ Production pattern intentionally matches the companion Shorts renderers:
 - generated ambient soundtrack
 - final MP4 when ffmpeg is available
 
+REAL DATA
+---------
+Primary series: NOAA/NCEI Global Ocean Heat and Salt Content, basin yearly time
+series for the World Ocean. The renderer requests both 0-700 m and 0-2000 m
+heat-content files and converts the published 10^22 joule units to zettajoules.
+The plotted values are rebased to the first common year so the animation shows
+change in stored heat across the record rather than absolute ocean heat.
 
 Scientific context:
 - NASA: about 90% of excess heat from planetary warming has been absorbed by the ocean.
@@ -58,7 +65,18 @@ Outputs
 - JSON summary and source notes
 - cached NOAA text files
 
-
+Sources
+-------
+- NOAA NCEI Global Ocean Heat and Salt Content:
+  https://www.ncei.noaa.gov/access/global-ocean-heat-content/
+- NOAA basin heat time series documentation:
+  https://www.ncei.noaa.gov/access/global-ocean-heat-content/basin_heat_data.html
+- NOAA 0-700 m yearly World Ocean series:
+  https://www.ncei.noaa.gov/data/oceans/woa/DATA_ANALYSIS/3M_HEAT_CONTENT/DATA/basin/yearly/h22-w0-700m.dat
+- NOAA 0-2000 m yearly World Ocean series:
+  https://www.ncei.noaa.gov/data/oceans/woa/DATA_ANALYSIS/3M_HEAT_CONTENT/DATA/basin/yearly/h22-w0-2000m.dat
+- NASA Ocean Warming indicator:
+  https://science.nasa.gov/earth/explore/earth-indicators/ocean-warming/
 """
 
 import io
@@ -100,7 +118,18 @@ for directory in (OUTPUT_ROOT, DATA_ROOT, CACHE_ROOT, PREVIEW_DIR):
     directory.mkdir(parents=True, exist_ok=True)
 
 CONFIG: Dict[str, Any] = {
-
+    "video_width": 540 if QUICK_MODE else 1080,
+    "video_height": 960 if QUICK_MODE else 1920,
+    "fps": 6 if QUICK_MODE else 24,
+    "duration_s": 12.0 if QUICK_MODE else 58.0,
+    "title": "THE OCEAN IS STORING THE HEAT",
+    "subtitle": "NOAA OCEAN HEAT CONTENT // SURFACE TO 2000 m",
+    "output_basename": "the_ocean_is_storing_the_heat",
+    "contrast": 1.08,
+    "saturation": 1.08,
+    "grain_strength": 2.6,
+    "vignette": 0.30,
+    "sample_rate": 22050 if QUICK_MODE else 44100,
 }
 
 OUT_W = int(CONFIG["video_width"])
@@ -128,13 +157,22 @@ COLORS = {
     "land2": (76, 103, 98),
 }
 
-
-
 FULL_SHOT_PLAN = [
-
+    {"name": "opening", "start": 0.0, "end": 7.2},
+    {"name": "timeline", "start": 7.2, "end": 23.8},
+    {"name": "depth", "start": 23.8, "end": 36.2},
+    {"name": "expansion", "start": 36.2, "end": 46.2},
+    {"name": "marine", "start": 46.2, "end": 54.1},
+    {"name": "finale", "start": 54.1, "end": 58.0},
 ]
 
 FULL_CAPTIONS: List[Tuple[float, float, str]] = [
+    (0.4, 7.0, "When Earth gains heat, most of it does not stay in the air. Around 90 percent of the excess heat is absorbed by the ocean."),
+    (7.4, 23.5, "NOAA's global record shows ocean heat content climbing. This line tracks the change in heat stored from the surface down to two thousand meters."),
+    (24.0, 35.9, "The warming is not just skin-deep. Heat is stored through the upper seven hundred meters and also in the layer from seven hundred to two thousand meters."),
+    (36.4, 45.9, "Warmer seawater expands. That thermal expansion raises sea level even before meltwater from glaciers and ice sheets is added."),
+    (46.4, 53.8, "Extra stored heat also raises the background for marine heatwaves, coral bleaching, and other stress on ocean ecosystems."),
+    (54.2, 57.8, "The atmosphere is where we feel warming quickly. The ocean is where most of the planet's excess heat is being stored."),
 ]
 
 if QUICK_MODE:
