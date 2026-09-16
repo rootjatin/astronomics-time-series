@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 """
-output : https://youtube.com/shorts/1g675ltD_kE?feature=share
+output : https://youtube.com/shorts/1g675ltD_kE
 
 The Strongest Winds Ever Measured in a Storm — cinematic YouTube Short renderer
 
