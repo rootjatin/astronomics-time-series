@@ -165,6 +165,12 @@ FULL_SHOT_PLAN = [
 ]
 
 FULL_CAPTIONS = [
+    (0.4, 6.7, "On a small island off Western Australia, one weather station recorded a wind gust so violent it would become a world record."),
+    (7.2, 18.6, "Tropical Cyclone Olivia was crossing the Pilbara region on April 10, 1996. The edge of the eye swept across Barrow Island."),
+    (19.3, 31.0, "As the eyewall arrived, the station's heavy-duty anemometer measured a series of extraordinary gusts. Then the trace surged beyond anything previously verified."),
+    (31.8, 43.0, "At 10:55 UTC, the instrument measured 113.2 meters per second — 253 miles per hour, or 408 kilometers per hour."),
+    (43.8, 53.0, "That number was a brief three-second gust, not Olivia's sustained wind. The cyclone itself was assessed at Australian Category 4 intensity."),
+    (53.7, 57.8, "The measurement was later formally verified by the World Meteorological Organization: the world-record surface wind gust."),
 ]
 
 if QUICK_MODE:
