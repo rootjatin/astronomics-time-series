@@ -111,8 +111,6 @@ CONFIG: Dict[str, Any] = {
     "vignette": 0.46,
 }
 
-
-
 OUT_W = int(CONFIG["video_width"])
 OUT_H = int(CONFIG["video_height"])
 OUT_SIZE = (OUT_W, OUT_H)
@@ -981,4 +979,30 @@ def render_video(scene: WindRecordScene) -> Path:
         return final_video
     shutil.copyfile(raw_video,final_video)
     return final_video
+
+
+def main():
+    csv_path, summary_path = save_data_products()
+    print("Story: Tropical Cyclone Olivia / Barrow Island")
+    print("Verified record gust: 113.2 m/s = 253 mph = 408 km/h")
+    print("CSV:", csv_path.resolve())
+    print("Summary:", summary_path.resolve())
+
+    scene = WindRecordScene()
+    preview_times = [
+        min(float(CONFIG["duration_s"])-0.5, x) for x in (
+            1.0,
+            float(CONFIG["duration_s"])*0.20,
+            float(CONFIG["duration_s"])*0.41,
+            float(CONFIG["duration_s"])*0.61,
+            float(CONFIG["duration_s"])*0.80,
+            float(CONFIG["duration_s"])-0.7,
+        )
+    ]
+    for pt in tqdm(preview_times,desc="Preview frames"):
+        Image.fromarray(scene.render_frame(float(pt))).save(PREVIEW_DIR/f"preview_{int(pt):02d}s.png")
+
+    final = render_video(scene)
+    print("Final video:", final.resolve())
+    print("Output directory:", OUTPUT_ROOT.resolve())
 
