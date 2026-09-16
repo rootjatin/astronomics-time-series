@@ -135,7 +135,18 @@ COLORS = {
 }
 
 RECORD = {
-
+    "gust_mps": 113.2,
+    "gust_kmh": 408.0,
+    "gust_mph": 253.0,
+    "gust_kt": 220.0,
+    "time_utc": "1996-04-10T10:55:00Z",
+    "location": "Barrow Island, Western Australia",
+    "latitude": -20.8167,
+    "longitude": 115.3833,
+    "instrument": "Heavy-duty three-cup Synchrotac anemometer",
+    "instrument_height_m": 10.0,
+    "station_elevation_m": 64.0,
+    "formal_wmo_review": "Verified by WMO review; record accepted in 2011 and documented in 2012",
 }
 
 OBSERVATIONS = [
