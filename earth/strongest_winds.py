@@ -182,7 +182,10 @@ else:
     CAPTIONS = FULL_CAPTIONS
 
 SOURCE_URLS = {
-
+    "wmo_record": "https://wmo.int/asu-map?map=Wind_028",
+    "wmo_records_table": "https://wmo.int/sites/default/files/2024-07/Table_Records_02Jul2024.pdf",
+    "bom_olivia": "https://www.bom.gov.au/cyclone/history/olivia.shtml",
+    "bom_olivia_wa": "https://www.bom.gov.au/cyclone/history/wa/olivia.shtml",
 }
 
 
