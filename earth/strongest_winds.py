@@ -50,6 +50,16 @@ Outputs
 - CSV of verified observation values used in the story
 - JSON summary and source notes
 
+Primary references
+------------------
+- WMO Archive of Weather and Climate Extremes — Maximum Surface Wind Gust:
+  https://wmo.int/asu-map?map=Wind_028
+- WMO records table (maximum gust: 113.2 m/s / 253 mph / 220 kt):
+  https://wmo.int/sites/default/files/2024-07/Table_Records_02Jul2024.pdf
+- Australian Bureau of Meteorology — Severe Tropical Cyclone Olivia:
+  https://www.bom.gov.au/cyclone/history/olivia.shtml
+- Bureau of Meteorology — Tropical Cyclone Olivia:
+  https://www.bom.gov.au/cyclone/history/wa/olivia.shtml
 """
 
 import json
