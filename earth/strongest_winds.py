@@ -156,7 +156,12 @@ OBSERVATIONS = [
 ]
 
 FULL_SHOT_PLAN = [
-
+    {"name": "cold_open", "start": 0.0, "end": 7.0},
+    {"name": "approach", "start": 7.0, "end": 19.0},
+    {"name": "eyewall", "start": 19.0, "end": 31.5},
+    {"name": "record", "start": 31.5, "end": 43.5},
+    {"name": "context", "start": 43.5, "end": 53.5},
+    {"name": "final", "start": 53.5, "end": 58.0},
 ]
 
 FULL_CAPTIONS = [
