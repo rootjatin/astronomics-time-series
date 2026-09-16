@@ -98,8 +98,20 @@ for directory in (OUTPUT_ROOT, DATA_ROOT, PREVIEW_DIR):
     directory.mkdir(parents=True, exist_ok=True)
 
 CONFIG: Dict[str, Any] = {
-
+    "video_width": 540 if QUICK_MODE else 1080,
+    "video_height": 960 if QUICK_MODE else 1920,
+    "fps": 6 if QUICK_MODE else 24,
+    "duration_s": 12.0 if QUICK_MODE else 58.0,
+    "output_basename": "the_strongest_winds_ever_measured_in_a_storm",
+    "title_1": "THE STRONGEST WINDS",
+    "title_2": "EVER MEASURED IN A STORM",
+    "subtitle": "TROPICAL CYCLONE OLIVIA // BARROW ISLAND // 10 APR 1996",
+    "soundtrack_sample_rate": 22050 if QUICK_MODE else 44100,
+    "grain_strength": 4.8,
+    "vignette": 0.46,
 }
+
+
 
 OUT_W = int(CONFIG["video_width"])
 OUT_H = int(CONFIG["video_height"])
