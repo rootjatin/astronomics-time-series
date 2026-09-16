@@ -150,7 +150,9 @@ RECORD = {
 }
 
 OBSERVATIONS = [
-
+    {"site": "Barrow Island", "gust_kmh": 408, "gust_mph": 253.0, "note": "WMO world-record 3-second gust"},
+    {"site": "Varanus Island", "gust_kmh": 267, "gust_mph": 165.9, "note": "Extreme gust measured during Olivia"},
+    {"site": "Mardie Station", "gust_kmh": 257, "gust_mph": 159.7, "note": "Extreme gust measured during Olivia"},
 ]
 
 FULL_SHOT_PLAN = [
