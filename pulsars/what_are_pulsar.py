@@ -917,3 +917,30 @@ def render_video(scene:PulsarScene)->Path:
     return final_video
 
 
+def main():
+    print("Title:",CONFIG["title_1"],CONFIG["title_2"])
+    print("Pulse profile:",PROFILE_SOURCE)
+    csv_path,json_path=save_data_products()
+    print("Facts CSV:",csv_path.resolve())
+    print("Summary JSON:",json_path.resolve())
+
+    scene=PulsarScene()
+    preview_times=[
+        1.2,
+        min(10.0,float(CONFIG["duration_s"])*0.22),
+        min(22.0,float(CONFIG["duration_s"])*0.42),
+        min(35.0,float(CONFIG["duration_s"])*0.64),
+        min(47.0,float(CONFIG["duration_s"])*0.82),
+        max(0.2,float(CONFIG["duration_s"])-0.7),
+    ]
+    for preview_time in tqdm(preview_times,desc="Preview frames"):
+        frame=scene.render_frame(float(preview_time))
+        Image.fromarray(frame).save(PREVIEW_DIR/f"preview_{int(preview_time):02d}s.png")
+    render_video(scene)
+    print("Output directory:",OUTPUT_ROOT.resolve())
+    for path in sorted(OUTPUT_ROOT.glob("*")):
+        print("-",path.name)
+
+
+if __name__=="__main__":
+    main()
