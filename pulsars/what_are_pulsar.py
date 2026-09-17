@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 """
+output : https://youtube.com/shorts/ZONSJxV-I2o?feature=share
+
 Understand What Pulsars Are — cinematic YouTube Short renderer
 
 A vertical 1080x1920 science explainer that visualizes why pulsars appear to
