@@ -50,6 +50,14 @@ Outputs
 - CSV of science facts used in the story
 - JSON summary and source notes
 
+Primary references
+------------------
+- NASA Science — Pulsars:
+  https://science.nasa.gov/mission/hubble/science/science-behind-the-discoveries/hubble-pulsars/
+- NASA Science — Fermi mission nets 300 gamma-ray pulsars:
+  https://science.nasa.gov/universe/stars/neutron-stars/pulsars/nasas-fermi-mission-nets-300-gamma-ray-pulsars-and-counting/
+- NASA Imagine the Universe — Neutron Stars / Pulsars:
+  https://imagine.gsfc.nasa.gov/science/objects/neutron_stars1.html
 """
 
 import csv
@@ -153,6 +161,9 @@ FACTS = [
 ]
 
 SOURCE_URLS = {
+    "nasa_pulsars": "https://science.nasa.gov/mission/hubble/science/science-behind-the-discoveries/hubble-pulsars/",
+    "nasa_fermi_pulsars": "https://science.nasa.gov/universe/stars/neutron-stars/pulsars/nasas-fermi-mission-nets-300-gamma-ray-pulsars-and-counting/",
+    "nasa_neutron_stars": "https://imagine.gsfc.nasa.gov/science/objects/neutron_stars1.html",
 }
 
 FULL_SHOT_PLAN = [
@@ -165,6 +176,12 @@ FULL_SHOT_PLAN = [
 ]
 
 FULL_CAPTIONS = [
+    (0.4, 6.2, "A pulsar looks like a star that switches on and off with impossible precision. But the star itself is not blinking."),
+    (6.8, 16.6, "A massive star can explode and leave behind a neutron star: a city-sized object with more mass than the Sun packed into an extraordinarily small volume."),
+    (17.3, 30.6, "If the neutron star spins rapidly and its magnetic axis is tilted, beams of radiation sweep through space like a lighthouse."),
+    (31.3, 42.1, "Each time a beam crosses our line of sight, a telescope records a pulse. The pulse rate tells us how fast the neutron star is rotating."),
+    (42.8, 52.0, "Some pulsars spin hundreds of times every second. The fastest known, PSR J1748-2446ad, rotates 716 times per second."),
+    (52.8, 57.8, "So a pulsar is not a flashing star. It is a rotating neutron star whose beam repeatedly sweeps across Earth."),
 ]
 
 if QUICK_MODE:
@@ -898,6 +915,5 @@ def render_video(scene:PulsarScene)->Path:
     shutil.copyfile(raw_video,final_video)
     print("ffmpeg audio mux unavailable; copied silent video to:",final_video.resolve())
     return final_video
-
 
 
