@@ -130,7 +130,21 @@ for directory in [OUTPUT_ROOT, DATA_ROOT, PREVIEW_DIR]:
     directory.mkdir(parents=True, exist_ok=True)
 
 CONFIG: Dict[str, Any] = {
-
+    "video_width": 540 if QUICK_MODE else 1080,
+    "video_height": 960 if QUICK_MODE else 1920,
+    "fps": 6 if QUICK_MODE else 24,
+    "duration_s": 12.0 if QUICK_MODE else 58.0,
+    "output_basename": "watch_a_hurricane_become_category_5",
+    "title": "WATCH A HURRICANE",
+    "title_2": "BECOME A CATEGORY 5",
+    "subtitle": "HURRICANE MILTON // 06–07 OCT 2024 // NHC",
+    "panel_left": 22 if QUICK_MODE else 44,
+    "panel_top": 144 if QUICK_MODE else 288,
+    "panel_right": 518 if QUICK_MODE else 1036,
+    "panel_bottom": 704 if QUICK_MODE else 1408,
+    "soundtrack_sample_rate": 22050 if QUICK_MODE else 44100,
+    "grain_strength": 4.1,
+    "vignette": 0.38,
 }
 
 OUT_W = int(CONFIG["video_width"])
