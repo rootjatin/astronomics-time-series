@@ -178,6 +178,12 @@ FULL_SHOT_PLAN = [
 ]
 
 FULL_CAPTIONS = [
+    (0.4, 7.1, "This is Hurricane Milton, reconstructed from National Hurricane Center intensity and position data as it rapidly strengthens over the Gulf of Mexico."),
+    (7.8, 23.6, "In about one day, Milton goes from a 65-mile-per-hour tropical storm to a violent major hurricane. The wind curve climbs faster and faster."),
+    (24.3, 36.1, "At the same time, the central pressure collapses. Lower pressure is a signature of the storm's rapidly deepening inner core."),
+    (36.8, 46.6, "The eye becomes tiny and sharply defined. NHC described a small eye surrounded by an intense eyewall as Milton continued to strengthen."),
+    (47.3, 54.7, "At 1555 UTC on October 7, Hurricane Hunter data confirmed Category 5 intensity: 160 miles per hour. Milton later reached 180 miles per hour."),
+    (55.1, 57.8, "From 65 to Category 5 in roughly twenty-five hours — one of the fastest intensification episodes in the modern Atlantic record."),
 ]
 
 if QUICK_MODE:
