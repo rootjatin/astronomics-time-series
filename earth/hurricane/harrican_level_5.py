@@ -152,7 +152,19 @@ OUT_H = int(CONFIG["video_height"])
 OUT_SIZE = (OUT_W, OUT_H)
 
 COLORS = {
-
+    "black": (1, 3, 7),
+    "navy": (3, 9, 20),
+    "panel": (4, 11, 23),
+    "grid": (83, 128, 168),
+    "white": (247, 250, 254),
+    "muted": (160, 191, 216),
+    "cyan": (87, 231, 255),
+    "blue": (90, 157, 255),
+    "green": (102, 235, 176),
+    "yellow": (255, 222, 93),
+    "orange": (255, 158, 72),
+    "red": (255, 81, 79),
+    "magenta": (236, 98, 255),
 }
 
 # Full 58-second edit. Quick mode scales the same story to 12 seconds.
