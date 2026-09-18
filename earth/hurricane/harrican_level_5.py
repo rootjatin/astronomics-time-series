@@ -25,6 +25,22 @@ SCIENTIFIC FRAMING
   intensification story but must not be interpreted as calibrated satellite data.
 - The map track and intensity HUD are data-driven; spiral-cloud geometry is not.
 
+WHY MILTON
+----------
+NHC advisories documented an extraordinary intensification sequence:
+- 06 Oct 1500 UTC: Tropical Storm Milton, 65 mph, 991 mb
+- 06 Oct 1800 UTC: Hurricane Milton, 80 mph, 988 mb
+- 06 Oct 2100 UTC: 85 mph, 983 mb
+- 07 Oct 0000 UTC: 85 mph, 981 mb
+- 07 Oct 0300 UTC: 90 mph, 977 mb
+- 07 Oct 0900 UTC: 100 mph, 972 mb
+- 07 Oct 1200 UTC: 125 mph, 945 mb
+- 07 Oct 1500 UTC: 155 mph, 933 mb
+- 07 Oct 1555 UTC: Category 5, 160 mph, 925 mb
+- 07 Oct 2100 UTC: 180 mph, 905 mb
+- 08 Oct 0000 UTC: 180 mph, 897 mb
+
+
 OPTIONAL REAL IMAGERY
 ---------------------
 If you have a chronological set of pre-cropped hurricane satellite frames, place
