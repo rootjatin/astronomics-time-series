@@ -12,19 +12,6 @@ a cinematic satellite-style reconstruction driven by the observed wind,
 pressure, position, and time series — it is NOT pixel-for-pixel satellite data.
 That distinction is shown on screen and in the saved metadata.
 
-NHC Discussion 10 stated that the 135-kt intensity at 1500 UTC 7 October was an
-80-kt increase in 24 hours. Later NHC observations documented a very small eye
-and extremely low pressure.
-
-SCIENTIFIC FRAMING
-------------------
-- Category is determined from maximum sustained wind using the Saffir-Simpson
-  Hurricane Wind Scale.
-- Pressure and wind values are taken from the cited NHC advisory/update stream.
-- The reconstructed cloud field is intentionally illustrative. It helps tell the
-  intensification story but must not be interpreted as calibrated satellite data.
-- The map track and intensity HUD are data-driven; spiral-cloud geometry is not.
-
 WHY MILTON
 ----------
 NHC advisories documented an extraordinary intensification sequence:
@@ -40,6 +27,18 @@ NHC advisories documented an extraordinary intensification sequence:
 - 07 Oct 2100 UTC: 180 mph, 905 mb
 - 08 Oct 0000 UTC: 180 mph, 897 mb
 
+NHC Discussion 10 stated that the 135-kt intensity at 1500 UTC 7 October was an
+80-kt increase in 24 hours. Later NHC observations documented a very small eye
+and extremely low pressure.
+
+SCIENTIFIC FRAMING
+------------------
+- Category is determined from maximum sustained wind using the Saffir-Simpson
+  Hurricane Wind Scale.
+- Pressure and wind values are taken from the cited NHC advisory/update stream.
+- The reconstructed cloud field is intentionally illustrative. It helps tell the
+  intensification story but must not be interpreted as calibrated satellite data.
+- The map track and intensity HUD are data-driven; spiral-cloud geometry is not.
 
 OPTIONAL REAL IMAGERY
 ---------------------
@@ -1007,5 +1006,22 @@ def render_video(scene: HurricaneScene) -> Path:
     shutil.copyfile(silent,final)
     return final
 
+
+def main():
+    print("Story: Hurricane Milton rapid intensification, 6–7 October 2024")
+    print("Loading optional satellite imagery ...")
+    images=load_local_images()
+    print("Visual mode:","local satellite frames" if images else "data-driven satellite-style reconstruction")
+    csv_path,summary_path=save_data_products(len(images))
+    print("Timeline CSV:",csv_path.resolve())
+    print("Summary JSON:",summary_path.resolve())
+    scene=HurricaneScene(images)
+    preview_times=[1.0,min(10.0,float(CONFIG["duration_s"])*0.18),min(28.0,float(CONFIG["duration_s"])*0.48),min(40.0,float(CONFIG["duration_s"])*0.69),min(49.5,float(CONFIG["duration_s"])*0.85),float(CONFIG["duration_s"])-0.5]
+    for pt in tqdm(preview_times,desc="Preview frames"):
+        frame=scene.render_frame(float(pt))
+        Image.fromarray(frame).save(PREVIEW_DIR/f"preview_{int(pt):02d}s.png")
+    final=render_video(scene)
+    print("Final video:",final.resolve())
+    print("Output directory:",OUTPUT_ROOT.resolve())
 
 
