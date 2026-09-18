@@ -70,7 +70,26 @@ Outputs
 - CSV of the NHC intensity timeline used by the animation
 - JSON summary and source notes
 
-
+Primary references
+------------------
+- NHC Hurricane Milton advisory archive:
+  https://www.nhc.noaa.gov/archive/2024/MILTON.shtml
+- NHC Public Advisory 5, 6 Oct 1500 UTC:
+  https://www.nhc.noaa.gov/archive/2024/al14/al142024.public.005.shtml
+- NHC Intermediate Advisory 5A, 6 Oct 1800 UTC:
+  https://www.nhc.noaa.gov/archive/2024/al14/al142024.public_a.005.shtml
+- NHC Public Advisory 8, 7 Oct 0900 UTC:
+  https://www.nhc.noaa.gov/archive/2024/al14/al142024.public.008.shtml
+- NHC Special Advisory 9, 7 Oct 1200 UTC:
+  https://www.nhc.noaa.gov/archive/2024/al14/al142024.public.009.shtml
+- NHC Public Advisory 10, 7 Oct 1500 UTC:
+  https://www.nhc.noaa.gov/archive/2024/al14/al142024.public.010.shtml
+- NHC Category-5 Update, 7 Oct 1555 UTC:
+  https://www.nhc.noaa.gov/archive/2024/al14/al142024.update.10071558.shtml
+- NHC Public Advisory 11, 7 Oct 2100 UTC:
+  https://www.nhc.noaa.gov/archive/2024/al14/al142024.public.011.shtml
+- NHC Intermediate Advisory 11A, 8 Oct 0000 UTC:
+  https://www.nhc.noaa.gov/archive/2024/al14/al142024.public_a.011.shtml
 """
 
 import json
