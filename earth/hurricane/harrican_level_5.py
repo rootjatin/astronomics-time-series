@@ -169,7 +169,12 @@ COLORS = {
 
 # Full 58-second edit. Quick mode scales the same story to 12 seconds.
 FULL_SHOT_PLAN = [
-
+    {"name": "opening", "start": 0.0, "end": 7.5},
+    {"name": "spinup", "start": 7.5, "end": 24.0},
+    {"name": "pressure_drop", "start": 24.0, "end": 36.5},
+    {"name": "eye_forms", "start": 36.5, "end": 47.0},
+    {"name": "category_five", "start": 47.0, "end": 55.0},
+    {"name": "final", "start": 55.0, "end": 58.0},
 ]
 
 FULL_CAPTIONS = [
