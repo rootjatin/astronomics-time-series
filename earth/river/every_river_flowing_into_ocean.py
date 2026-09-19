@@ -953,3 +953,28 @@ def render_video(scene: RiverScene, out_path: Path):
             t = idx / fps
             writer.append_data(np.asarray(scene.render(t)))
 
+
+def main():
+    rivers, land, snapshot, summary = collect_data()
+    csv_path, json_path = save_data(rivers, snapshot, summary)
+    srt_path = OUTPUT_ROOT / f"{CONFIG['basename']}.srt"
+    write_srt(srt_path)
+
+    scene = RiverScene(rivers, land, snapshot, summary)
+    preview_paths, contact_path = render_preview_frames(scene)
+    video_path = OUTPUT_ROOT / f"{CONFIG['basename']}.mp4"
+    render_video(scene, video_path)
+
+    print("\nDONE")
+    print(f"Data status : {snapshot.data_status}")
+    print(f"River scale : {snapshot.river_scale}")
+    print(f"River feats : {snapshot.river_features:,}")
+    print(f"CSV         : {csv_path}")
+    print(f"JSON        : {json_path}")
+    print(f"SRT         : {srt_path}")
+    print(f"Contact     : {contact_path}")
+    print(f"Video       : {video_path}")
+
+
+if __name__ == "__main__":
+    main()
