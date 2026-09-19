@@ -155,11 +155,21 @@ COLORS = {
 }
 
 SHOT_PLAN = [
-
+    {"name": "intro", "start": 0.0, "end": 7.0 if not QUICK_MODE else 1.8},
+    {"name": "network", "start": 7.0 if not QUICK_MODE else 1.8, "end": 21.0 if not QUICK_MODE else 4.4},
+    {"name": "outlets", "start": 21.0 if not QUICK_MODE else 4.4, "end": 33.0 if not QUICK_MODE else 6.8},
+    {"name": "watershed", "start": 33.0 if not QUICK_MODE else 6.8, "end": 43.5 if not QUICK_MODE else 8.8},
+    {"name": "exceptions", "start": 43.5 if not QUICK_MODE else 8.8, "end": 53.0 if not QUICK_MODE else 10.7},
+    {"name": "outro", "start": 53.0 if not QUICK_MODE else 10.7, "end": CONFIG["duration_s"]},
 ]
 
 CAPTION_TEXTS = [
-
+    "From rain and snow on land, gravity gathers water into streams and rivers that form branching networks across the continents.",
+    "This map lights up every river feature in the selected Natural Earth drainage layer. It is a cartographic dataset, not every tiny stream on Earth.",
+    "Huge watersheds funnel water toward river mouths around the world—from the Amazon and Congo to the Mississippi, Ganges-Brahmaputra, Yangtze, and Lena.",
+    "A watershed is land that drains toward the same outlet. Runoff moves downhill, joins tributaries, and much of it eventually returns to the ocean.",
+    "But not every river reaches the sea. Some end in closed basins, seep underground, evaporate, or are heavily diverted before reaching their historic mouths.",
+    "Rivers are one of the great return paths in Earth's water cycle: land to channel, channel to coast, coast back to ocean.",
 ]
 
 CAPTIONS = [
