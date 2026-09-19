@@ -29,7 +29,14 @@ Earth. It renders every river feature available in the selected Natural Earth
 river layer after excluding lake-centerline records. Natural Earth is a global
 cartographic dataset, not a complete hydrologic census.
 
-
+Sources
+-------
+Natural Earth — Rivers + lake centerlines:
+    https://www.naturalearthdata.com/downloads/10m-physical-vectors/10m-rivers-lake-centerlines/
+USGS — Streamflow and the Water Cycle:
+    https://www.usgs.gov/water-science-school/science/streamflow-and-water-cycle
+NASA — The Water Cycle:
+    https://science.nasa.gov/earth/earth-observatory/the-water-cycle/
 
 Install
 -------
