@@ -108,7 +108,13 @@ SHOT_PLAN = [
 ]
 
 CAPTION_TEXTS = [
-  ]
+    "Greenland holds an enormous ice sheet, but satellites show it has been losing mass since 2002.",
+    "NASA's latest GRACE and GRACE Follow-On summary puts the long-term loss at roughly a quarter-trillion metric tons of ice per year.",
+    "The strongest losses are concentrated around many lower-elevation coastal areas, with especially large decreases along West Greenland.",
+    "Ice leaves Greenland in two major ways: surface meltwater runs off, and fast-moving outlet glaciers discharge ice into the ocean.",
+    "That lost land ice adds water to the ocean. The satellite record is built from GRACE and the GRACE Follow-On mission.",
+    "This animation is data-grounded, but the trend line is an illustration of NASA's published average rate—not the monthly GRACE dataset.",
+]
 
 # Keep captions synchronized in both the 58-second final render and 12-second
 # quick-preview render by deriving their timing directly from SHOT_PLAN.
