@@ -969,4 +969,30 @@ def make_contact_sheet(paths: Sequence[Path], out_path: Path):
     sheet.save(out_path, quality=92)
 
 
+def main():
+    print("Collecting Greenland ice data ...")
+    snapshot, trend, events, summary = collect_data()
+    csv_path, json_path = save_data(snapshot, trend, events, summary)
+    print("Trend data:", csv_path.resolve())
+    print("Summary:", json_path.resolve())
+
+    scene = GreenlandScene(snapshot, trend, events, summary)
+    preview_times = [
+        1.0,
+        min(10.0, CONFIG["duration_s"] * 0.22),
+        min(23.0, CONFIG["duration_s"] * 0.42),
+        min(36.0, CONFIG["duration_s"] * 0.64),
+        min(47.0, CONFIG["duration_s"] * 0.83),
+        CONFIG["duration_s"] - 1,
+    ]
+    preview_paths: List[Path] = []
+    for t in tqdm(preview_times, desc="Preview frames"):
+        path = PREVIEW_ROOT / f"preview_{int(t):02d}s.png"
+        Image.fromarray(scene.render_frame(float(t))).save(path)
+        preview_paths.append(path)
+
+    make_contact_sheet(preview_paths, PREVIEW_ROOT / "greenland_is_losing_ice_contact_sheet.jpg")
+    video_path = render_video(scene)
+    print("Video:", video_path.resolve())
+    print("Source status:", summary)
 
