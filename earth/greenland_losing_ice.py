@@ -91,7 +91,19 @@ for directory in (OUTPUT_ROOT, DATA_ROOT, PREVIEW_ROOT, CACHE_ROOT):
     directory.mkdir(parents=True, exist_ok=True)
 
 CONFIG = {
-
+    "width": 540 if QUICK_MODE else 1080,
+    "height": 960 if QUICK_MODE else 1920,
+    "fps": 6 if QUICK_MODE else 24,
+    "duration_s": 12 if QUICK_MODE else 58,
+    "basename": "greenland_is_losing_ice",
+    "title": "GREENLAND IS LOSING ICE",
+    "subtitle": "What NASA's GRACE satellites reveal since 2002",
+    "timeout_s": 35,
+    "particles": 240 if QUICK_MODE else 520,
+    "cache_hours": 36,
+    "indicator_url": "https://science.nasa.gov/earth/explore/earth-indicators/ice-sheets/",
+    "svs_url": "https://svs.gsfc.nasa.gov/31156/",
+    "grace_url": "https://grace.jpl.nasa.gov/",
 }
 
 W = CONFIG["width"]
