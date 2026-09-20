@@ -996,3 +996,6 @@ def main():
     print("Video:", video_path.resolve())
     print("Source status:", summary)
 
+
+if __name__ == "__main__":
+    main()
