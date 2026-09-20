@@ -28,7 +28,14 @@ mass-anomaly time series. NASA Earthdata authentication is now required for the
 underlying downloadable ice-sheet data, so this script deliberately avoids
 pretending it has monthly values it did not retrieve.
 
-
+Official sources
+----------------
+NASA Earth Indicator — Ice Sheets:
+    https://science.nasa.gov/earth/explore/earth-indicators/ice-sheets/
+NASA Scientific Visualization Studio — Greenland Ice Mass Loss 2002-2025:
+    https://svs.gsfc.nasa.gov/31156/
+NASA GRACE / GRACE-FO:
+    https://grace.jpl.nasa.gov/
 
 Install
 -------
