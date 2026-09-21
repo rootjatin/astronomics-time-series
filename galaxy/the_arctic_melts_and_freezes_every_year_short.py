@@ -156,8 +156,13 @@ SHOT_PLAN = [
 ]
 
 CAPTION_TEXTS = [
+    "The Arctic Ocean does something dramatic every year: its floating sea ice expands in winter and contracts in summer.",
+    "The annual maximum usually arrives in March. The minimum usually arrives in September. Exact timing and size change from year to year.",
+    "During the dark, cold Arctic autumn and winter, ocean water freezes and the ice edge spreads outward across millions of square kilometers.",
+    "In spring and summer, stronger sunlight and warmer air and ocean conditions melt ice and pull the ice edge back toward the central Arctic.",
+    "This cycle is natural, but the long-term baseline is changing: satellite observations show much less Arctic sea ice than in earlier decades.",
+    "Sea ice still freezes and melts every year. The animation is a sourced seasonal illustration—not a daily satellite reconstruction.",
 ]
-
 CAPTIONS = [
     (
         shot["start"] + min(0.4, 0.08 * (shot["end"] - shot["start"])),
