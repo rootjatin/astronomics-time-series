@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 """
-output : "https://www.youtube.com/shorts/VjuObkD87VE"
+
 
 The Arctic Melts and Freezes Every Year
 =======================================
+
+output : "https://www.youtube.com/shorts/VjuObkD87VE"
 
 A cinematic vertical YouTube Short renderer about the Arctic sea-ice seasonal
 cycle. It follows the same production pattern as the other Shorts in this
@@ -27,6 +29,17 @@ What the video shows
   maximum in the satellite record.
 - The seasonal freeze/melt cycle continues every year even as the long-term
   Arctic sea-ice baseline has declined.
+
+Official sources
+----------------
+NSIDC Sea Ice Today:
+    https://nsidc.org/sea-ice-today
+NSIDC sea-ice overview:
+    https://nsidc.org/our-research/featured-projects/sea-ice-today-and-ice-sheets-today
+NASA 2026 Arctic winter maximum:
+    https://science.nasa.gov/earth/arctic-winter-sea-ice-2026/
+NASA Earth Observatory sea-ice overview:
+    https://science.nasa.gov/earth/earth-observatory/sea-ice/
 
 Interpretation rule
 -------------------
