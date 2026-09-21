@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 """
-
-
 The Arctic Melts and Freezes Every Year
 =======================================
 
