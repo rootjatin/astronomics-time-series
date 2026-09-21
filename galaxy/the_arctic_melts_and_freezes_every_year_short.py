@@ -107,7 +107,20 @@ for directory in (OUTPUT_ROOT, DATA_ROOT, PREVIEW_ROOT, CACHE_ROOT):
     directory.mkdir(parents=True, exist_ok=True)
 
 CONFIG = {
-
+    "width": 540 if QUICK_MODE else 1080,
+    "height": 960 if QUICK_MODE else 1920,
+    "fps": 6 if QUICK_MODE else 24,
+    "duration_s": 12 if QUICK_MODE else 58,
+    "basename": "the_arctic_melts_and_freezes_every_year",
+    "title": "THE ARCTIC MELTS AND FREEZES EVERY YEAR",
+    "subtitle": "A yearly pulse of sea ice around the North Pole",
+    "timeout_s": 35,
+    "cache_hours": 36,
+    "particles": 180 if QUICK_MODE else 420,
+    "nasa_2026_url": "https://science.nasa.gov/earth/arctic-winter-sea-ice-2026/",
+    "nsidc_url": "https://nsidc.org/sea-ice-today",
+    "nsidc_overview_url": "https://nsidc.org/our-research/featured-projects/sea-ice-today-and-ice-sheets-today",
+    "nasa_sea_ice_url": "https://science.nasa.gov/earth/earth-observatory/sea-ice/",
 }
 
 W = CONFIG["width"]
