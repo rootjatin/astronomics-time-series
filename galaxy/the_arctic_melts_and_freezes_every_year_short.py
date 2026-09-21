@@ -4,8 +4,6 @@ from __future__ import annotations
 The Arctic Melts and Freezes Every Year
 =======================================
 
-output : "https://www.youtube.com/shorts/VjuObkD87VE"
-
 A cinematic vertical YouTube Short renderer about the Arctic sea-ice seasonal
 cycle. It follows the same production pattern as the other Shorts in this
 series: official-source snapshot + cache, offline fallback, 9:16 rendering,
@@ -163,6 +161,7 @@ CAPTION_TEXTS = [
     "This cycle is natural, but the long-term baseline is changing: satellite observations show much less Arctic sea ice than in earlier decades.",
     "Sea ice still freezes and melts every year. The animation is a sourced seasonal illustration—not a daily satellite reconstruction.",
 ]
+
 CAPTIONS = [
     (
         shot["start"] + min(0.4, 0.08 * (shot["end"] - shot["start"])),
@@ -808,5 +807,24 @@ def make_contact_sheet(paths: Sequence[Path], out_path: Path):
     sheet.save(out_path,quality=92)
 
 
+def main():
+    print("Collecting Arctic sea-ice source snapshot ...")
+    snapshot,cycle,summary=collect_data()
+    csv_path,json_path=save_data(snapshot,cycle,summary)
+    print("Cycle data:",csv_path.resolve())
+    print("Summary:",json_path.resolve())
+    scene=ArcticScene(snapshot,cycle,summary)
+    preview_times=[1.0,min(10.0,CONFIG["duration_s"]*0.22),min(24.0,CONFIG["duration_s"]*0.43),min(36.0,CONFIG["duration_s"]*0.64),min(47.0,CONFIG["duration_s"]*0.83),CONFIG["duration_s"]-1]
+    preview_paths: List[Path]=[]
+    for t in tqdm(preview_times,desc="Preview frames"):
+        path=PREVIEW_ROOT/f"preview_{int(t):02d}s.png"
+        Image.fromarray(scene.render_frame(float(t))).save(path)
+        preview_paths.append(path)
+    contact=PREVIEW_ROOT/"the_arctic_melts_and_freezes_every_year_contact_sheet.jpg"
+    make_contact_sheet(preview_paths,contact)
+    video_path=render_video(scene)
+    print("Video:",video_path.resolve())
+    print("Contact sheet:",contact.resolve())
+    print("Source status:",summary)
 
 
