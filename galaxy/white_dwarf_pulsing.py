@@ -95,7 +95,29 @@ CACHE_DIR = DATA_ROOT / "mast_cache"
 for directory in [OUTPUT_ROOT, DATA_ROOT, PREVIEW_DIR, CACHE_DIR]:
     directory.mkdir(parents=True, exist_ok=True)
 
-
+CONFIG: Dict[str, Any] = {
+    "video_width": 540 if QUICK_MODE else 1080,
+    "video_height": 960 if QUICK_MODE else 1920,
+    "fps": 6 if QUICK_MODE else 24,
+    "duration_s": 12 if QUICK_MODE else 58,
+    "output_basename": "a_white_dwarf_pulsing_in_real_data",
+    "title": "A WHITE DWARF PULSING IN REAL DATA",
+    "subtitle": "KIC 4552982 // Kepler short cadence // minute-scale modes",
+    "target_name": "KIC 4552982",
+    "target_alias": "WD J1916+3938",
+    "mission": "Kepler",
+    "min_period_seconds": 500.0,
+    "max_period_seconds": 1800.0,
+    "spectrum_trials": 2400 if QUICK_MODE else 6200,
+    "max_analysis_points": 9000 if QUICK_MODE else 24000,
+    "max_live_products": 1 if QUICK_MODE else 2,
+    "trend_hours": 3.2,
+    "background_stars": 300,
+    "hud_noise": 52,
+    "contrast": 1.09,
+    "saturation": 1.04,
+    "vignette": 0.25,
+}
 OUT_W = int(CONFIG["video_width"])
 OUT_H = int(CONFIG["video_height"])
 OUT_SIZE = (OUT_W, OUT_H)
