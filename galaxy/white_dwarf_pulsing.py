@@ -136,6 +136,12 @@ COLORS = {
 
 
 FULL_CAPTIONS = [
+    (0.5, 7.2, "This Earth-sized stellar remnant is not quiet. Its brightness trembles every few minutes."),
+    (7.3, 17.2, "Kepler short-cadence observations recorded KIC 4552982 almost continuously, one measurement after another."),
+    (17.3, 27.0, "Zoom into a few hours and the real data becomes a train of overlapping pulses—not random noise."),
+    (27.1, 38.7, "A frequency search separates those waves. Each peak marks a pulsation mode with its own period."),
+    (38.8, 49.5, "Folding the strongest mode reveals one repeating component, while the other modes keep the cycles from matching perfectly."),
+    (49.6, 57.3, "These non-radial gravity modes turn the white dwarf into a seismic instrument for mapping its hidden interior."),
 ]
 if QUICK_MODE:
     _scale = CONFIG["duration_s"] / 58.0
