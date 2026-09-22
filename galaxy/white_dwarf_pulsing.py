@@ -1,9 +1,8 @@
-
 from __future__ import annotations
 
 """
 A White Dwarf Pulsing in Real Data — cinematic YouTube Short renderer
-output : 'https://youtube.com/shorts/XCShPhMNAP0?feature=share'
+output : https://www.youtube.com/shorts/XCShPhMNAP0
 Creates a vertical 1080x1920 astronomy short that reveals minute-scale
 oscillations in real Kepler photometry of KIC 4552982 (WD J1916+3938), a
 hydrogen-atmosphere pulsating white dwarf / ZZ Ceti star.
@@ -47,6 +46,7 @@ Quick preview render
 Force offline fixture mode
 --------------------------
     WHITE_DWARF_SHORT_OFFLINE=1 python a_white_dwarf_pulsing_in_real_data_short.py
+
 Primary references used when designing the script
 --------------------------------------------------
 - MAST Kepler archive: https://archive.stsci.edu/missions-and-data/kepler
@@ -118,6 +118,7 @@ CONFIG: Dict[str, Any] = {
     "saturation": 1.04,
     "vignette": 0.25,
 }
+
 OUT_W = int(CONFIG["video_width"])
 OUT_H = int(CONFIG["video_height"])
 OUT_SIZE = (OUT_W, OUT_H)
@@ -133,7 +134,6 @@ COLORS = {
     "muted": (158, 205, 226),
     "dark": (3, 7, 16),
 }
-
 
 FULL_CAPTIONS = [
     (0.5, 7.2, "This Earth-sized stellar remnant is not quiet. Its brightness trembles every few minutes."),
@@ -157,7 +157,6 @@ SHOT_PLAN = [
     {"name": "fold", "start": 40.5 if not QUICK_MODE else 8.4, "end": 50.5 if not QUICK_MODE else 10.45},
     {"name": "interior", "start": 50.5 if not QUICK_MODE else 10.45, "end": CONFIG["duration_s"]},
 ]
-
 
 
 # -----------------------------------------------------------------------------
@@ -1234,6 +1233,7 @@ def render_video(scene: WhiteDwarfScene) -> Path:
     print("Final video:", final_video.resolve())
     return final_video
 
+
 def main():
     print("Loading KIC 4552982 photometry ...")
     frame, source, notes = load_all_data()
@@ -1274,4 +1274,5 @@ def main():
         print("-", path.name)
 
 
-
+if __name__ == "__main__":
+    main()
