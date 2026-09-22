@@ -150,8 +150,14 @@ else:
     CAPTIONS = FULL_CAPTIONS
 
 SHOT_PLAN = [
-
+    {"name": "intro", "start": 0.0, "end": 7.8 if not QUICK_MODE else 1.65},
+    {"name": "real_data", "start": 7.8 if not QUICK_MODE else 1.65, "end": 18.5 if not QUICK_MODE else 3.85},
+    {"name": "zoom", "start": 18.5 if not QUICK_MODE else 3.85, "end": 29.0 if not QUICK_MODE else 6.05},
+    {"name": "spectrum", "start": 29.0 if not QUICK_MODE else 6.05, "end": 40.5 if not QUICK_MODE else 8.4},
+    {"name": "fold", "start": 40.5 if not QUICK_MODE else 8.4, "end": 50.5 if not QUICK_MODE else 10.45},
+    {"name": "interior", "start": 50.5 if not QUICK_MODE else 10.45, "end": CONFIG["duration_s"]},
 ]
+
 
 
 # -----------------------------------------------------------------------------
