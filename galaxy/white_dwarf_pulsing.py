@@ -122,6 +122,17 @@ OUT_W = int(CONFIG["video_width"])
 OUT_H = int(CONFIG["video_height"])
 OUT_SIZE = (OUT_W, OUT_H)
 
+COLORS = {
+    "ice": (146, 224, 255),
+    "cyan": (83, 226, 255),
+    "blue": (75, 140, 255),
+    "violet": (182, 118, 255),
+    "gold": (255, 192, 92),
+    "rose": (255, 105, 160),
+    "white": (244, 249, 255),
+    "muted": (158, 205, 226),
+    "dark": (3, 7, 16),
+}
 
 
 FULL_CAPTIONS = [
