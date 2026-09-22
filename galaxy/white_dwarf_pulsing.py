@@ -1234,5 +1234,44 @@ def render_video(scene: WhiteDwarfScene) -> Path:
     print("Final video:", final_video.resolve())
     return final_video
 
+def main():
+    print("Loading KIC 4552982 photometry ...")
+    frame, source, notes = load_all_data()
+
+    print("Measuring the pulsation spectrum ...")
+    spectrum, modes, spectrum_method = estimate_spectrum(frame)
+    strongest_period = float(modes[0]["period_seconds"])
+    folded, profile = phase_fold(frame, strongest_period)
+    summary = summarize(frame, source, spectrum, modes, spectrum_method)
+
+    lightcurve_path, summary_path = save_data_products(frame, spectrum, folded, profile, summary, notes)
+    create_scientific_plots(frame, spectrum, folded, profile, summary)
+
+    print("Light-curve source:", source)
+    print("Strongest detected mode:", f"{strongest_period:.2f} s / {strongest_period / 60.0:.2f} min")
+    print("Detected modes:", ", ".join(f"{mode['period_seconds']:.0f}s" for mode in modes[:6]))
+    for note in notes:
+        print("Data note:", note)
+    print("Data:", lightcurve_path.resolve())
+    print("Summary:", summary_path.resolve())
+
+    scene = WhiteDwarfScene(frame, spectrum, folded, profile, summary)
+    preview_times = [
+        1.0,
+        min(10.0, float(CONFIG["duration_s"]) * 0.20),
+        min(22.0, float(CONFIG["duration_s"]) * 0.39),
+        min(34.0, float(CONFIG["duration_s"]) * 0.60),
+        min(45.0, float(CONFIG["duration_s"]) * 0.79),
+        float(CONFIG["duration_s"]) - 1.0,
+    ]
+    for preview_time in tqdm(preview_times, desc="Preview frames"):
+        frame_image = scene.render_frame(float(preview_time))
+        Image.fromarray(frame_image).save(PREVIEW_DIR / f"preview_{int(preview_time):02d}s.png")
+
+    render_video(scene)
+    print("Output directory:", OUTPUT_ROOT.resolve())
+    for path in sorted(OUTPUT_ROOT.glob("*")):
+        print("-", path.name)
+
 
 
