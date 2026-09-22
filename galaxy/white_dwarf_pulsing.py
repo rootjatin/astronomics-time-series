@@ -1,9 +1,9 @@
-output = 'https://youtube.com/shorts/XCShPhMNAP0?feature=share'
+
 from __future__ import annotations
 
 """
 A White Dwarf Pulsing in Real Data — cinematic YouTube Short renderer
-
+output : 'https://youtube.com/shorts/XCShPhMNAP0?feature=share'
 Creates a vertical 1080x1920 astronomy short that reveals minute-scale
 oscillations in real Kepler photometry of KIC 4552982 (WD J1916+3938), a
 hydrogen-atmosphere pulsating white dwarf / ZZ Ceti star.
@@ -47,8 +47,14 @@ Quick preview render
 Force offline fixture mode
 --------------------------
     WHITE_DWARF_SHORT_OFFLINE=1 python a_white_dwarf_pulsing_in_real_data_short.py
-
-
+Primary references used when designing the script
+--------------------------------------------------
+- MAST Kepler archive: https://archive.stsci.edu/missions-and-data/kepler
+- Lightkurve documentation: https://lightkurve.github.io/lightkurve/
+- Hermes et al. 2011, discovery of WD J1916+3938 / KIC 4552982:
+  https://arxiv.org/abs/1109.6023
+- Bell et al. 2015, Kepler pulsations and outbursts of KIC 4552982:
+  https://arxiv.org/abs/1506.07878
 """
 
 import json
