@@ -3,7 +3,7 @@ from __future__ import annotations
 """
 A Planet Orbiting Three Stars
 =============================
-
+output : https://www.youtube.com/shorts/cfBigudkhc4
 A cinematic vertical YouTube Short renderer about a physically plausible
 version of a planet orbiting three stars: a distant circUMTRIPLE planet around
 an idealized hierarchical triple-star system.
