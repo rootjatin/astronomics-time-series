@@ -99,7 +99,12 @@ for directory in (OUTPUT_ROOT, DATA_ROOT, PREVIEW_ROOT):
     directory.mkdir(parents=True, exist_ok=True)
 
 CONFIG: Dict[str, Any] = {
-
+    "title": "A PLANET ORBITING THREE STARS",
+    "subtitle": "One world // three suns // one shared center of mass",
+    "basename": "a_planet_orbiting_three_stars",
+    "contrast": 1.11,
+    "saturation": 1.08,
+    "vignette": 0.28,
 }
 
 COLORS = {
