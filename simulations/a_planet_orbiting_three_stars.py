@@ -131,7 +131,12 @@ COLORS = {
 }
 
 SHOT_PLAN = [
-
+    {"name": "triple_reveal", "start": 0.0, "end": 8.0 if not QUICK_MODE else 1.8},
+    {"name": "hierarchy", "start": 8.0 if not QUICK_MODE else 1.8, "end": 19.0 if not QUICK_MODE else 4.25},
+    {"name": "circumtriple", "start": 19.0 if not QUICK_MODE else 4.25, "end": 30.0 if not QUICK_MODE else 6.70},
+    {"name": "sky", "start": 30.0 if not QUICK_MODE else 6.70, "end": 41.0 if not QUICK_MODE else 9.15},
+    {"name": "changing_light", "start": 41.0 if not QUICK_MODE else 9.15, "end": 51.0 if not QUICK_MODE else 11.35},
+    {"name": "outro", "start": 51.0 if not QUICK_MODE else 11.35, "end": DURATION},
 ]
 
 CAPTION_TEXTS = [
