@@ -3,7 +3,9 @@ from __future__ import annotations
 """
 A Planet Orbiting Three Stars
 =============================
+
 output : https://www.youtube.com/shorts/cfBigudkhc4
+
 A cinematic vertical YouTube Short renderer about a physically plausible
 version of a planet orbiting three stars: a distant circUMTRIPLE planet around
 an idealized hierarchical triple-star system.
@@ -43,7 +45,6 @@ NASA — TESS compact stellar triplet; a distant planet could orbit all three:
     https://www.nasa.gov/universe/nasas-tess-spots-record-breaking-stellar-triplets/
 NASA Science — Alpha Centauri is a nearby triple-star system:
     https://science.nasa.gov/missions/webb/nasas-webb-finds-new-evidence-for-planet-around-closest-solar-twin/
-
 
 Install
 -------
@@ -787,5 +788,28 @@ def write_youtube_metadata_txt() -> Path:
     )
     return path
 
-
+def main():
+    snapshot=build_snapshot()
+    csv_path,json_path=save_data(snapshot)
+    srt_path=write_srt(OUTPUT_ROOT/f"{CONFIG['basename']}_subtitles.srt")
+    scene=ThreeStarsScene(snapshot)
+    previews=render_preview_frames(scene)
+    sheet=make_contact_sheet(previews)
+    video=render_video(scene)
+    flat_video,flat_sheet,flat_srt=copy_flat(video,sheet,srt_path)
+    print("\nRender complete")
+    print("="*76)
+    print(CONFIG["title"])
+    print(f"Mode: {'QUICK' if QUICK_MODE else ('4K' if FOUR_K else 'FULL HD')}")
+    print(f"Frame: {W}x{H} @ {FPS} fps // {DURATION:.1f} s")
+    print(f"Inner A-B period: {snapshot.inner_period_days:.2f} days")
+    print(f"Outer star period: {snapshot.outer_period_days:.2f} days")
+    print(f"Planet circumtriple year: {snapshot.planet_period_days:.2f} days")
+    print(f"Flux range: {snapshot.flux_min_earth_units:.3f}x to {snapshot.flux_max_earth_units:.3f}x")
+    print(f"Flux mean: {snapshot.flux_mean_earth_units:.3f}x")
+    print(f"Peak-to-trough flux swing: {snapshot.flux_peak_to_trough_pct:.1f}%")
+    for label,path in [("video",video),("subtitles",srt_path),("csv",csv_path),("json",json_path),("contact",sheet),("flat_video",flat_video),("flat_sheet",flat_sheet),("flat_srt",flat_srt)]:
+        print(f"{label:12s} {path}")
+    metadata_txt = write_youtube_metadata_txt()
+    print("Title/description TXT:", metadata_txt.resolve())
 
