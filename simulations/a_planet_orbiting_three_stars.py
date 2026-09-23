@@ -35,6 +35,15 @@ Scientific framing
   inclinations, separations, resonances, and formation history. The geometry
   here is educational rather than a formal N-body stability proof.
 
+Primary references
+------------------
+NASA — KOI-5Ab, a planet in a triple-star system:
+    https://www.nasa.gov/missions/kepler/planetary-sleuthing-finds-triple-star-world/
+NASA — TESS compact stellar triplet; a distant planet could orbit all three:
+    https://www.nasa.gov/universe/nasas-tess-spots-record-breaking-stellar-triplets/
+NASA Science — Alpha Centauri is a nearby triple-star system:
+    https://science.nasa.gov/missions/webb/nasas-webb-finds-new-evidence-for-planet-around-closest-solar-twin/
+
 
 Install
 -------
