@@ -140,7 +140,13 @@ SHOT_PLAN = [
 ]
 
 CAPTION_TEXTS = [
- ]
+    "Three suns in one sky sounds impossible, but triple-star systems are real. The cleanest version is a planet on a wide orbit around all three stars together.",
+    "A stable triple is usually hierarchical: two stars form a tight inner binary, while a third star travels on a wider orbit around that pair. Their motions all center on one system barycenter.",
+    "Put the planet much farther out and, in a simplified picture, it can orbit the combined gravity of all three stars. This illustrative planet circles at 1.2 astronomical units from the shared barycenter.",
+    "From the surface, the three suns would constantly rearrange themselves. Sometimes two would bunch together; sometimes all three would separate, producing multiple shadows and spectacular triple sunsets.",
+    "The moving stars also change the planet's illumination. In this toy model the total received light varies by about twenty-two percent peak to trough. Climate response is not modeled.",
+    "A planet orbiting three stars is not automatically impossible. The key is hierarchy: compact stellar orbits inside, a much wider planetary orbit outside, and enough separation for long-term stability.",
+]
 
 CAPTIONS = [
     (
