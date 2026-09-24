@@ -101,7 +101,20 @@ for directory in (OUTPUT_ROOT, DATA_ROOT, PREVIEW_ROOT, CACHE_ROOT):
     directory.mkdir(parents=True, exist_ok=True)
 
 CONFIG: Dict[str, Any] = {
-
+    "title": "EARTH'S SUBMARINE CABLES IN 3D",
+    "subtitle": "the hidden fiber-optic network beneath the oceans",
+    "basename": "earths_submarine_cables_in_3d",
+    "contrast": 1.12,
+    "saturation": 1.09,
+    "vignette": 0.26,
+    "timeout_s": 40,
+    "cache_hours": 72,
+    "cable_geojson_url": "https://raw.githubusercontent.com/JesseCallahanBryant/undersea-cables/main/data/cable-geo.json",
+    "landing_geojson_url": "https://raw.githubusercontent.com/JesseCallahanBryant/undersea-cables/main/data/landing-point-geo.json",
+    "dataset_repo": "https://github.com/JesseCallahanBryant/undersea-cables",
+    "telegeography_2026": "https://resources.telegeography.com/2026-submarine-cable-map",
+    "itu_report": "https://www.itu.int/itu-d/reports/statistics/global-connectivity-report-2025/",
+    "itu_resilience": "https://www.itu.int/digital-resilience/submarine-cables/",
 }
 
 COLORS = {
