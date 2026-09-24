@@ -1,11 +1,11 @@
-output = 'https://youtube.com/shorts/XrT_I2ESlxk'
+
 
 from __future__ import annotations
 
 """
 Earth's Submarine Cables in 3D
 ==============================
-
+output : https://youtube.com/shorts/XrT_I2ESlxk
 A cinematic vertical YouTube Short renderer that wraps submarine cable routes
 around a rotating 3D-style Earth.
 
