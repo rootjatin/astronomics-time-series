@@ -1,11 +1,9 @@
-
-
 from __future__ import annotations
 
 """
 Earth's Submarine Cables in 3D
 ==============================
-output : https://youtube.com/shorts/XrT_I2ESlxk
+
 A cinematic vertical YouTube Short renderer that wraps submarine cable routes
 around a rotating 3D-style Earth.
 
@@ -118,14 +116,41 @@ CONFIG: Dict[str, Any] = {
 }
 
 COLORS = {
-
+    "space": (1, 5, 14),
+    "space2": (5, 17, 34),
+    "white": (245, 250, 255),
+    "muted": (155, 190, 211),
+    "cyan": (67, 233, 255),
+    "blue": (58, 141, 255),
+    "green": (91, 238, 176),
+    "gold": (255, 205, 88),
+    "orange": (255, 137, 72),
+    "red": (255, 80, 103),
+    "violet": (185, 118, 255),
+    "magenta": (244, 89, 194),
+    "ocean": (6, 39, 75),
+    "ocean_lit": (14, 91, 133),
+    "land": (50, 91, 82),
+    "land_edge": (110, 174, 143),
+    "panel": (2, 10, 23),
 }
 
 SHOT_PLAN = [
-
+    {"name": "reveal", "start": 0.0, "end": 8.0 if not QUICK_MODE else 1.8},
+    {"name": "backbone", "start": 8.0 if not QUICK_MODE else 1.8, "end": 19.0 if not QUICK_MODE else 4.25},
+    {"name": "atlantic", "start": 19.0 if not QUICK_MODE else 4.25, "end": 30.0 if not QUICK_MODE else 6.7},
+    {"name": "landings", "start": 30.0 if not QUICK_MODE else 6.7, "end": 40.5 if not QUICK_MODE else 9.05},
+    {"name": "fragility", "start": 40.5 if not QUICK_MODE else 9.05, "end": 51.0 if not QUICK_MODE else 11.4},
+    {"name": "outro", "start": 51.0 if not QUICK_MODE else 11.4, "end": DURATION},
 ]
 
 CAPTION_TEXTS = [
+    "Under the oceans is a physical network of glass fiber linking continents. From space it would look like a glowing web wrapped around Earth.",
+    "More than ninety-nine percent of international data traffic travels through submarine cables. Satellites are visible; most of the global internet backbone is not.",
+    "Some of the densest corridors cross the Atlantic, Pacific, Mediterranean, Red Sea and Indian Ocean. Light pulses can cross an ocean inside fibers only millimeters across.",
+    "Every route eventually reaches land. Landing stations connect the wet plant offshore to terrestrial fiber, data centers and national networks.",
+    "The network is enormous, but individual cables are vulnerable. Anchors, fishing, earthquakes and other events can break them, so redundancy and repair ships matter.",
+    "TeleGeography's 2026 map depicts hundreds of active and planned systems and nearly two thousand landing stations. The internet has a geography — and most of it runs under water.",
 ]
 
 CAPTIONS = [
@@ -1921,4 +1946,26 @@ def write_youtube_metadata_txt() -> Path:
         encoding="utf-8",
     )
     return path
+
+def main():
+    snapshot,routes,landings,summary=collect_data()
+    csv_path,json_path,note_path=save_data(snapshot,routes,landings,summary)
+    srt_path=write_srt(OUTPUT_ROOT/f"{CONFIG['basename']}_subtitles.srt")
+    scene=CableEarthScene(snapshot,routes,landings,summary)
+    previews=save_previews(scene)
+    contact=make_contact_sheet(previews)
+    video=render_video(scene)
+
+    export_top_level([csv_path,json_path,note_path,srt_path,contact,video])
+    print("\nRender complete")
+    print("data status:",snapshot.data_status)
+    print("routes loaded:",snapshot.route_feature_count)
+    print("landings loaded:",snapshot.landing_point_count_loaded)
+    print("video:",video)
+    print("contact sheet:",contact)
+    print("subtitles:",srt_path)
+    print("route summary:",csv_path)
+    metadata_txt = write_youtube_metadata_txt()
+    print("Title/description TXT:", metadata_txt.resolve())
+
 
