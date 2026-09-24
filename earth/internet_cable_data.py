@@ -3,7 +3,7 @@ from __future__ import annotations
 """
 Earth's Submarine Cables in 3D
 ==============================
-
+output : https://www.youtube.com/shorts/XrT_I2ESlxk
 A cinematic vertical YouTube Short renderer that wraps submarine cable routes
 around a rotating 3D-style Earth.
 
@@ -1968,4 +1968,5 @@ def main():
     metadata_txt = write_youtube_metadata_txt()
     print("Title/description TXT:", metadata_txt.resolve())
 
-
+if __name__ == "__main__":
+    main()
