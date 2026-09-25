@@ -671,3 +671,15 @@ def write_youtube_metadata_txt() -> Path:
     )
     return path
 
+def main():
+    snap=snapshot(); csv_path,json_path=save_data(snap); srt_path=write_srt(OUTPUT_ROOT/f"{CONFIG['basename']}_subtitles.srt")
+    scene=ThousandPlanetScene(snap); previews=save_preview_frames(scene); contact=make_contact_sheet(previews); video=render_video(scene)
+    outputs={"video":str(video),"subtitles":str(srt_path),"contact_sheet":str(contact),"architecture_csv":str(csv_path),"snapshot_json":str(json_path)}
+    outputs["readme"]=str(write_readme(snap,outputs))
+    print(json.dumps({"snapshot":asdict(snap),"outputs":outputs},indent=2))
+    metadata_txt = write_youtube_metadata_txt()
+    print("Title/description TXT:", metadata_txt.resolve())
+
+
+if __name__=="__main__":
+    main()
