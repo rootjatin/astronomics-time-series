@@ -3,6 +3,7 @@ from __future__ import annotations
 """
 I Put 1,000 Planets Around One Star
 ===================================
+output: https://youtube.com/shorts/Kmw-PshZvVc?feature=share
 
 A cinematic vertical YouTube Short renderer about orbital crowding.
 
