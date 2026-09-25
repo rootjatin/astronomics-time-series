@@ -84,11 +84,30 @@ for directory in (OUTPUT_ROOT, DATA_ROOT, PREVIEW_ROOT):
     directory.mkdir(parents=True, exist_ok=True)
 
 CONFIG: Dict[str, Any] = {
-
+    "title": "I PUT 1,000 PLANETS AROUND ONE STAR",
+    "subtitle": "one Sun // 1,000 Earth-mass worlds // orbital traffic jam",
+    "basename": "i_put_1000_planets_around_one_star",
+    "contrast": 1.12,
+    "saturation": 1.08,
+    "vignette": 0.28,
 }
 
 COLORS = {
-
+    "space": (2, 4, 13),
+    "space2": (8, 15, 36),
+    "white": (247, 251, 255),
+    "muted": (164, 191, 214),
+    "cyan": (72, 229, 255),
+    "blue": (80, 137, 255),
+    "gold": (255, 207, 91),
+    "orange": (255, 141, 72),
+    "red": (255, 78, 103),
+    "green": (103, 239, 174),
+    "violet": (190, 126, 255),
+    "magenta": (241, 91, 190),
+    "star": (255, 220, 105),
+    "star_hot": (255, 249, 220),
+    "panel": (3, 8, 22),
 }
 
 SHOT_PLAN = [
@@ -651,5 +670,4 @@ def write_youtube_metadata_txt() -> Path:
         encoding="utf-8",
     )
     return path
-
 
