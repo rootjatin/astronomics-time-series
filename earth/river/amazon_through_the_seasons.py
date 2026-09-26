@@ -29,6 +29,16 @@ What the video shows
   gauge record, forecast, or reconstruction of daily discharge.
 
 
+Sources used for scientific framing
+-----------------------------------
+NASA Earth Observatory / NASA Science — Water Flow in the Amazon:
+    https://science.nasa.gov/earth/earth-observatory/water-flow-in-the-amazon-4820/
+NASA Earth Observatory / NASA Science — Escape from the Amazon:
+    https://science.nasa.gov/earth/earth-observatory/escape-from-the-amazon/
+Serviço Geológico do Brasil (SGB) — Amazon Basin hydrological bulletins:
+    https://www.sgb.gov.br/
+    
+
 Install
 -------
     pip install numpy pillow imageio imageio-ffmpeg requests tqdm
