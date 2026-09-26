@@ -960,3 +960,8 @@ def main():
     print("Source status:",summary)
     metadata_txt = write_youtube_metadata_txt()
     print("Title/description TXT:", metadata_txt.resolve())
+
+
+if __name__=="__main__":
+    main()
+
