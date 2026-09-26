@@ -4,6 +4,8 @@ from __future__ import annotations
 The Amazon River Breathes With the Seasons
 ==========================================
 
+Output : https://www.youtube.com/shorts/DjGN61KISto
+
 A cinematic vertical YouTube Short renderer about the Amazon flood pulse.
 The production pattern intentionally mirrors the attached Arctic Shorts:
 9:16 rendering, quick-preview mode, a multi-shot scientific story, animated
