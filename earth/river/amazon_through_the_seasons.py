@@ -90,7 +90,19 @@ for directory in (OUTPUT_ROOT, DATA_ROOT, PREVIEW_ROOT, CACHE_ROOT):
     directory.mkdir(parents=True, exist_ok=True)
 
 CONFIG = {
-
+    "width": 540 if QUICK_MODE else 1080,
+    "height": 960 if QUICK_MODE else 1920,
+    "fps": 6 if QUICK_MODE else 24,
+    "duration_s": 13.0 if QUICK_MODE else 58.0,
+    "basename": "the_amazon_river_breathes_with_the_seasons",
+    "title": "THE AMAZON RIVER BREATHES WITH THE SEASONS",
+    "subtitle": "A yearly flood pulse across river, forest, and floodplain",
+    "timeout_s": 30,
+    "cache_hours": 72,
+    "particles": 120 if QUICK_MODE else 320,
+    "nasa_flow_url": "https://science.nasa.gov/earth/earth-observatory/water-flow-in-the-amazon-4820/",
+    "nasa_escape_url": "https://science.nasa.gov/earth/earth-observatory/escape-from-the-amazon/",
+    "sgb_url": "https://www.sgb.gov.br/",
 }
 
 W = int(CONFIG["width"])
