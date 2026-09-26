@@ -134,6 +134,14 @@ COLORS = {
 }
 MONTHS = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"]
 
+CAPTION_TEXTS = [
+    "The Amazon does not stay the same size all year. Water rises, spreads into floodplains and flooded forest, then retreats again — a vast seasonal pulse.",
+    "The timing changes from river to river. Around the central Amazon near Manaus, high water commonly comes around June, while the seasonal low is often in October or November.",
+    "Rain falling across the basin and water arriving from distant tributaries raise the main rivers for months. Channels deepen and connected lakes and floodplains expand.",
+    "At high water, forests called várzea can become part river, part lake. Water moves through trees, carries sediment and nutrients, and opens temporary habitat for aquatic life.",
+    "Then the pulse reverses. Water drains back toward channels, beaches and bars reappear, and floodplain lakes shrink. The next rainy season begins the cycle again.",
+    "This animation is a sourced seasonal illustration, not a live gauge or daily discharge record. In the Amazon, the river's shape is always being rewritten by water.",
+]
 
 
 CAPTIONS = [
