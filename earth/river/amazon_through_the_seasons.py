@@ -4,7 +4,7 @@ from __future__ import annotations
 The Amazon River Breathes With the Seasons
 ==========================================
 
-Output : https://www.youtube.com/shorts/DjGN61KISto
+output : https://www.youtube.com/shorts/DjGN61KISto
 
 A cinematic vertical YouTube Short renderer about the Amazon flood pulse.
 The production pattern intentionally mirrors the attached Arctic Shorts:
@@ -28,7 +28,6 @@ What the video shows
 - The seasonal curve in this animation is deliberately schematic. It is not a
   gauge record, forecast, or reconstruction of daily discharge.
 
-
 Sources used for scientific framing
 -----------------------------------
 NASA Earth Observatory / NASA Science — Water Flow in the Amazon:
@@ -37,7 +36,6 @@ NASA Earth Observatory / NASA Science — Escape from the Amazon:
     https://science.nasa.gov/earth/earth-observatory/escape-from-the-amazon/
 Serviço Geológico do Brasil (SGB) — Amazon Basin hydrological bulletins:
     https://www.sgb.gov.br/
-    
 
 Install
 -------
@@ -142,7 +140,17 @@ COLORS = {
     "red": (255, 92, 92),
     "panel": (3, 18, 23),
 }
+
 MONTHS = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"]
+
+SHOT_PLAN = [
+    {"name": "intro", "start": 0.0, "end": 7.0 if not QUICK_MODE else 1.7},
+    {"name": "pulse", "start": 7.0 if not QUICK_MODE else 1.7, "end": 19.5 if not QUICK_MODE else 4.2},
+    {"name": "rise", "start": 19.5 if not QUICK_MODE else 4.2, "end": 31.0 if not QUICK_MODE else 6.7},
+    {"name": "high_water", "start": 31.0 if not QUICK_MODE else 6.7, "end": 42.0 if not QUICK_MODE else 9.1},
+    {"name": "retreat", "start": 42.0 if not QUICK_MODE else 9.1, "end": 52.0 if not QUICK_MODE else 11.3},
+    {"name": "outro", "start": 52.0 if not QUICK_MODE else 11.3, "end": CONFIG["duration_s"]},
+]
 
 CAPTION_TEXTS = [
     "The Amazon does not stay the same size all year. Water rises, spreads into floodplains and flooded forest, then retreats again — a vast seasonal pulse.",
@@ -152,7 +160,6 @@ CAPTION_TEXTS = [
     "Then the pulse reverses. Water drains back toward channels, beaches and bars reappear, and floodplain lakes shrink. The next rainy season begins the cycle again.",
     "This animation is a sourced seasonal illustration, not a live gauge or daily discharge record. In the Amazon, the river's shape is always being rewritten by water.",
 ]
-
 
 CAPTIONS = [
     (
@@ -922,3 +929,34 @@ def write_youtube_metadata_txt() -> Path:
         encoding="utf-8",
     )
     return path
+
+def main():
+    print("Collecting Amazon flood-pulse source snapshot ...")
+    snapshot,rows,summary=collect_data()
+    csv_path,json_path=save_data(snapshot,rows,summary)
+    print("Cycle data:",csv_path.resolve())
+    print("Summary:",json_path.resolve())
+
+    scene=AmazonScene(snapshot,rows,summary)
+    preview_times=[
+        1.0,
+        min(10.0,CONFIG["duration_s"]*.22),
+        min(24.0,CONFIG["duration_s"]*.43),
+        min(35.0,CONFIG["duration_s"]*.62),
+        min(47.0,CONFIG["duration_s"]*.82),
+        CONFIG["duration_s"]-1.0,
+    ]
+    preview_paths: List[Path]=[]
+    for t in tqdm(preview_times,desc="Preview frames"):
+        path=PREVIEW_ROOT/f"preview_{int(t):02d}s.png"
+        Image.fromarray(scene.render_frame(float(t))).save(path)
+        preview_paths.append(path)
+
+    contact=PREVIEW_ROOT/"the_amazon_river_breathes_with_the_seasons_contact_sheet.jpg"
+    make_contact_sheet(preview_paths,contact)
+    video_path=render_video(scene)
+    print("Video:",video_path.resolve())
+    print("Contact sheet:",contact.resolve())
+    print("Source status:",summary)
+    metadata_txt = write_youtube_metadata_txt()
+    print("Title/description TXT:", metadata_txt.resolve())
