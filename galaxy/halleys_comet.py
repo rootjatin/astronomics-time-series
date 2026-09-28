@@ -1203,5 +1203,28 @@ def write_youtube_metadata_txt() -> Path:
         encoding="utf-8",
     )
     return path
+def main():
+    print("Collecting Halley data ...")
+    snapshot, apparitions, summary = collect_data()
+    csv_path, json_path = save_data(snapshot, apparitions, summary)
+    print("Data:", csv_path.resolve())
+    print("Summary:", json_path.resolve())
 
+    scene = HalleyScene(snapshot, apparitions, summary)
+    preview_times = [1.0, min(10.0, CONFIG["duration_s"] * 0.22), min(22.0, CONFIG["duration_s"] * 0.42), min(35.0, CONFIG["duration_s"] * 0.64), min(47.0, CONFIG["duration_s"] * 0.83), CONFIG["duration_s"] - 1]
+    preview_paths = []
+    for t in tqdm(preview_times, desc="Preview frames"):
+        path = PREVIEW_ROOT / f"preview_{int(t):02d}s.png"
+        Image.fromarray(scene.render_frame(float(t))).save(path)
+        preview_paths.append(path)
+    make_contact_sheet(preview_paths, PREVIEW_ROOT / "watch_halleys_comet_travel_through_time_contact_sheet.jpg")
+    video_path = render_video(scene)
+    print("Video:", video_path.resolve())
+    print("Source status:", summary)
+    metadata_txt = write_youtube_metadata_txt()
+    print("Title/description TXT:", metadata_txt.resolve())
+
+
+if __name__ == "__main__":
+    main()
 
