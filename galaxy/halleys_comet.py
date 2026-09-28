@@ -3,6 +3,7 @@ from __future__ import annotations
 """
 Watch Halley's Comet Travel Through Time
 =======================================
+output : https://www.youtube.com/shorts/F9arIVbnwEg
 
 A cinematic vertical YouTube Short renderer about 1P/Halley, combining a
 current orbit snapshot from NASA/JPL's Small-Body Database with a historical
