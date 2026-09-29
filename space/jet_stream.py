@@ -9,7 +9,22 @@ cyclone / space-debris Shorts: live public data first, cached data second, a cle
 deterministic offline fixture third, plus previews, captions, CSV/JSON exports,
 ambient audio, and a final MP4.
 
+REAL DATA
+---------
+Primary source: NOAA Physical Sciences Laboratory, NCEP/NCAR Reanalysis 1 daily
+pressure-level winds. The animation uses daily-mean U and V wind at 250 hPa,
+roughly the pressure level commonly used to visualize upper-tropospheric jet
+streams.
 
+Important source note: NOAA PSL states that NCEP/NCAR Reanalysis 1 stopped
+production with its last date on 17 March 2026. For that reason the default real
+window is 16 February–17 March 2026: the latest 30-day window available from this
+source at the time this script was written. The video labels the actual dates and
+does not imply that the data are live/current.
+
+The script requests a compact NetCDF3 subset through NOAA PSL's THREDDS NetCDF
+Subset Service (NCSS): global latitude/longitude, one pressure level (250 hPa),
+and only the requested 30 days.
 
 Install
 -------
@@ -130,17 +145,7 @@ OUT_H = int(CONFIG["video_height"])
 OUT_SIZE = (OUT_W, OUT_H)
 SCALE = OUT_W / 1080.0
 
-COLORS = {
-  
-}
 
-FULL_SHOT_PLAN = [
-
-]
-
-FULL_CAPTIONS = [
-
-]
 
 if QUICK_MODE:
     k = float(CONFIG["duration_s"]) / 58.0
@@ -1745,48 +1750,7 @@ class JetStreamScene:
         i1 = min(i0 + 1, len(self.day_layers) - 1)
         f = smoothstep(pos - i0)
         if i0 == i1:
-            return self.day_layers[i0], i0, i1, fdef main():
-    print("Title:", CONFIG["title"])
-    print("Requested 30-day window:", REQUESTED_START_DATE.isoformat(), "to", REQUESTED_END_DATE.isoformat())
-    print("Pressure level:", f"{PRESSURE_HPA:.0f} hPa")
-    print("Loading global daily U/V wind ...")
-    data = load_winds()
-    stats = compute_day_stats(data)
-    csv_path, summary_path = save_data_products(data, stats)
-    strongest = max(stats, key=lambda s: s.global_max_ms)
-    print("Data source:", data.source)
-    print("Actual window:", data.dates[0].isoformat(), "to", data.dates[-1].isoformat())
-    print("Daily fields:", len(data.dates))
-    print("Grid:", len(data.lat), "lat x", len(data.lon), "lon")
-    print("Strongest loaded day:", strongest.when.isoformat(), f"{strongest.global_max_ms:.1f} m/s")
-    print("CSV:", csv_path.resolve())
-    print("Summary:", summary_path.resolve())
-    for note in data.notes:
-        print("Data note:", note)
-
-    scene = JetStreamScene(data, stats)
-    preview_times = [
-        1.3,
-        min(10.0, float(CONFIG["duration_s"])*0.22),
-        min(26.0, float(CONFIG["duration_s"])*0.48),
-        min(40.0, float(CONFIG["duration_s"])*0.69),
-        min(48.0, float(CONFIG["duration_s"])*0.83),
-        float(CONFIG["duration_s"])-0.7,
-    ]
-    for preview_time in tqdm(preview_times, desc="Preview frames"):
-        frame = scene.render_frame(float(preview_time))
-        Image.fromarray(frame).save(PREVIEW_DIR / f"preview_{int(preview_time):02d}s.png")
-
-    render_video(scene)
-    print("Output directory:", OUTPUT_ROOT.resolve())
-    for path in sorted(OUTPUT_ROOT.glob("*")):
-        print("-", path.name)
-    metadata_txt = write_youtube_metadata_txt()
-    print("Title/description TXT:", metadata_txt.resolve())
-
-
-if __name__ == "__main__":
-    main()
+            return self.day_layers[i0], i0, i1, f
         return Image.blend(self.day_layers[i0], self.day_layers[i1], f), i0, i1, f
 
     def draw_opening(self, image: Image.Image, t: float, shot: Dict[str, Any]):
@@ -2113,5 +2077,4 @@ def write_youtube_metadata_txt() -> Path:
         encoding="utf-8",
     )
     return path
-
 
