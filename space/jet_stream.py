@@ -145,7 +145,39 @@ OUT_H = int(CONFIG["video_height"])
 OUT_SIZE = (OUT_W, OUT_H)
 SCALE = OUT_W / 1080.0
 
+COLORS = {
+    "bg_top": (2, 8, 18),
+    "bg_bottom": (0, 2, 8),
+    "land": (16, 28, 36),
+    "land_edge": (70, 105, 118),
+    "grid": (65, 112, 130),
+    "white": (246, 250, 252),
+    "muted": (151, 187, 201),
+    "weak": (49, 112, 146),
+    "moderate": (54, 209, 235),
+    "fast": (250, 211, 86),
+    "very_fast": (255, 125, 75),
+    "extreme": (236, 83, 207),
+    "dark": (1, 4, 11),
+}
 
+FULL_SHOT_PLAN = [
+    {"name": "opening", "start": 0.0, "end": 5.5},
+    {"name": "thirty_days", "start": 5.5, "end": 38.0},
+    {"name": "hemispheres", "start": 38.0, "end": 45.0},
+    {"name": "strongest_day", "start": 45.0, "end": 51.5},
+    {"name": "composite", "start": 51.5, "end": 56.0},
+    {"name": "finale", "start": 56.0, "end": 58.0},
+]
+
+FULL_CAPTIONS = [
+    (0.4, 5.2, "This is the global jet stream, day by day, for thirty days."),
+    (5.8, 37.6, "Each frame is daily mean wind near 250 hectopascals. Watch the fastest ribbons bend, split, and reconnect around the planet."),
+    (38.2, 44.7, "The Northern and Southern Hemisphere jets evolve independently, each shaped by waves in the upper atmosphere."),
+    (45.2, 51.1, "One day in the sequence contains the strongest 250-hectopascal wind loaded for this thirty-day window."),
+    (51.8, 55.6, "Stack all thirty days together and the wandering corridors of strongest upper-level wind become visible."),
+    (56.1, 57.8, "Thirty days. One atmosphere. A jet stream that never holds still."),
+]
 
 if QUICK_MODE:
     k = float(CONFIG["duration_s"]) / 58.0
@@ -2078,3 +2110,45 @@ def write_youtube_metadata_txt() -> Path:
     )
     return path
 
+def main():
+    print("Title:", CONFIG["title"])
+    print("Requested 30-day window:", REQUESTED_START_DATE.isoformat(), "to", REQUESTED_END_DATE.isoformat())
+    print("Pressure level:", f"{PRESSURE_HPA:.0f} hPa")
+    print("Loading global daily U/V wind ...")
+    data = load_winds()
+    stats = compute_day_stats(data)
+    csv_path, summary_path = save_data_products(data, stats)
+    strongest = max(stats, key=lambda s: s.global_max_ms)
+    print("Data source:", data.source)
+    print("Actual window:", data.dates[0].isoformat(), "to", data.dates[-1].isoformat())
+    print("Daily fields:", len(data.dates))
+    print("Grid:", len(data.lat), "lat x", len(data.lon), "lon")
+    print("Strongest loaded day:", strongest.when.isoformat(), f"{strongest.global_max_ms:.1f} m/s")
+    print("CSV:", csv_path.resolve())
+    print("Summary:", summary_path.resolve())
+    for note in data.notes:
+        print("Data note:", note)
+
+    scene = JetStreamScene(data, stats)
+    preview_times = [
+        1.3,
+        min(10.0, float(CONFIG["duration_s"])*0.22),
+        min(26.0, float(CONFIG["duration_s"])*0.48),
+        min(40.0, float(CONFIG["duration_s"])*0.69),
+        min(48.0, float(CONFIG["duration_s"])*0.83),
+        float(CONFIG["duration_s"])-0.7,
+    ]
+    for preview_time in tqdm(preview_times, desc="Preview frames"):
+        frame = scene.render_frame(float(preview_time))
+        Image.fromarray(frame).save(PREVIEW_DIR / f"preview_{int(preview_time):02d}s.png")
+
+    render_video(scene)
+    print("Output directory:", OUTPUT_ROOT.resolve())
+    for path in sorted(OUTPUT_ROOT.glob("*")):
+        print("-", path.name)
+    metadata_txt = write_youtube_metadata_txt()
+    print("Title/description TXT:", metadata_txt.resolve())
+
+
+if __name__ == "__main__":
+    main()
