@@ -7,6 +7,16 @@ A more cinematic, more graphical version of the Moon-wave short. The physics
 framing stays narrow and grounded: if liquid water existed on the Moon, could
 waves form under real lunar gravity and the Moon's near-vacuum environment?
 
+Key framing
+-----------
+- Liquid water is assumed to exist, but an Earth-like atmosphere is NOT added.
+- The Moon still has gravity (~1.62 m/s^2), so gravity waves are physically possible.
+- The Moon has only a tenuous exosphere, so ordinary wind-driven ocean swell would be
+  essentially absent.
+- Waves could still be launched by disturbances such as meteoroid impacts,
+  seafloor displacement, or mass movement.
+- For deep-water gravity waves at the same wavelength, speed scales as sqrt(g),
+  so the lunar speed is ~0.41 of the Earth value and the period is ~2.46x longer.
 
 Visual style
 ------------
@@ -74,7 +84,29 @@ CONFIG: Dict[str, Any] = {
 }
 
 COLORS = {
-
+    "space": (3, 8, 20),
+    "space2": (8, 18, 42),
+    "white": (244, 248, 255),
+    "muted": (165, 190, 220),
+    "cyan": (71, 228, 255),
+    "blue": (56, 141, 255),
+    "deep_blue": (3, 42, 106),
+    "water": (13, 90, 176),
+    "water2": (48, 166, 220),
+    "water3": (8, 58, 132),
+    "foam": (227, 247, 255),
+    "moon": (165, 166, 171),
+    "moon_dark": (71, 73, 80),
+    "rock": (104, 100, 98),
+    "rock2": (154, 149, 141),
+    "rock3": (72, 70, 76),
+    "gold": (255, 203, 86),
+    "orange": (255, 141, 69),
+    "red": (255, 90, 105),
+    "violet": (185, 128, 255),
+    "green": (109, 242, 176),
+    "earth_ocean": (45, 116, 201),
+    "earth_land": (82, 156, 102),
 }
 
 G_EARTH = 9.81
@@ -83,6 +115,12 @@ SPEED_RATIO = math.sqrt(G_MOON / G_EARTH)
 PERIOD_RATIO = math.sqrt(G_EARTH / G_MOON)
 
 FULL_CAPTIONS: List[Tuple[float, float, str]] = [
+    (0.35, 7.4, "If liquid water lay on the Moon, could it make waves? Yes. Lunar gravity can still pull a disturbed surface back toward level, so gravity waves are possible."),
+    (7.5, 16.9, "But the Moon has almost no atmosphere. That means no ordinary wind-driven ocean swell — the endless wave field we usually associate with Earthly seas."),
+    (17.0, 27.0, "A meteoroid impact would be a different story. It would shove water aside, launch circular waves, and send energy racing across the basin."),
+    (27.1, 37.8, "A moonquake or sudden movement of the basin floor could also displace water and produce broad, long-period waves — more like a tsunami-style pulse than choppy surf."),
+    (37.9, 48.1, "Because lunar gravity is only 1.62 meters per second squared, waves of the same wavelength would travel at about forty-one percent of the Earth speed and oscillate more slowly."),
+    (48.2, 57.4, "And if one of those waves reached shallow water, it could still steepen and break on a lunar shore. So yes: waves are possible — just not normal wind-made surf."),
 ]
 
 if QUICK_MODE:
@@ -815,4 +853,21 @@ def write_youtube_metadata_txt() -> Path:
     )
     return path
 
+def main():
+    scene = MoonWaveScene()
+    summary_path = save_summary()
+    srt_path = write_srt(CAPTIONS, OUTPUT_ROOT / f"{CONFIG['output_basename']}_subtitles.srt")
+    preview_paths = save_preview_frames(scene)
+    contact_sheet_path = make_contact_sheet(preview_paths, OUTPUT_ROOT / f"{CONFIG['output_basename']}_contact_sheet.jpg")
+    video_path = render_video(scene, OUTPUT_ROOT / f"{CONFIG['output_basename']}.mp4")
+    print(f"Saved summary: {summary_path}")
+    print(f"Saved subtitles: {srt_path}")
+    print(f"Saved previews: {[str(p) for p in preview_paths]}")
+    print(f"Saved contact sheet: {contact_sheet_path}")
+    print(f"Saved video: {video_path}")
+    metadata_txt = write_youtube_metadata_txt()
+    print("Title/description TXT:", metadata_txt.resolve())
 
+
+if __name__ == "__main__":
+    main()
