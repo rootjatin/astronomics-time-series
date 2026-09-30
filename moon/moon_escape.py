@@ -1,46 +1,25 @@
 from __future__ import annotations
 
 """
-Waves on the Moon — If It Had Water — cinematic YouTube Short renderer (enhanced)
+The Moon Is Slowly "Escaping" Earth — cinematic YouTube Short renderer
 
-A more cinematic, more graphical version of the Moon-wave short. The physics
-framing stays narrow and grounded: if liquid water existed on the Moon, could
-waves form under real lunar gravity and the Moon's near-vacuum environment?
+This script creates a vertical 1080×1920 astronomy short explaining the measured
+lunar recession caused by tidal interactions in the Earth–Moon system.
 
-Key framing
------------
-- Liquid water is assumed to exist, but an Earth-like atmosphere is NOT added.
-- The Moon still has gravity (~1.62 m/s^2), so gravity waves are physically possible.
-- The Moon has only a tenuous exosphere, so ordinary wind-driven ocean swell would be
-  essentially absent.
-- Waves could still be launched by disturbances such as meteoroid impacts,
-  seafloor displacement, or mass movement.
-- For deep-water gravity waves at the same wavelength, speed scales as sqrt(g),
-  so the lunar speed is ~0.41 of the Earth value and the period is ~2.46x longer.
+Scientific grounding:
+- Mean Earth–Moon distance: ~384,400 km
+- Present-day lunar recession from lunar laser ranging: ~3.82 cm/year
+- Apollo-era retroreflectors allow direct ranging using laser pulses
+- The Moon is moving outward, but it is NOT currently escaping Earth's gravity
+- The recession rate is a present-day measured average and should not be
+  back-extrapolated linearly over all geological time
 
-Visual style
-------------
-Cinematic and eye-catching, with stronger graphics, camera moves, glow, richer
-water shading, and more simulation-like wave motion than the earlier version.
-Still diagrammatic; not a full CFD fluid simulation.
+Recommended install:
+    pip install numpy pandas matplotlib pillow imageio imageio-ffmpeg tqdm
 
-Install
--------
-    pip install numpy pillow imageio imageio-ffmpeg tqdm
-
-Quick preview
--------------
-    MOON_WAVES_SHORT_QUICK=1 python waves_on_the_moon_if_it_had_water_cinematic.py
-
-Full render
------------
-    python waves_on_the_moon_if_it_had_water_cinematic.py
-
-4K vertical
------------
-    MOON_WAVES_SHORT_4K=1 python waves_on_the_moon_if_it_had_water_cinematic.py
+Quick test render:
+    MOON_ESCAPE_SHORT_QUICK=1 python the_moon_is_slowly_escaping_earth_short.py
 """
-
 
 import math
 import os
@@ -101,31 +80,7 @@ CONFIG = {
         'be extended linearly across all of geologic history.'
     ),
 }
-COLORS = {
-    "space": (3, 8, 20),
-    "space2": (8, 18, 42),
-    "white": (244, 248, 255),
-    "muted": (165, 190, 220),
-    "cyan": (71, 228, 255),
-    "blue": (56, 141, 255),
-    "deep_blue": (3, 42, 106),
-    "water": (13, 90, 176),
-    "water2": (48, 166, 220),
-    "water3": (8, 58, 132),
-    "foam": (227, 247, 255),
-    "moon": (165, 166, 171),
-    "moon_dark": (71, 73, 80),
-    "rock": (104, 100, 98),
-    "rock2": (154, 149, 141),
-    "rock3": (72, 70, 76),
-    "gold": (255, 203, 86),
-    "orange": (255, 141, 69),
-    "red": (255, 90, 105),
-    "violet": (185, 128, 255),
-    "green": (109, 242, 176),
-    "earth_ocean": (45, 116, 201),
-    "earth_land": (82, 156, 102),
-}
+
 OUT_SIZE = (CONFIG["video_width"], CONFIG["video_height"])
 
 
