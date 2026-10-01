@@ -84,7 +84,7 @@ CONFIG: Dict[str, Any] = {
 }
 
 COLORS = {
-
+ 
 }
 
 G_EARTH = 9.81
@@ -102,7 +102,12 @@ else:
     CAPTIONS = FULL_CAPTIONS
 
 SHOT_PLAN = [
-
+    {"name": "hook", "start": 0.0, "end": 7.8 if not QUICK_MODE else 1.75},
+    {"name": "no_wind", "start": 7.8 if not QUICK_MODE else 1.75, "end": 17.2 if not QUICK_MODE else 3.95},
+    {"name": "impact", "start": 17.2 if not QUICK_MODE else 3.95, "end": 27.5 if not QUICK_MODE else 6.2},
+    {"name": "moonquake", "start": 27.5 if not QUICK_MODE else 6.2, "end": 38.5 if not QUICK_MODE else 8.7},
+    {"name": "gravity", "start": 38.5 if not QUICK_MODE else 8.7, "end": 49.0 if not QUICK_MODE else 11.0},
+    {"name": "shore", "start": 49.0 if not QUICK_MODE else 11.0, "end": DURATION},
 ]
 
 # -----------------------------------------------------------------------------
@@ -820,4 +825,17 @@ def write_youtube_metadata_txt() -> Path:
     )
     return path
 
-
+def main():
+    scene = MoonWaveScene()
+    summary_path = save_summary()
+    srt_path = write_srt(CAPTIONS, OUTPUT_ROOT / f"{CONFIG['output_basename']}_subtitles.srt")
+    preview_paths = save_preview_frames(scene)
+    contact_sheet_path = make_contact_sheet(preview_paths, OUTPUT_ROOT / f"{CONFIG['output_basename']}_contact_sheet.jpg")
+    video_path = render_video(scene, OUTPUT_ROOT / f"{CONFIG['output_basename']}.mp4")
+    print(f"Saved summary: {summary_path}")
+    print(f"Saved subtitles: {srt_path}")
+    print(f"Saved previews: {[str(p) for p in preview_paths]}")
+    print(f"Saved contact sheet: {contact_sheet_path}")
+    print(f"Saved video: {video_path}")
+    metadata_txt = write_youtube_metadata_txt()
+    print("Title/description TXT:", metadata_txt.resolve())
