@@ -75,7 +75,12 @@ for directory in (OUTPUT_ROOT, PREVIEW_DIR):
     directory.mkdir(parents=True, exist_ok=True)
 
 CONFIG: Dict[str, Any] = {
-
+    "title": "WAVES ON THE MOON — IF IT HAD WATER",
+    "subtitle": "more cinematic // lunar gravity // no wind-generated swell",
+    "output_basename": "waves_on_the_moon_if_it_had_water_cinematic_v2",
+    "contrast": 1.10,
+    "saturation": 1.12,
+    "vignette": 0.31,
 }
 
 COLORS = {
@@ -814,4 +819,5 @@ def write_youtube_metadata_txt() -> Path:
         encoding="utf-8",
     )
     return path
+
 
