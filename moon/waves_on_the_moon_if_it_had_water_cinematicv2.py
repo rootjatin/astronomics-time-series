@@ -84,7 +84,7 @@ CONFIG: Dict[str, Any] = {
 }
 
 COLORS = {
- 
+
 }
 
 G_EARTH = 9.81
@@ -93,6 +93,12 @@ SPEED_RATIO = math.sqrt(G_MOON / G_EARTH)
 PERIOD_RATIO = math.sqrt(G_EARTH / G_MOON)
 
 FULL_CAPTIONS: List[Tuple[float, float, str]] = [
+    (0.35, 7.4, "If liquid water lay on the Moon, could it make waves? Yes. Lunar gravity can still pull a disturbed surface back toward level, so gravity waves are possible."),
+    (7.5, 16.9, "But the Moon has almost no atmosphere. That means no ordinary wind-driven ocean swell — the endless wave field we usually associate with Earthly seas."),
+    (17.0, 27.0, "A meteoroid impact would be a different story. It would shove water aside, launch circular waves, and send energy racing across the basin."),
+    (27.1, 37.8, "A moonquake or sudden movement of the basin floor could also displace water and produce broad, long-period waves — more like a tsunami-style pulse than choppy surf."),
+    (37.9, 48.1, "Because lunar gravity is only 1.62 meters per second squared, waves of the same wavelength would travel at about forty-one percent of the Earth speed and oscillate more slowly."),
+    (48.2, 57.4, "And if one of those waves reached shallow water, it could still steepen and break on a lunar shore. So yes: waves are possible — just not normal wind-made surf."),
 ]
 
 if QUICK_MODE:
@@ -839,3 +845,5 @@ def main():
     print(f"Saved video: {video_path}")
     metadata_txt = write_youtube_metadata_txt()
     print("Title/description TXT:", metadata_txt.resolve())
+
+
