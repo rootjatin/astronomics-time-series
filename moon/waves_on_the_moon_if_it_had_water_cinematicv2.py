@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 """
+Output: https://youtube.com/shorts/1ZJjWc33naQ?feature=share
 Waves on the Moon — If It Had Water — cinematic YouTube Short renderer (enhanced)
 
 A more cinematic, more graphical version of the Moon-wave short. The physics
