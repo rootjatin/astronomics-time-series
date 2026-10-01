@@ -84,7 +84,29 @@ CONFIG: Dict[str, Any] = {
 }
 
 COLORS = {
-
+    "space": (3, 8, 20),
+    "space2": (8, 18, 42),
+    "white": (244, 248, 255),
+    "muted": (165, 190, 220),
+    "cyan": (71, 228, 255),
+    "blue": (56, 141, 255),
+    "deep_blue": (3, 42, 106),
+    "water": (13, 90, 176),
+    "water2": (48, 166, 220),
+    "water3": (8, 58, 132),
+    "foam": (227, 247, 255),
+    "moon": (165, 166, 171),
+    "moon_dark": (71, 73, 80),
+    "rock": (104, 100, 98),
+    "rock2": (154, 149, 141),
+    "rock3": (72, 70, 76),
+    "gold": (255, 203, 86),
+    "orange": (255, 141, 69),
+    "red": (255, 90, 105),
+    "violet": (185, 128, 255),
+    "green": (109, 242, 176),
+    "earth_ocean": (45, 116, 201),
+    "earth_land": (82, 156, 102),
 }
 
 G_EARTH = 9.81
@@ -847,3 +869,5 @@ def main():
     print("Title/description TXT:", metadata_txt.resolve())
 
 
+if __name__ == "__main__":
+    main()
