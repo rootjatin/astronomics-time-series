@@ -4,6 +4,8 @@ from __future__ import annotations
 What Happens When Two Planets Share an Orbit?
 ==============================================
 
+Output : https://youtube.com/shorts/iXDogbUp2OQ?feature=share
+
 A cinematic vertical YouTube Short renderer about co-orbital dynamics.
 
 The video compares three distinct meanings of "sharing an orbit":
