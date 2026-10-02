@@ -1,4 +1,3 @@
-output='https://youtube.com/shorts/iXDogbUp2OQ?feature=share'
 from __future__ import annotations
 
 """
@@ -16,7 +15,16 @@ The video compares three distinct meanings of "sharing an orbit":
    on top of one another on the same orbital track and strong mutual gravity
    can drive close encounters.
 
-
+Scientific interpretation
+-------------------------
+- Sharing a semimajor axis does NOT mean occupying the same place at the same time.
+- L4/L5 geometry places co-orbiting bodies about 60 degrees ahead/behind a primary.
+- Saturn's Janus and Epimetheus provide a real Solar System example of a 1:1
+  co-orbital resonance: their nearby orbits swap inner/outer roles every few years.
+- The horseshoe and unsafe-close scenes here are educational schematic animations,
+  not a precision long-term N-body prediction for two Earth twins.
+- Exact stability depends on masses, eccentricities, inclinations, phase, and
+  perturbations from other bodies.
 
 Install
 -------
@@ -79,6 +87,43 @@ CONFIG: Dict[str, Any] = {
     "vignette": 0.28,
 }
 
+COLORS = {
+    "space": (2, 5, 16),
+    "space2": (8, 18, 40),
+    "white": (247, 251, 255),
+    "muted": (164, 192, 216),
+    "cyan": (75, 229, 255),
+    "blue": (76, 139, 255),
+    "gold": (255, 207, 90),
+    "orange": (255, 142, 74),
+    "red": (255, 82, 106),
+    "green": (105, 241, 178),
+    "violet": (190, 127, 255),
+    "magenta": (241, 94, 193),
+    "star": (255, 215, 93),
+    "star_hot": (255, 249, 221),
+    "planet_a": (84, 206, 255),
+    "planet_b": (255, 119, 89),
+    "panel": (3, 9, 24),
+}
+
+SHOT_PLAN = [
+    {"name": "reveal", "start": 0.0, "end": 8.0 if not QUICK_MODE else 1.8},
+    {"name": "trojan", "start": 8.0 if not QUICK_MODE else 1.8, "end": 19.0 if not QUICK_MODE else 4.25},
+    {"name": "horseshoe", "start": 19.0 if not QUICK_MODE else 4.25, "end": 31.0 if not QUICK_MODE else 6.95},
+    {"name": "swap", "start": 31.0 if not QUICK_MODE else 6.95, "end": 41.5 if not QUICK_MODE else 9.3},
+    {"name": "unsafe", "start": 41.5 if not QUICK_MODE else 9.3, "end": 51.5 if not QUICK_MODE else 11.55},
+    {"name": "outro", "start": 51.5 if not QUICK_MODE else 11.55, "end": DURATION},
+]
+
+CAPTION_TEXTS = [
+    "Two planets can share the same orbital period without sharing the same location. The trick is a one-to-one resonance: both worlds go around the star once in the same amount of time.",
+    "One surprisingly stable arrangement is Trojan-style motion. If the planets are tiny compared with the star, one can remain about sixty degrees ahead of the other instead of catching it.",
+    "Another possibility is a horseshoe orbit. In a frame rotating with one planet, the other appears to trace a giant horseshoe as their gravity prevents a direct pass.",
+    "The mechanism is an exchange of orbital energy. The planet that is nudged inward moves faster; the one pushed outward moves slower. Their relative motion reverses before a collision.",
+    "But co-orbital does not automatically mean safe. Put two massive planets too close together with the wrong phase, eccentricity, or inclination and close encounters can destroy the neat resonance.",
+    "So two planets can share an orbit — but only when gravity organizes the traffic. Same year does not mean same place, and resonance can be the difference between a dance and a crash.",
+]
 
 CAPTIONS = [
     (
@@ -683,5 +728,4 @@ def write_youtube_metadata_txt() -> Path:
         encoding="utf-8",
     )
     return path
-
 
