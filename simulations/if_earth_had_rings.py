@@ -4,6 +4,8 @@ from __future__ import annotations
 What If Earth Had Rings Like Saturn?
 ====================================
 
+output:https://www.youtube.com/shorts/rRIyUfL8yag
+
 A cinematic vertical YouTube Short renderer about a hypothetical Earth with a
 bright planetary ring system.
 
