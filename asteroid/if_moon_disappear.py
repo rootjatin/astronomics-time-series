@@ -3,6 +3,7 @@ from __future__ import annotations
 """
 What If Earth Orbited Two Suns?
 ===============================
+output: https://www.youtube.com/shorts/zLn2RtEpREY 
 
 A cinematic vertical YouTube Short renderer about a physically plausible
 version of a "two suns" Earth: a circumbinary planet orbiting around both
