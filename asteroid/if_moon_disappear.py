@@ -737,4 +737,30 @@ def write_youtube_metadata_txt() -> Path:
     )
     return path
 
+def main():
+    snapshot=build_snapshot()
+    csv_path,json_path=save_data(snapshot)
+    srt_path=write_srt(OUTPUT_ROOT/f"{CONFIG['basename']}_subtitles.srt")
+    scene=TwoSunsScene(snapshot)
+    previews=render_preview_frames(scene)
+    sheet=make_contact_sheet(previews)
+    video=render_video(scene)
+    flat_video,flat_sheet,flat_srt=copy_flat(video,sheet,srt_path)
+    print("\nRender complete")
+    print("="*76)
+    print(CONFIG["title"])
+    print(f"Mode: {'QUICK' if QUICK_MODE else ('4K' if FOUR_K else 'FULL HD')}")
+    print(f"Frame: {W}x{H} @ {FPS} fps // {DURATION:.1f} s")
+    print(f"Binary period: {snapshot.binary_period_days:.2f} days")
+    print(f"Earth circumbinary year: {snapshot.earth_period_days:.2f} days")
+    print(f"Flux range: {snapshot.flux_min_earth_units:.3f}x to {snapshot.flux_max_earth_units:.3f}x")
+    print(f"Peak-to-trough flux swing: {snapshot.flux_peak_to_trough_pct:.1f}%")
+    for label,path in [("video",video),("subtitles",srt_path),("csv",csv_path),("json",json_path),("contact",sheet),("flat_video",flat_video),("flat_sheet",flat_sheet),("flat_srt",flat_srt)]:
+        print(f"{label:12s} {path}")
+    metadata_txt = write_youtube_metadata_txt()
+    print("Title/description TXT:", metadata_txt.resolve())
+
+
+if __name__ == "__main__":
+    main()
 
