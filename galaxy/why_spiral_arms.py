@@ -1,6 +1,8 @@
 
 #!/usr/bin/env python3
+
 # This script is standalone. It generates its own imagery, audio, captions and metadata.
+#output :https://youtube.com/shorts/gpyg78TCxAo
 # No images, fonts, soundtracks, ephemerides, network access, or helper .py files required.
 # Install: python -m pip install numpy opencv-python pillow
 # System recommendation: ffmpeg; espeak for optional offline voice-over.
