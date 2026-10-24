@@ -468,4 +468,8 @@ def cli():
     ap.add_argument('--no-voice',action='store_true',help='Generate score only, no optional espeak voice-over')
     args=ap.parse_args()
     if args.width<180 or args.fps<1:ap.error('width must be >= 180 and fps >= 1')
+    generate(args)
 
+
+if __name__=='__main__':
+    cli()
