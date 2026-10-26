@@ -4,7 +4,7 @@ from __future__ import annotations
 """
 What If the Sun Suddenly Lost 10% of Its Mass?
 ===============================================
-
+output : https://www.youtube.com/shorts/Vu7qTwLr4bE
 A cinematic vertical YouTube Short renderer for a controlled orbital-physics
 thought experiment: the Sun instantaneously and isotropically loses 10% of its
 mass, without the removed mass/energy striking the planets.
