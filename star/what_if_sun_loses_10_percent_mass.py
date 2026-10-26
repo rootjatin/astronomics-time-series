@@ -758,4 +758,28 @@ def write_youtube_metadata_txt() -> Path:
     )
     return path
 
+def main():
+    snapshot=build_snapshot()
+    csv_path,json_path=save_data(snapshot)
+    srt_path=write_srt(OUTPUT_ROOT/f"{CONFIG['basename']}_subtitles.srt")
+    scene=SunMassLossScene(snapshot)
+    previews=render_preview_frames(scene)
+    sheet=make_contact_sheet(previews)
+    video=render_video(scene)
+    flat_video,flat_sheet,flat_srt=copy_flat(video,sheet,srt_path)
+    print("\nRender complete")
+    print("="*76)
+    print(CONFIG["title"])
+    print(f"Mode: {'QUICK' if QUICK_MODE else ('4K' if FOUR_K else 'FULL HD')}")
+    print(f"Frame: {W}x{H} @ {FPS} fps // {DURATION:.1f} s")
+    print(f"Post-loss Earth orbit: rp={snapshot.new_perihelion_au:.3f} AU, a={snapshot.new_semimajor_axis_au:.3f} AU, e={snapshot.new_eccentricity:.4f}, ra={snapshot.new_aphelion_au:.3f} AU")
+    print(f"New orbital period: {snapshot.new_period_old_years:.4f} old years = {snapshot.new_period_days:.1f} days")
+    print(f"Irradiance at 1.25 AU if luminosity unchanged: {snapshot.sunlight_at_aphelion_if_luminosity_constant*100:.1f}%")
+    for label,path in [("video",video),("subtitles",srt_path),("csv",csv_path),("json",json_path),("contact",sheet),("flat_video",flat_video),("flat_sheet",flat_sheet),("flat_srt",flat_srt)]:
+        print(f"{label:12s} {path}")
+    metadata_txt = write_youtube_metadata_txt()
+    print("Title/description TXT:", metadata_txt.resolve())
 
+
+if __name__ == "__main__":
+    main()
