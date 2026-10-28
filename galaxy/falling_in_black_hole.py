@@ -482,4 +482,5 @@ def cli():
     generate(args)
 
 
-
+if __name__=='__main__':
+    cli()
