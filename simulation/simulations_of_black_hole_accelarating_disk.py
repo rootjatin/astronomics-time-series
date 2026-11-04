@@ -3,6 +3,13 @@
 # No images, fonts, soundtracks, ephemerides, network access, or helper .py files required.
 # Install: python -m pip install numpy opencv-python pillow
 # System recommendation: ffmpeg; espeak for optional offline voice-over.
+'''
+SOURCES
+NASA: accretion disks and bright sides
+https://science.nasa.gov/universe/black-holes/anatomy/
+NASA: Schwarzschild disk visualization
+https://svs.gsfc.nasa.gov/14619/
+'''
 import argparse
 import json
 import math
