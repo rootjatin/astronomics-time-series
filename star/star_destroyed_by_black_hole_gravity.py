@@ -4,6 +4,13 @@
 # No images, fonts, soundtracks, ephemerides, network access, or helper .py files required.
 # Install: python -m pip install numpy opencv-python pillow
 # System recommendation: ffmpeg; espeak for optional offline voice-over.
+'''
+SOURCES
+NASA: spaghettification and tidal forces
+https://science.nasa.gov/universe/what-happens-when-something-gets-too-close-to-a-black-hole/
+NASA: accretion and stellar matter
+https://science.nasa.gov/universe/black-holes/anatomy/
+'''
 import argparse
 import json
 import math
