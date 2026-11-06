@@ -2,8 +2,6 @@
 # This script is standalone. It generates its own imagery, audio, captions and metadata.
 # No images, fonts, soundtracks, ephemerides, network access, or helper .py files required.
 # Install: python -m pip install numpy opencv-python pillow
-
-
 # System recommendation: ffmpeg; espeak for optional offline voice-over.
 '''
 SOURCES
@@ -11,7 +9,6 @@ NASA: anatomy and black hole dynamics
 https://science.nasa.gov/universe/black-holes/anatomy/
 NASA: infalling camera model
 https://www.nas.nasa.gov/SC24/research/project19.php
-
 '''
 import argparse
 import json
