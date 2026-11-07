@@ -3,7 +3,14 @@ Output : https://www.youtube.com/shorts/R0n4aEeloc4
 # This script is standalone. It generates its own imagery, audio, captions and metadata.
 # No images, fonts, soundtracks, ephemerides, network access, or helper .py files required.
 # Install: python -m pip install numpy opencv-python pillow
-# System recommendation: ffmpeg; espeak for optional offline voice-over.
+# System recommendation: ffmpeg; espeak for optional offline voice-over
+'''
+LIGO: binary coalescence and chirp
+https://ligo.org/gravitational-wave-science/
+LIGO: black hole merger and ringdown visualization
+https://www.ligo.caltech.edu/MIT/video/ligo20250910v3
+'''
+
 import argparse
 import json
 import math
