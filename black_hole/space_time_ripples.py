@@ -652,4 +652,15 @@ def generate(args):
     print('Audio:',narration)
     print('Scientific mode:',VIDEO['method'])
 
+def cli():
+    ap=argparse.ArgumentParser(description='Standalone cinematic space Shorts renderer')
+    ap.add_argument('--output',default='.',help='Folder for generated MP4, SRT and YouTube TXT')
+    ap.add_argument('--width',type=int,default=720,help='9:16 video width; 1080 for Full HD (default 720)')
+    ap.add_argument('--fps',type=int,default=30)
+    ap.add_argument('--preview-seconds',type=float,default=None,help='Fast rendering test; leaves full SRT & metadata')
+    ap.add_argument('--no-voice',action='store_true',help='Generate score only, no optional espeak voice-over')
+    args=ap.parse_args()
+    if args.width<180 or args.fps<1:ap.error('width must be >= 180 and fps >= 1')
+    generate(args)
+
 
