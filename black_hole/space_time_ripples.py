@@ -4,6 +4,11 @@
 # No images, fonts, soundtracks, ephemerides, network access, or helper .py files required.
 # Install: python -m pip install numpy opencv-python pillow
 # System recommendation: ffmpeg; espeak for optional offline voice-over.
+'''
+SOURCES
+LIGO: waves stretch and squeeze spacetime
+https://ligo.org/gravitational-wave-science/
+'''
 import argparse
 import json
 import math
