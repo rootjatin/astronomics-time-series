@@ -5,7 +5,7 @@
 # Install: python -m pip install numpy opencv-python pillow
 # System recommendation: ffmpeg; espeak for optional offline voice-over.
 ''' 
-Data SOURCES
+DATA SOURCES
 NASA: gravity warps space-time
 https://science.nasa.gov/universe/what-happens-when-something-gets-too-close-to-a-black-hole/
 NASA: warped-world visualization
