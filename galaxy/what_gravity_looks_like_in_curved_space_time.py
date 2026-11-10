@@ -5,7 +5,6 @@
 # System recommendation: ffmpeg; espeak for optional offline voice-over.
 
 ''' 
-
 SOURCES
 NASA: gravity warps space-time
 https://science.nasa.gov/universe/what-happens-when-something-gets-too-close-to-a-black-hole/
