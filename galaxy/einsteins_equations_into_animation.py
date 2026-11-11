@@ -3,6 +3,12 @@
 # No images, fonts, soundtracks, ephemerides, network access, or helper .py files required.
 # Install: python -m pip install numpy opencv-python pillow
 # System recommendation: ffmpeg; espeak for optional offline voice-over.
+'''
+SOURCES
+NASA: Einstein and warped spacetime
+https://www.nasa.gov/universe/nasa-visualization-shows-a-black-holes-warped-world/
+NASA: lensing and gravity model
+https://svs.gsfc.nasa.gov/14619/'''
 import argparse
 import json
 import math
