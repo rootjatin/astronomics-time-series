@@ -6,7 +6,7 @@
 # Install: python -m pip install numpy opencv-python pillow
 # System recommendation: ffmpeg; espeak for optional offline voice-over. #recommendation
 '''
-SOURCES
+Data SOURCES
 NASA: event horizon anatomy
 https://science.nasa.gov/universe/black-holes/anatomy/
 NASA: crossing a black-hole horizon
