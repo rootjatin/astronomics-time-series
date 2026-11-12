@@ -7,7 +7,11 @@
 # System recommendation: ffmpeg; espeak for optional offline voice-over.
 
 '''
-Sources
+SOURCES
+NASA: event horizon anatomy
+https://science.nasa.gov/universe/black-holes/anatomy/
+NASA: crossing a black-hole horizon
+https://www.nas.nasa.gov/SC24/research/project19.php
 '''
 import argparse
 import json
