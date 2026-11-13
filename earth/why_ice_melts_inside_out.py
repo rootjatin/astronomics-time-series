@@ -4,6 +4,13 @@
 # Install: python -m pip install numpy opencv-python pillow
 # output : https://www.youtube.com/shorts/fyMloULahD0
 # System recommendation: ffmpeg; espeak for optional offline voice-over.
+'''
+SOURCES
+OpenStax University Physics: Phase Changes and Latent Heat
+https://openstax.org/books/university-physics-volume-2/pages/1-5-phase-changes
+Stefan moving-boundary problem
+https://en.wikipedia.org/wiki/Stefan_problem
+'''
 import argparse
 import json
 import math
