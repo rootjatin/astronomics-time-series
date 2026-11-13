@@ -721,3 +721,4 @@ def cli():
     args=ap.parse_args()
     if args.width<180 or args.fps<1:ap.error('width must be >= 180 and fps >= 1')
 
+    generate(args)
