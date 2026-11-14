@@ -5,6 +5,13 @@
 # No images, fonts, soundtracks, ephemerides, network access, or helper .py files required.
 # Install: python -m pip install numpy opencv-python pillow
 # System recommendation: ffmpeg; espeak for optional offline voice-over.
+'''
+SOURCES
+University of Virginia: spherical Sedov–Taylor scaling
+https://galileo.phys.virginia.edu/classes/311/notes/dim/node7.html
+NASA technical report: spherical strong-shock solutions
+https://ntrs.nasa.gov/api/citations/20130012036/downloads/20130012036.pdf
+'''
 import argparse
 import json
 import math
