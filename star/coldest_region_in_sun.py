@@ -3,6 +3,7 @@ from __future__ import annotations
 
 """
 WHICH IS THE COLDEST REGION OF THE SUN? — cinematic YouTube Shorts renderer
+output : https://www.youtube.com/shorts/JaV3a4uQWKA
 
 This short answers a surprisingly subtle question:
 
