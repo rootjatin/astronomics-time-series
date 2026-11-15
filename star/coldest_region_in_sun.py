@@ -821,4 +821,34 @@ def write_youtube_metadata_txt() -> Path:
     )
     return path
 
+def main():
+    csv_path,json_path=save_science_products()
+    print("Title:",CONFIG["title"])
+    print("Reference CSV:",csv_path.resolve())
+    print("Summary:",json_path.resolve())
+    print("Science answer: quiet-atmosphere temperature minimum ~4,300 K;")
+    print("                localized sunspot umbra can be ~3,700 K.")
+
+    scene=SunColdScene()
+
+    preview_times=[
+        1.3,
+        min(10.0,float(CONFIG["duration_s"])*0.22),
+        min(25.0,float(CONFIG["duration_s"])*0.45),
+        min(35.0,float(CONFIG["duration_s"])*0.62),
+        min(46.0,float(CONFIG["duration_s"])*0.80),
+        float(CONFIG["duration_s"])-0.7,
+    ]
+    for pt in tqdm(preview_times,desc="Preview frames"):
+        frame=scene.render_frame(float(pt))
+        Image.fromarray(frame).save(PREVIEW_DIR/f"preview_{int(pt):02d}s.png")
+
+    srt=write_srt(CAPTIONS,OUTPUT_ROOT/(CONFIG["output_basename"]+"_subtitles.srt"))
+    final=render_video(scene)
+    print("SRT:",srt.resolve())
+    print("Final video:",final.resolve())
+    print("Output directory:",OUTPUT_ROOT.resolve())
+    metadata_txt = write_youtube_metadata_txt()
+    print("Title/description TXT:", metadata_txt.resolve())
+
 
