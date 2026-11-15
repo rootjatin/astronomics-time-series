@@ -852,3 +852,5 @@ def main():
     print("Title/description TXT:", metadata_txt.resolve())
 
 
+if __name__=="__main__":
+    main()
