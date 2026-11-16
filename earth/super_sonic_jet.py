@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 """Render a vertical science Short offline using its supplied narration mix."""
 # output : https://www.youtube.com/shorts/dhJgpE4kWvs
+'''
+source : 
+NASA Glenn — Mach angle — https://www.grc.nasa.gov/www/k-12/airplane/machang.html
+NASA — Supersonic flight and sonic booms — https://www.nasa.gov/learning-resources/for-kids-and-students/what-is-supersonic-flight-grades-5-8/
+'''
 import argparse
 from functools import lru_cache
 import math
@@ -13,11 +18,7 @@ import wave
 import cv2
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
-'''
-source : 
-NASA Glenn — Mach angle — https://www.grc.nasa.gov/www/k-12/airplane/machang.html
-NASA — Supersonic flight and sonic booms — https://www.nasa.gov/learning-resources/for-kids-and-students/what-is-supersonic-flight-grades-5-8/
-'''
+
 W, H = 540, 960
 TAU = 2 * math.pi
 DURATION = 36
