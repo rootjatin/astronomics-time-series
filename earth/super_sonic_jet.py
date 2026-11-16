@@ -520,4 +520,50 @@ def setup():
     texture=noise(804,(18,59,155))
     return bg,texture
 
+def scene(state,t):
+    bg,noise_field=state
+    im=bg.copy()
+    y=469
+    mach=1.48+.71*float(smooth((t-17)/10))
+    x=350+45*math.sin(.059*t)
+    mu=math.asin(1/mach)
+    dx,dy=x-XX,YY-y
+    edge=np.abs(dy)*math.cos(mu)-dx*math.sin(mu)
+    mask=smooth(dx/24)*(.66+.34*np.sin(XX*.047+t*.46)**2)
+    # Schlieren edges are bright and dark where the refractive gradient reverses.
+    shock=(.51*np.exp(-((edge+2)/3.05)**2)+.30*np.exp(-(edge/12)**2))*mask
+    shadow=.48*np.exp(-((edge-7)/4.5)**2)*mask
+    wake=np.exp(-((dy-5*np.sin(XX*.035+t*4))/np.maximum(4,dx*.072+9))**2)*smooth(dx/95)
+    wake *= .21+.68*np.maximum(0,noise_field)
+    im[:]=np.uint8(im*(1-shadow[...,None]-.50*wake[...,None]))
+    lit(im,.84*shock,rgb("ffd796"))
+    lit(im,.49*wake,rgb("caa28e"))
+    for j in range(13,0,-1):
+        age=j*25+(t*22%25)
+        r=age/mach
+        shade=blend(rgb("785045"),rgb("ffd9aa"),.69-.033*j)
+        ellipse(im,(x-age,y),(r,r),shade)
+    for j in range(39):
+        yy=273+(83*j%382)
+        px=(j*83-t*(88+j%7)*1.5)%(W+100)-50
+        line(im,(px,yy),(px+7+j%18,yy),rgb("987663"))
+    body=np.array([[0,0],[-25,-8],[-81,-13],[-109,-28],[-124,-26],[-117,-8],
+                   [-146,-4],[-146,5],[-105,11],[-78,13],[-26,8]])
+    fill(im,body+(x,y),rgb("3d3034"))
+    path(im,body+(x,y),rgb("ffddb2"),2,True)
+    fill(im,np.array([[-43,-6],[-65,-9],[-77,-4],[-52,-2]])+(x,y),rgb("afccd3"))
+    fill(im,np.array([[-20,0],[-85,1],[-116,6],[-71,10]])+(x,y),rgb("946653"))
+    line(im,(x-32,y+4),(x-135,y+5),rgb("b98b6e"))
+    if t>5.8:
+        tag(im,(38,286),"PRESSURE WAVELETS",rgb("ffdbad"),15)
+    if t>16:
+        theta=np.linspace(math.pi-mu, math.pi,44)
+        path(im,np.c_[x+98*np.cos(theta),y+98*np.sin(theta)],rgb("fff0bf"),2)
+        line(im,(x-133,y),(x-63,y),rgb("d9af8d"))
+        tag(im,(x-153,y+19),f"{math.degrees(mu):.0f}°",rgb("fff0bf"),23,"serif",bold=True)
+    tag(im,(38,730),f"MACH {mach:.2f}",rgb("ffe6b8"),24,"serif",bold=True)
+    return im
+
+
+
 
