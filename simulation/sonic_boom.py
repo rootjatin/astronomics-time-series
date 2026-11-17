@@ -2,6 +2,9 @@
 """Render a vertical science Short offline using its supplied narration mix."""
 # output : https://youtube.com/shorts/bkZHfwPFEyE?feature=share
 '''
+Source 
+NASA — Supersonic flight and sonic booms — https://www.nasa.gov/learning-resources/for-kids-and-students/what-is-supersonic-flight-grades-5-8/
+NASA — Sonic-boom wave fronts and the idealized N-wave, Figure 3-4 — https://ntrs.nasa.gov/api/citations/20250003228/downloads/NASA-TM-20250003228.pdf
 '''
 
 import argparse
