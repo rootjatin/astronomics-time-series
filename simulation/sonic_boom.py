@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python3
 """Render a vertical science Short offline using its supplied narration mix."""
 
@@ -531,6 +530,7 @@ def setup():
         path(bg,np.c_[h,ridge],blend(rgb(col),rgb("db9b92"),.26))
     return bg
 
+
 def scene(bg,t):
     im=bg.copy()
     ground,station=622,308
@@ -572,6 +572,7 @@ def scene(bg,t):
         path(im,np.c_[x[visible],719-28*p[visible]],rgb("ffd3b6"),2)
         line(im,(marker,688),(marker,752),rgb("e68fae"))
         dot(im,(marker,np.interp(marker,x,719-28*p)),3,rgb("fff2d8"))
+    return im
 
 
 
