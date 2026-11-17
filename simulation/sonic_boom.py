@@ -531,5 +531,47 @@ def setup():
         path(bg,np.c_[h,ridge],blend(rgb(col),rgb("db9b92"),.26))
     return bg
 
+def scene(bg,t):
+    im=bg.copy()
+    ground,station=622,308
+    local=((t-1.4)%18)+1.4
+    px=53+(local-1.4)*24
+    ay=349
+    slope=(ground-ay)/(53+(14.4-1.4)*24-station)
+    for sep,color in ((47,rgb("ed96bd")),(0,rgb("ffddbb"))):
+        nose=px-sep
+        a,b=(nose-590,ay+590*slope),(nose,ay)
+        distance=np.abs((YY-ay)+(XX-nose)*slope)/math.hypot(1,slope)
+        lit(im,.22*np.exp(-(distance/9)**2)*smooth((nose-XX)/19),color)
+        line(im,a,b,color,2)
+    jet=np.array([[-44,4],[-25,-2],[-34,-12],[-24,-12],[-12,-4],[8,-3],
+                  [22,1],[10,4],[-13,5],[-24,12],[-35,12],[-30,6]])
+    fill(im,jet+(px,ay),rgb("211e35"))
+    path(im,jet+(px,ay),rgb("ffe7cb"),1,True)
+    line(im,(station,ground),(station,ground-30),rgb("f6bd9f"),2)
+    line(im,(station-9,ground),(station+9,ground),rgb("daa088"),2)
+    dot(im,(station,ground-31),4,rgb("fff0cc"))
+    for moment in (14.4,16.36,32.4,34.36):
+        dt=t-moment
+        if 0<=dt<.9:
+            c=blend(rgb("594355"),rgb("ffe3cc"),1-dt/.9)
+            ellipse(im,(station,ground),(5+86*dt,4+24*dt),c,2)
+    tag(im,(station+12,ground-24),"GROUND LISTENER",rgb("fce0cc"),13)
+    fill(im,[(34,653),(505,653),(505,767),(34,767)],rgb("222238"))
+    path(im,[(34,653),(505,653),(505,767),(34,767)],rgb("755873"),1,True)
+    for y in (696,719,742):
+        line(im,(56,y),(482,y),rgb("54465e"))
+    x=np.linspace(57,482,430)
+    u=(x-212)/119
+    p=np.where((u>=0)&(u<=1),1-2*u,0)
+    path(im,np.c_[x,719-28*p],rgb("aa7487"),2)
+    tag(im,(52,667),"GROUND PRESSURE",rgb("f6c8ca"),13)
+    marker=212+119*(local-14.4)/1.96
+    if 57<marker<482:
+        visible=x<=marker
+        path(im,np.c_[x[visible],719-28*p[visible]],rgb("ffd3b6"),2)
+        line(im,(marker,688),(marker,752),rgb("e68fae"))
+        dot(im,(marker,np.interp(marker,x,719-28*p)),3,rgb("fff2d8"))
+
 
 
