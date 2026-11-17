@@ -574,5 +574,7 @@ def scene(bg,t):
         dot(im,(marker,np.interp(marker,x,719-28*p)),3,rgb("fff2d8"))
     return im
 
+if __name__ == "__main__":
+    main()
 
 
