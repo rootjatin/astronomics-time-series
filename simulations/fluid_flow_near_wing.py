@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Render a vertical science Short offline using its supplied narration mix.
+
 Output : https://youtube.com/shorts/_plKLruKCtc?feature=share
+
 Sources
 MIT — Joukowski airfoil and circulation — https://web.mit.edu/16.unified/www/SPRING/fluids/Lecture_Notes/F5LectureNotes.pdf
 NASA Glenn — Angle of attack and lift — https://www.grc.nasa.gov/www/k-12/VirtualAero/BottleRocket/airplane/incline.html
