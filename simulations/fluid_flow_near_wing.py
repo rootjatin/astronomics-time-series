@@ -605,3 +605,8 @@ def scene(state,t):
     tag(im,(43,237),"INCOMING FLOW",rgb("a4dec9"),14)
     return im
 
+
+
+if __name__ == "__main__":
+    main()
+
