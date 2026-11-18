@@ -569,5 +569,39 @@ def setup():
         line(bg,(0,y0+29),(W,y0-27),rgb("28515c"),1)
     return bg, foil_xy, traces
 
-
+def scene(state,t):
+    bg,foil,traces=state
+    im=bg.copy()
+    for j,(xy,travel) in enumerate(traces):
+        path(im,xy,rgb("3a786f") if j%4 else rgb("609d89"))
+        u=(np.arange(0,travel[-1]+59,59)+t*58+13*j)%travel[-1]
+        head=np.c_[np.interp(u,travel,xy[:,0]),np.interp(u,travel,xy[:,1])]
+        start=np.maximum(0,u-16)
+        tail=np.c_[np.interp(start,travel,xy[:,0]),np.interp(start,travel,xy[:,1])]
+        for tip,trail in zip(head,tail):
+            line(im,trail,tip,rgb("92c1a9"))
+            dot(im,tip,1.3,rgb("d7f9d8"))
+    mask=np.zeros((H,W),np.uint8)
+    cv2.fillPoly(mask,[np.round(foil).astype(np.int32)],255)
+    m=mask.astype(np.float32)/255
+    band=.5+.5*np.sin((YY-XX*.10)*.31)
+    glint=np.exp(-((YY-470+XX*.085)/21)**2)
+    sheen=material(np.clip(.23+.47*glint+.16*band,0,1),(0,.42,1),
+                   (rgb("182b38"),rgb("385968"),rgb("d1efe8")))
+    im[:]=np.uint8(im*(1-m[...,None])+sheen*m[...,None])
+    path(im,foil,rgb("b8e2d7"),2,True)
+    if 6<t<13:
+        x,y=foil[np.argmin(foil[:,0])]
+        line(im,(x,y),(x-27,y-54),rgb("d1eee8"))
+        line(im,(x-27,y-54),(58,y-54),rgb("d1eee8"))
+        dot(im,(x,y),3,rgb("d8f2e8"))
+        tag(im,(51,y-79),"LEADING EDGE",rgb("e0f7e6"),14)
+    elif 19<t:
+        x,y=foil[np.argmax(foil[:,0])]
+        line(im,(x,y),(x-37,y-70),rgb("c9f5e4"))
+        line(im,(x-37,y-70),(x-132,y-70),rgb("c9f5e4"))
+        tag(im,(x-143,y-94),"TRAILING EDGE",rgb("c9f5e4"),14)
+    arrow(im,(43,263),(119,263),rgb("8ccbc2"))
+    tag(im,(43,237),"INCOMING FLOW",rgb("a4dec9"),14)
+    return im
 
