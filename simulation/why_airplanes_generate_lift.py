@@ -524,5 +524,53 @@ def setup():
     thick = .60*(.2969*np.sqrt(x) - .126*x - .3516*x*x + .2843*x**3 - .1036*x**4)
     return bg, np.vstack((np.c_[x, -thick],np.c_[x[::-1], thick[::-1]]))
 
-
+def scene(state,t):
+    bg, foil = state
+    im = bg.copy()
+    ink, gold, blue = map(rgb, ("f7e7ca","ffba69","89c1c0"))
+    degrees = 2 + 8*float(smooth((t-9)/12))
+    theta = math.radians(degrees)
+    matrix = np.array([[math.cos(theta), math.sin(theta)],[-math.sin(theta),math.cos(theta)]])
+    wing = ((foil-(.48,0))*302)@matrix + (262,474)
+    line(im,(38,474),(496,474),rgb("8e795e"))
+    left,right=wing[0],wing[125]
+    line(im,left,right,rgb("a28a68"))
+    if t>5:
+        # Chord and incoming direction define the angle of attack.
+        pivot=left
+        arm=125
+        x,y=pivot
+        line(im,pivot,(x+153,y),rgb("9f8969"))
+        angles=np.linspace(0,theta,41)
+        arc=np.c_[x+arm*np.cos(angles),y+arm*np.sin(angles)]
+        path(im,arc,gold,2)
+        tag(im,(x+arm+8,y+20),"α",gold,20,"serif",bold=True)
+    for k in range(6):
+        x = np.linspace(10,530,140)
+        y = 345+56*k-22*np.exp(-((x-226)/112)**2)*(1 if k<3 else -1)
+        y += 58*float(smooth(theta*5))*smooth((x-255)/235)
+        path(im,np.c_[x,y],rgb("8d7861"),1)
+        u = (t*62 + 33*k) % 433
+        p = (u+30, np.interp(u+30,x,y))
+        arrow(im,p,(p[0]+25,p[1]+np.interp(u+55,x,y)-p[1]),blue,2)
+    fill(im, wing, rgb("322e2a"))
+    path(im, wing, ink, 2, True)
+    for j in ((25,42,59,76,92) if t>=14 else ()):
+        x,y = wing[j]
+        dx,dy = math.sin(theta),-math.cos(theta)
+        arrow(im,(x+dx*22,y+dy*22),(x+dx*3,y+dy*3),blue,2,.27)
+        x,y = wing[251-j]
+        amount = 30 + 13*math.sin(j/90*math.pi)
+        arrow(im,(x-dx*amount,y-dy*amount),(x-dx*4,y-dy*4),gold,2,.24)
+    if t >= 15:
+        height=40+98*float(smooth((t-15)/3.7))*math.sin(theta)*5
+        arrow(im,(272,475),(272,475-height),ink,3,.16)
+    if t > 4:
+        if t>=16:
+            tag(im,(291,382),"LIFT",ink,20,"serif",bold=True)
+        tag(im,(30,251),"ANGLE OF ATTACK",blue)
+        tag(im,(30,274),f"{degrees:04.1f}°",ink,26,"mono",bold=True)
+        tag(im,(32,650),"AIR DEFLECTS DOWNWARD",blue,16)
+    if t > 17:
+        tag(im,(34,724),"SURFACE PRESSURE PRODUCES A NET UPWARD FORCE",ink,13)
 
