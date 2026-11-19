@@ -573,4 +573,9 @@ def scene(state,t):
         tag(im,(32,650),"AIR DEFLECTS DOWNWARD",blue,16)
     if t > 17:
         tag(im,(34,724),"SURFACE PRESSURE PRODUCES A NET UPWARD FORCE",ink,13)
+    return im
+
+
+if __name__ == "__main__":
+    main()
 
