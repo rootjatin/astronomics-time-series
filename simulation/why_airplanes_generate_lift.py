@@ -1,7 +1,7 @@
 
 #!/usr/bin/env python3
 """Render a vertical science Short offline using its supplied narration mix."""
-output : https://youtube.com/shorts/7JHfYgi_4Fc?feature=share
+# output : https://youtube.com/shorts/7JHfYgi_4Fc?feature=share
 
 import argparse
 from functools import lru_cache
