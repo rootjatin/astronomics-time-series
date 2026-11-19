@@ -1,12 +1,13 @@
 
 #!/usr/bin/env python3
-"""Render a vertical science Short offline using its supplied narration mix."""
+"""Render a vertical science Short offline using its supplied narration mix.
+
 # output : https://youtube.com/shorts/7JHfYgi_4Fc?feature=share
-'''
+
 Sources
 NASA Glenn — Bernoulli and Newton explanations of lift — https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/bernoulli-and-newton/
 NASA Glenn — Angle of attack and lift — https://www.grc.nasa.gov/www/k-12/VirtualAero/BottleRocket/airplane/incline.html
-'''
+"""
 import argparse
 from functools import lru_cache
 import math
