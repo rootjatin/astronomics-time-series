@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
-"""Render a vertical science Short offline using its supplied narration mix."""
+'''Render a vertical science Short offline using its supplied narration mix.
 
 Output : https://www.youtube.com/shorts/ir1P40joIJA
 
+Sources
+Boffetta and Ecke — Two-Dimensional Turbulence, Annual Review of Fluid Mechanics — https://www.to.infn.it/~boffetta/Papers/be_arfm12.pdf
+'''
 import argparse
 from functools import lru_cache
 import math
