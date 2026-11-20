@@ -575,3 +575,6 @@ def scene(state,t):
     tag(im,(506,754),"+ VORTICITY",rgb("ffb681"),14,align="right")
     return im
 
+
+if __name__ == "__main__":
+    main()
