@@ -573,4 +573,5 @@ def scene(state,t):
         tag(im,(43,687),"LOCAL VORTICITY PROFILE",rgb("dcc2e6"),11)
     tag(im,(31,754),"− VORTICITY",rgb("c9b8ff"),14)
     tag(im,(506,754),"+ VORTICITY",rgb("ffb681"),14,align="right")
+    return im
 
