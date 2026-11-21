@@ -553,5 +553,5 @@ def scene(state,t):
     tag(im,(30,677),label,rgb("e1fff0"),21,bold=True)
     if t > 24:
         tag(im,(30,716),"SECONDARY INSTABILITIES CAN PROMOTE MIXING",rgb("b5cfc4"),13)
-
+    return im
 
