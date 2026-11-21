@@ -520,5 +520,38 @@ def setup():
     return bg,x,noise(3772,(14,44,101))
 
 
+def scene(state,t):
+    bg,x,texture = state
+    im=bg.copy()
+    growth = float(smooth((t-4)/18))
+    turn = float(smooth((t-13)/14))
+    phase=TAU*(x/132-t*.10)
+    y0=479+42*growth*np.sin(TAU*(XX/132-t*.10))
+    cloud=np.exp(-((YY-y0)/89)**2)*(.35+.65*np.clip(.58+texture,0,1))
+    upper=smooth((y0-YY+15)/65)
+    lit(im,.31*cloud*upper,rgb("dd675c"))
+    lit(im,.43*cloud*(1-upper),rgb("58e8ac"))
+    # Kinematic drawing of a rolling sheet, with smaller secondary corrugations.
+    for k in range(39):
+        side = 1 if k>=19 else -1
+        offset = (k-19)*5.5
+        envelop = math.exp(-abs(offset)/64)
+        bend = 54*growth*envelop
+        xx = x + 42*turn*envelop*np.cos(phase+offset*.022)
+        yy = 479+offset + bend*np.sin(phase+offset*.031)
+        yy += 6*turn*envelop*np.sin(3*phase+offset*.13+.4*t)
+        col = rgb("8ce8c5") if side>0 else rgb("f99487")
+        dim = .36+.54*math.exp(-abs(offset)/36)
+        path(im,np.c_[xx,yy],blend(rgb("345652"),col,dim),1 if k%9 else 2)
+        speed = t*(49 if side>0 else -49)
+        p = (speed + k*29) % 465 + 80
+        j = int(np.clip(p / 580 * len(x), 1, len(x)-9))
+        j2 = j+7 if side>0 else j-7
+        if k%4==0:
+            arrow(im,(xx[j],yy[j]),(xx[j2],yy[j2]),col,2,.4)
+    label = ("ALMOST FLAT INTERFACE" if t<7 else "RIPPLES AMPLIFY" if t<18 else "THE SHEAR LAYER ROLLS UP")
+    tag(im,(30,677),label,rgb("e1fff0"),21,bold=True)
+    if t > 24:
+        tag(im,(30,716),"SECONDARY INSTABILITIES CAN PROMOTE MIXING",rgb("b5cfc4"),13)
 
 
