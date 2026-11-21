@@ -513,4 +513,12 @@ CAMERA = ((1.005, 270, 472, 0.013), (1.07, 265, 481, 0.038), (1.045, 276, 478, 0
 CUES = ('Two smooth streams', 'A slight ripple appears', 'Shear amplifies the ripple', 'The interface rolls up', 'Smaller disturbances grow', 'From a ripple to mixing')
 
 
+def setup():
+    bg = gradient([rgb("102124"),rgb("1d4442"),rgb("152d2f")],430,9)
+    grid(bg,27,rgb("31534f"),242,727)
+    x = np.linspace(-20,560,670)
+    return bg,x,noise(3772,(14,44,101))
+
+
+
 
