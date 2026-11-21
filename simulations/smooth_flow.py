@@ -555,3 +555,7 @@ def scene(state,t):
         tag(im,(30,716),"SECONDARY INSTABILITIES CAN PROMOTE MIXING",rgb("b5cfc4"),13)
     return im
 
+
+
+if __name__ == "__main__":
+    main()
