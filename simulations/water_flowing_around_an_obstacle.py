@@ -2,6 +2,11 @@
 """Render a vertical science Short offline using its supplied narration mix."""
 """
 Output : https://www.youtube.com/shorts/Cdz_iR8NyPk
+
+Narration generated with Sulabh Katiyar’s Indic Tiny TTS (Indian English), trained on the LIMMITS 2024 corpus (SYSPIN project, SPIRE Lab, Indian Institute of Science, Bangalore).
+Model: https://huggingface.co/sulabhkatiyar/indic-tiny-tts-english
+Corpus terms: https://ee.iisc.ac.in/limmitsdataset/SYSPIN-Dataset-Terms.pdf
+CC BY 4.0: https://creativecommons.org/licenses/by/4.0/
 """
 
 import argparse
