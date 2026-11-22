@@ -583,4 +583,8 @@ def scene(state,t):
         if 16<t<28:
             arrow(im,(251,375),(332,388),rgb("f3dfaa"),2)
             tag(im,(186,324),"FASTER AROUND THE SIDE",rgb("f4e6bd"),13)
+        return im
 
+
+if __name__ == "__main__":
+    main()
