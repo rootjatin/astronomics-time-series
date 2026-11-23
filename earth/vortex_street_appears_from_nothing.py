@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python3
 """Render a vertical science Short offline using its supplied narration mix."""
 
@@ -599,3 +598,5 @@ def scene(state,t):
     dot(im,(135,760),3,rgb("7caef7"))
     tag(im,(143,753),"− SPIN",rgb("bad6fa"),13)
     tag(im,(500,753),"Re ≈ 116",rgb("d5d9e9"),14,align="right")
+    return im
+
