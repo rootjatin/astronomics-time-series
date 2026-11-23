@@ -4,6 +4,8 @@
 
 '''
 Sources
+NASA Earth Observatory — Two Views of Von Kármán Vortices — https://science.nasa.gov/earth/earth-observatory/two-views-of-von-karman-vortices-90734/
+Journal of Engineering Mathematics — Potential flow around a circular cylinder, section 2 — https://link.springer.com/article/10.1007/s10665-024-10386-8
 '''
 
 import argparse
