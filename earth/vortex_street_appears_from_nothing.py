@@ -600,3 +600,5 @@ def scene(state,t):
     tag(im,(500,753),"Re ≈ 116",rgb("d5d9e9"),14,align="right")
     return im
 
+if __name__ == "__main__":
+    main()
