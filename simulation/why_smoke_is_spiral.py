@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """Render a vertical science Short offline using its supplied narration mix."""
 # output : https://www.youtube.com/shorts/LG1fNoCANRs
-Sources : 
+'''
 Sources
 International Journal of Thermofluids — Thermal plume flow and evolution — https://www.sciencedirect.com/science/article/pii/S2666123325000467
 Journal of Fluid Mechanics — Shear-layer roll-up and Kelvin–Helmholtz instability, section 8.2 — https://www.cambridge.org/core/journals/journal-of-fluid-mechanics/article/reynolds-number-effects-in-separating-and-reattaching-flows-with-passive-scalar-transport/910384FC3DFA353A612FEEF81FA1A05F
+'''
 import argparse
 from functools import lru_cache
 import math
