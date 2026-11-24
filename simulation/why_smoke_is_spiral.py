@@ -557,3 +557,7 @@ def scene(state,t):
         if t>15:
             arrow(im,(478,342),(348,400),rgb("d9afc7"),1,.14)
         tag(im,(505,754),"BUOYANT PLUME",rgb("f2cddd"),15,align="right")
+
+    return im
+
+
