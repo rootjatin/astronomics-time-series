@@ -527,4 +527,33 @@ def setup():
     lit(bg,.25*stage,rgb("7e647f"))
     return bg,atoms
 
-
+def scene(state,t):
+    bg,(offset,azimuth,rnd,weight)=state
+    im=bg.copy()
+    cycle=(offset+t*.122)%1
+    mature=float(smooth((t-2)/13))
+    y=704-458*cycle
+    bend=31*np.sin(cycle*9-t*.43)*cycle + 18*np.sin(cycle*21+t*.60)*cycle**1.5
+    theta=azimuth+cycle*(16+9*mature)
+    ridge=np.clip(.57+.43*np.sin(3*theta-10*cycle-t*.48),0,1)
+    width=(3+86*cycle**1.37)*(1+.22*np.sin(25*cycle-t*.95)*mature)
+    curl=55*mature*smooth((cycle-.15)/.52)*np.sin(cycle*32-t*.8)
+    x=274+bend+curl+width*np.cos(theta)*(.48+.22*rnd)
+    y+=width*np.sin(theta)*.27 + rnd*2*cycle
+    opacity=(1-cycle)**.51*weight*(.034+.111*mature)*(.50+.67*cycle)
+    opacity*=.41+.62*ridge+.23*np.cos(theta)
+    sprites(im,x-3,y+4,opacity*.53,rgb("ae83b1"),6,.025)
+    sprites(im,x,y,opacity,rgb("d5aeca"),2.3,.07)
+    sprites(im,x+1.3,y-2,opacity*.48,rgb("b397d7"),4.7,.02)
+    lit(im,.17*np.exp(-((XX-273)/47)**2-((YY-722)/17)**2),rgb("e9ae82"))
+    fill(im,[(255,706),(291,706),(305,736),(241,736)],rgb("4b364f"))
+    line(im,(243,735),(303,735),rgb("917082"))
+    ellipse(im,(273,706),(18,4),rgb("b88088"),1)
+    dot(im,(273,704),2,rgb("ffb17d"))
+    if t>7:
+        tag(im,(31,273),"COOL AIR",rgb("ddbed3"),15)
+        target_y=411-41*float(smooth((t-14)/12))
+        arrow(im,(42,311),(193,target_y),rgb("d9afc7"),1,.13)
+        if t>15:
+            arrow(im,(478,342),(348,400),rgb("d9afc7"),1,.14)
+        tag(im,(505,754),"BUOYANT PLUME",rgb("f2cddd"),15,align="right")
